@@ -1,30 +1,35 @@
 package com.agasa.xd_f371_v0_0_1.controller;
 
 import com.agasa.xd_f371_v0_0_1.dto.SoCaiDto;
-import com.agasa.xd_f371_v0_0_1.dto.TonKho;
 import com.agasa.xd_f371_v0_0_1.service.SoCaiService;
-import com.agasa.xd_f371_v0_0_1.service.TonKhoService;
 import com.agasa.xd_f371_v0_0_1.service.impl.SoCaiImp;
-import com.agasa.xd_f371_v0_0_1.service.impl.TonkhoImp;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.print.*;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.text.RandomStringGenerator;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellCopyPolicy;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.*;
 
+import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class ChiTietSCController implements Initializable {
 
     private SoCaiService soCaiService = new SoCaiImp();
     private List<SoCaiDto> ls;
+    @FXML
+    private VBox vb_root;
 
     @FXML
     private TableView<SoCaiDto> tbChiTiet;
@@ -34,11 +39,10 @@ public class ChiTietSCController implements Initializable {
     @FXML
     private Label lb_dvvc, lb_dvn, lb_so, lb_nguoinhan, lb_tungay, lb_denngay, lb_tcn, lb_lenhkh, lb_soxe, lb_sokm, lb_sogio, lb_loaiphieu;
     @FXML
-    private Button exitBtn;
-
-
+    private Button exitBtn, printBtn;
+    private Label jobStatus = new Label();
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    public void initialize(URL url, ResourceBundle resourceBundle){
         addNewImport();
         ls = new ArrayList<>();
         int index_val = 0;
@@ -55,7 +59,140 @@ public class ChiTietSCController implements Initializable {
         exitBtn.setOnAction(actionEvent -> {
             DashboardController.ctStage.close();
         });
+
+
+        printBtn.setOnAction(actionEvent -> {
+            System.out.println("Print ...");
+            String file_name = "baocao.xlsx";
+            try{
+                File file = new File(file_name);
+                XSSFWorkbook wb = null;
+                if (file.exists()) {
+
+                    FileInputStream fileInputStream = new FileInputStream(file);
+                    wb = new XSSFWorkbook(fileInputStream);
+                    new XSSFWorkbook(new FileInputStream(file));
+
+
+                    // Now creating Sheets using sheet object
+                    XSSFSheet sheet1 = wb.getSheet("phieu_nhap");
+
+                    fillDataToPhieuNhap(sheet1, wb);
+                    FileOutputStream fileOutputStream = new FileOutputStream(file_name);
+                    wb.write(fileOutputStream);
+                    fileOutputStream.close();
+                }
+
+
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+
+//            try {
+//                Parent root = FXMLLoader.load(getClass().getResource("../baocaonx.fxml"));
+//                Stage stage = new Stage();
+//                Scene scene = new Scene(root);
+//                stage.setScene(scene);
+//                stage.initStyle(StageStyle.DECORATED);
+//                stage.initModality(Modality.APPLICATION_MODAL);
+//                stage.setTitle("REPORT");
+//                stage.show();
+//
+//
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+
+        });
     }
+
+    private void fillDataToPhieuNhap(XSSFSheet sheet, XSSFWorkbook wb){
+        setCEll(sheet, ls.get(0).getDvi(), 3,3);
+        setCEll(sheet, ls.get(0).getDvvc(), 4,3);
+        setCEll(sheet, ls.get(0).getNhiem_vu(), 5,3);
+        setCEll(sheet, ls.get(0).getTheo_lenh_so(), 6,3);
+        setCEll(sheet, ls.get(0).getNguoi_nhan_hang(), 7,3);
+        setCEll(sheet, "ABC", 8,3);
+        setCEll(sheet, "", 3,10);
+        setCEll(sheet, ls.get(0).getSo_xe(), 4,10);
+
+        setCEll(sheet, ls.get(0).getSo(), 3,7);
+        setCEll(sheet, ls.get(0).getNgay(), 4,7);
+        String generatedString = RandomStringUtils.randomAlphanumeric(5);
+
+        System.out.println(generatedString);
+//        for (int i = 0; i< ls.size()+2; i++) {
+//            addNewRow(sheet);
+//        }
+//        for (int i = 0; i< ls.size()+2; i++) {
+//            int row_num = 12;
+//            setCEll(sheet, String.valueOf(i+1), row_num,1);
+//            setCEll(sheet, ls.get(i).getMa_xd(), row_num,2);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,3);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,4);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,5);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,6);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,7);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,8);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,9);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,10);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,11);
+//                String generatedString = RandomStringUtils.randomAlphanumeric(5);
+//
+//                System.out.println(generatedString);
+//        }for (int i = 0; i< ls.size()+2; i++) {
+//            addNewRow(sheet);
+//        }
+//        for (int i = 0; i< ls.size()+2; i++) {
+//            int row_num = 12;
+//            setCEll(sheet, String.valueOf(i+1), row_num,1);
+//            setCEll(sheet, ls.get(i).getMa_xd(), row_num,2);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,3);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,4);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,5);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,6);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,7);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,8);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,9);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,10);
+//            setCEll(sheet, ls.get(i).getSo(), row_num,11);
+//                String generatedString = RandomStringUtils.randomAlphanumeric(5);
+//
+//                System.out.println(generatedString);
+//        }
+    }
+
+    private void addNewRow(XSSFSheet sheet){
+        int lastRow = sheet.getLastRowNum();
+        sheet.shiftRows(13, lastRow, 1, true, true);
+        sheet.copyRows(13,14,13,new CellCopyPolicy());
+    }
+
+    private void setCEll(XSSFSheet sheet, String value, int row_num, int cell_num){
+        Row row =  sheet.getRow(row_num);
+        Cell cell = row.getCell(cell_num);
+        cell.setCellValue(value);
+    }
+
+
+    private void print(Node node){
+        PrinterJob printerJob = PrinterJob.createPrinterJob();
+        if (printerJob != null && printerJob.showPrintDialog(vb_root.getScene().getWindow())){
+
+            if (printerJob.printPage(node)){
+                printerJob.endJob();
+            }else
+            {
+                System.out.println("print failed");            }
+        }
+        else {
+            System.out.println("could not create a printer job");
+        }
+    }
+
     private void addNewImport(){
         fct_stt.setCellValueFactory(new PropertyValueFactory<SoCaiDto, String>("stt"));
         fct_tenxd.setCellValueFactory(new PropertyValueFactory<SoCaiDto, String>("ten_xd"));

@@ -17,7 +17,7 @@ public class F371Application extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("dashboard2.fxml"));
         Scene scene = new Scene(root);
         stage.setScene(scene);
-        stage.setMaximized(true);
+//        stage.setMaximized(true);
         stage.setTitle("Xăng dầu F371");
         rootStage = stage;
         stage.show();

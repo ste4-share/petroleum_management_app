@@ -28,7 +28,35 @@ public class SoCaiDto {
     private String so_km;
     private String so_gio;
 
+    private String denngay;
+    private String cmt;
+    private String ma_so;
+
     public SoCaiDto() {
+    }
+
+    public String getMa_so() {
+        return ma_so;
+    }
+
+    public void setMa_so(String ma_so) {
+        this.ma_so = ma_so;
+    }
+
+    public String getDenngay() {
+        return denngay;
+    }
+
+    public void setDenngay(String denngay) {
+        this.denngay = denngay;
+    }
+
+    public String getCmt() {
+        return cmt;
+    }
+
+    public void setCmt(String cmt) {
+        this.cmt = cmt;
     }
 
     public Integer getStt() {
