@@ -9,5 +9,9 @@ public interface NguonNXService {
     List<NguonNx> getAll();
     NguonNx create(NguonNx nguonNx);
     NguonNx update(NguonNx nguonNx);
+    NguonNx findById(int id);
     boolean delete_f(String so);
+    List<NguonNx> getAllWithType(String type);
+    NguonNx findNguonNXByName(String name, String loai_tt1);
+    List<NguonNx> nguonLs(List<Integer> id);
 }

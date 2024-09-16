@@ -5,6 +5,13 @@ import com.agasa.xd_f371_v0_0_1.dto.LichsuXNK;
 import com.agasa.xd_f371_v0_0_1.dto.SoCaiDto;
 import com.agasa.xd_f371_v0_0_1.dto.TTPhieuDto;
 import com.agasa.xd_f371_v0_0_1.dto.TonKho;
+import com.agasa.xd_f371_v0_0_1.entity.ChiTietNhiemVu;
+import com.agasa.xd_f371_v0_0_1.entity.DviNvu;
+import com.agasa.xd_f371_v0_0_1.entity.LoaiXangDau;
+import com.agasa.xd_f371_v0_0_1.entity.NguonNx;
+import com.agasa.xd_f371_v0_0_1.model.LoaiNXEnum;
+import com.agasa.xd_f371_v0_0_1.model.TCN;
+import com.agasa.xd_f371_v0_0_1.model.ValidateFiledBol;
 import com.agasa.xd_f371_v0_0_1.service.*;
 import com.agasa.xd_f371_v0_0_1.service.impl.*;
 import javafx.collections.FXCollections;
@@ -18,8 +25,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.InputMethodEvent;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javafx.util.Callback;
+import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 
@@ -36,10 +47,21 @@ public class XuatController implements Initializable {
     private static List<SoCaiDto> ls_socai;
 
     @FXML
-    private TextField fx_dvn, fx_dvvc, fx_so, fx_nguoinhan,fx_tcn,fx_lenhkhso,fx_soxe,
-            fx_sokm, fx_sogio, fx_tenxd,fx_dongia,fx_phaixuat, fx_nhietdothucte,fx_vcf, fx_tytrong,fx_thucxuat;
+    private TextField fx_so, fx_nguoinhan,fx_lenhkhso,fx_soxe,
+            fx_sokm, fx_sogio,fx_phaixuat, fx_nhietdothucte,fx_vcf, fx_tytrong,fx_thucxuat;
     @FXML
     private Button editBtn,addBtn, delBtn, exportBtn,cancelBtn;
+    private static ValidateFiledBol validateFiledBol = new ValidateFiledBol();
+    @FXML
+    private CheckBox ck_kehoach, ck_nhiemvu, ck_khac;
+    @FXML
+    private ComboBox<NguonNx> cbb_dvn, cbb_dvvc;
+    @FXML
+    private ComboBox<LoaiXangDau> cbb_tenxd;
+    @FXML
+    private ComboBox<ChiTietNhiemVu> cbb_tcn;
+    @FXML
+    private ComboBox<String> cbb_dongia;
     @FXML
     private TableView<SoCaiDto> tbXuat;
     @FXML
@@ -48,22 +70,23 @@ public class XuatController implements Initializable {
     private TableColumn<SoCaiDto, String> col_stt, col_tenxd, col_dongia,col_phaixuat,col_nhietdo,col_tytrong,col_vcf,col_thucxuat,col_thanh_tien;
 
     private TonKhoService tonKhoService = new TonkhoImp();
+    private ChiTietNhiemVuService chiTietNhiemVuService = new ChiTietNhiemVuImp();
     private LichsuNXKService lichsuNXKService = new LichsuNXKImp();
     private LoaiXdService loaiXdService = new LoaiXdImp();
     private SoCaiService soCaiService = new SoCaiImp();
+    private DvNvService dvNvService = new DvNvImp();
     private NguonNXService nguonNXService = new NguonNXImp();
-    private AutoCompletionBinding<String> autoCompletionBinding;
-    private Set<String> possibleSuggestions_loaiXd;
-    private Set<String> getPossibleSuggestions_NguonNx;
-
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ls_socai = new ArrayList<>();
-        TextFields.bindAutoCompletion(fx_tenxd, _possibleSuggestion());
-        TextFields.bindAutoCompletion(fx_dvn, _possibleSuggestion_nguonnx());
-        if (click_index == -1 && ls_socai.isEmpty()){
+        setTenXDToCombobox();
+        setDvCombobox(LoaiNXEnum.KHAC.getNameChungloai());
+        ck_khac.setSelected(true);
+        setDvnCombobox(LoaiNXEnum.KHAC.getNameChungloai());
+        if (click_index == -1 || ls_socai.isEmpty()){
             delBtn.setDisable(true);
+            editBtn.setDisable(true);
         }
         tbXuat.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -72,6 +95,7 @@ public class XuatController implements Initializable {
                 click_index = soCaiDto.getStt() - 1;
                 if (click_index != -1 && !ls_socai.isEmpty()){
                     delBtn.setDisable(false);
+                    editBtn.setDisable(false);
                 }
                 fillDataToTextField(soCaiDto);
             }
@@ -155,12 +179,12 @@ public class XuatController implements Initializable {
                     });
                     try {
                         F371Application.rootStage.close();
-                        Stage stage = new Stage();
+
                         Parent root = FXMLLoader.load(getClass().getResource("../dashboard2.fxml"));
                         Scene scene = new Scene(root);
-                        stage.setMaximized(true);
-                        stage.setScene(scene);
-                        stage.show();
+                        F371Application.rootStage.setMaximized(true);
+                        F371Application.rootStage.setScene(scene);
+                        F371Application.rootStage.show();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -177,7 +201,131 @@ public class XuatController implements Initializable {
         cancelBtn.setOnAction(actionEvent -> {
             DashboardController.xuatStage.close();
         });
+        cbb_dvvc.setOnAction(event -> {
+
+        });
+        cbb_tenxd.setOnAction(event -> {
+            setTonKhoCombobox(cbb_tenxd.getValue().getTenxd());
+        });
+        cbb_dvn.setOnAction(event -> {
+            setNhiemVuToCombobox();
+        });
     }
+
+    private void setNhiemVuToCombobox(){
+        cbb_tcn.setConverter(new StringConverter<ChiTietNhiemVu>() {
+            @Override
+            public String toString(ChiTietNhiemVu object) {
+                if (object.getChi_tiet() == null){
+                    return object == null ? "": object.getTen_nv();
+                }
+                return object == null ? "": object.getTen_nv()+  "-"+object.getChi_tiet();
+            }
+            @Override
+            public ChiTietNhiemVu fromString(String str) {
+                if (str.contains("-")){
+                    String[] arrOfStr = str.split("-", 2);
+                    return chiTietNhiemVuService.findByTenNv(arrOfStr[0], arrOfStr[1]);
+                }
+                return chiTietNhiemVuService.findByTenNv(str, "");
+            }
+        });
+        try {
+            List<DviNvu> list_nv =  dvNvService.findByDvId(cbb_dvn.getValue().getId());
+            List<ChiTietNhiemVu> chiTietNhiemVuList = new ArrayList<>();
+            list_nv.forEach(e -> {
+                chiTietNhiemVuList.add(chiTietNhiemVuService.findById(e.getNv_id()));
+            });
+
+            ObservableList<ChiTietNhiemVu> observableArrayList =
+                    FXCollections.observableArrayList(chiTietNhiemVuList);
+            cbb_tcn.setItems(observableArrayList);
+            cbb_dvvc.getSelectionModel().selectFirst();
+        }catch (NullPointerException nullPointerException){
+            System.out.println("null nv");
+        }
+    }
+
+    private void setTenXDToCombobox(){
+        cbb_tenxd.setConverter(new StringConverter<LoaiXangDau>() {
+            @Override
+            public String toString(LoaiXangDau object) {
+                return object == null ? "": object.getTenxd();
+            }
+            @Override
+            public LoaiXangDau fromString(String string) {
+                return loaiXdService.findLoaiXdByID(string);
+            }
+        });
+        cbb_tenxd.getItems().addAll(loaiXdService.getAll());
+    }
+
+    private void setDvCombobox(String type){
+        cbb_dvvc.setConverter(new StringConverter<NguonNx>() {
+            @Override
+            public String toString(NguonNx object) {
+                return object==null ? "" : object.getTen();
+            }
+
+            @Override
+            public NguonNx fromString(String string) {
+                return nguonNXService.findNguonNXByName(string, type);
+            }
+        });
+
+        ObservableList<NguonNx> observableArrayList =
+                FXCollections.observableArrayList(nguonNXService.getAllWithType(type));
+        cbb_dvvc.setItems(observableArrayList);
+        cbb_dvvc.getSelectionModel().select(37);
+    }
+
+    private void setDvnCombobox(String type){
+        cbb_dvn.setConverter(new StringConverter<NguonNx>() {
+            @Override
+            public String toString(NguonNx object) {
+                return object==null ? "" : object.getTen();
+            }
+
+            @Override
+            public NguonNx fromString(String string) {
+                return nguonNXService.findNguonNXByName(string, type);
+            }
+        });
+
+        ObservableList<NguonNx> observableArrayList =
+                FXCollections.observableArrayList(nguonNXService.getAllWithType(type));
+        cbb_dvn.setItems(observableArrayList);
+    }
+
+    private void setTonKhoCombobox(String tenxd){
+        cbb_dongia.setConverter(new StringConverter<String>() {
+            @Override
+            public String toString(String object) {
+                return object == null ? "" : object;
+            }
+            @Override
+            public String fromString(String string) {
+                return string;
+            }
+        });
+
+        List<String> arrls = new ArrayList<>();
+        List<TonKho> tonKho = tonKhoService.findByLoaiXD_nonGia(tenxd);
+        tonKho.forEach(x -> arrls.add(String.valueOf(x.getMucgia())));
+        ObservableList<String> observableArrayList =
+                FXCollections.observableArrayList(arrls);
+        cbb_dongia.setItems(observableArrayList);
+        cbb_dongia.getSelectionModel().selectFirst();
+        if (!tonKho.isEmpty()){
+            fx_phaixuat.setText(String.valueOf(tonKho.get(0).getSoluong()));
+            fx_thucxuat.setText(String.valueOf(tonKho.get(0).getSoluong()));
+        }
+        else {
+            fx_phaixuat.setText("");
+            fx_thucxuat.setText("");
+        }
+    }
+
     private void createNewTonKho(SoCaiDto soCaiDto){
         createNewTransaction(soCaiDto, 0, soCaiDto.getThuc_xuat()*(-1));
         TonKho tonKho = new TonKho();
@@ -223,8 +371,8 @@ public class XuatController implements Initializable {
     }
 
     private void fillDataToTextField(SoCaiDto soCaiDto){
-        fx_tenxd.setText(String.valueOf(soCaiDto.getTen_xd()));
-        fx_dongia.setText(String.valueOf(soCaiDto.getDon_gia()));
+        cbb_tenxd.getSelectionModel().select(soCaiDto.getXd());
+        setTonKhoCombobox(cbb_tenxd.getValue().getTenxd());
         fx_phaixuat.setText(String.valueOf(soCaiDto.getPhai_xuat()));
         fx_thucxuat.setText(String.valueOf(soCaiDto.getThuc_xuat()));
         fx_nhietdothucte.setText(String.valueOf(soCaiDto.getNhiet_do_tt()));
@@ -245,8 +393,6 @@ public class XuatController implements Initializable {
     }
 
     private void clearHH(){
-        fx_tenxd.clear();
-        fx_dongia.clear();
         fx_phaixuat.clear();
         fx_thucxuat.clear();
         fx_nhietdothucte.clear();
@@ -256,40 +402,208 @@ public class XuatController implements Initializable {
 
     private SoCaiDto getDataFromField(){
         SoCaiDto soCaiDto = new SoCaiDto();
-        soCaiDto.setDvi(fx_dvn.getText());
-        soCaiDto.setNgay(tungay.getValue().format(DateTimeFormatter.ofPattern("YYYY-MM-dd")));
-        String str = fx_tenxd.getText();
-        soCaiDto.setTen_xd(str.substring(0, str.indexOf("[")).trim());
+        soCaiDto.setDvi(cbb_dvn.getValue().getTen());
+        soCaiDto.setXd(cbb_tenxd.getValue());
+        soCaiDto.setNgay(tungay.getValue().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+        soCaiDto.setTen_xd(cbb_tenxd.getValue().getTenxd());
         soCaiDto.setLoai_phieu("X");
         soCaiDto.setSo(fx_so.getText());
         soCaiDto.setTheo_lenh_so(fx_lenhkhso.getText());
-        soCaiDto.setNhiem_vu(fx_tcn.getText());
+        soCaiDto.setNhiem_vu(cbb_tcn.getValue().getTen_nv());
         soCaiDto.setNguoi_nhan_hang(fx_nguoinhan.getText());
         soCaiDto.setSo_xe(fx_soxe.getText());
-        soCaiDto.setDon_gia(Integer.parseInt(fx_dongia.getText()));
+        soCaiDto.setDon_gia(Integer.parseInt(cbb_dongia.getValue()));
         soCaiDto.setPhai_xuat(Integer.parseInt(fx_phaixuat.getText()));
         soCaiDto.setThuc_xuat(Integer.parseInt(fx_thucxuat.getText()));
-        soCaiDto.setNhiet_do_tt(Double.parseDouble(fx_nhietdothucte.getText()));
-        soCaiDto.setHe_so_vcf(Integer.parseInt(fx_vcf.getText()));
-        soCaiDto.setTy_trong(Double.parseDouble(fx_tytrong.getText()));
-        soCaiDto.setThanh_tien(Integer.parseInt(fx_thucxuat.getText()) * Integer.parseInt(fx_dongia.getText()));
-        soCaiDto.setDvvc(fx_dvvc.getText());
+        soCaiDto.setNhiet_do_tt(Double.parseDouble(fx_nhietdothucte.getText().isEmpty() ? "" : fx_nhietdothucte.getText()));
+        soCaiDto.setHe_so_vcf(Integer.parseInt(fx_vcf.getText().isEmpty() ? "" : fx_vcf.getText()));
+        soCaiDto.setTy_trong(Double.parseDouble(fx_tytrong.getText().isEmpty() ? "" : fx_tytrong.getText()));
+        soCaiDto.setThanh_tien(Integer.parseInt(fx_thucxuat.getText()) * Integer.parseInt(cbb_dongia.getValue()));
+        soCaiDto.setDvvc(cbb_dvvc.getValue().getTen());
         soCaiDto.setSo_gio(fx_sogio.getText());
         soCaiDto.setSo_km(fx_sokm.getText());
+        soCaiDto.setDenngay(denngay.getValue().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+        soCaiDto.setXd(cbb_tenxd.getValue());
+        soCaiDto.setDvvc_obj(cbb_dvvc.getValue());
+        soCaiDto.setDvn_obj(cbb_dvn.getValue());
+//        soCaiDto.setSscd("YES");
+//        soCaiDto.setSscd(ckb_sscd.isSelected() ? "YES" : "NO");
         return soCaiDto;
     }
 
-    private Set<String> _possibleSuggestion(){
-        List<String> list = new ArrayList<>();
-        loaiXdService.getAll().forEach(x -> list.add(x.getTenxd().trim()+ " ["+x.getChungloai().trim()+"]"));
-        possibleSuggestions_loaiXd = new HashSet<>(list);
-        return possibleSuggestions_loaiXd;
+    @FXML
+    public void setActionDongia(ActionEvent actionEvent) {
+        String dongia = cbb_dongia.getValue();
+        if (dongia != "" || dongia!=null){
+            try {
+
+                List<TonKho> tonKhos = tonKhoService.findByLoaiXD(cbb_tenxd.getValue().getTenxd(), Integer.parseInt(dongia));
+                if (!tonKhos.isEmpty()){
+                    fx_phaixuat.setText(String.valueOf(tonKhos.get(0).getSoluong()));
+                }
+            }
+            catch (NumberFormatException e){
+                System.out.println("null");
+                e.printStackTrace();
+            }
+        }
     }
 
-    private Set<String> _possibleSuggestion_nguonnx() {
-        List<String> list = new ArrayList<>();
-        nguonNXService.getAll().forEach(x -> list.add(x.getTen().trim()));
-        getPossibleSuggestions_NguonNx = new HashSet<>(list);
-        return getPossibleSuggestions_NguonNx;
+    public void ck_khacAction(ActionEvent actionEvent) {
+
+        ck_khac.setSelected(true);
+
+        if (ck_khac.isSelected()){
+            ck_kehoach.setSelected(false);
+            ck_nhiemvu.setSelected(false);
+            setDvnCombobox(LoaiNXEnum.KHAC.getNameChungloai());
+        }
+
+    }
+
+    public void ck_nhiemvuAction(ActionEvent actionEvent) {
+        ck_nhiemvu.setSelected(true);
+        if (ck_nhiemvu.isSelected()){
+            ck_kehoach.setSelected(false);
+            ck_khac.setSelected(false);
+            setDvnCombobox(LoaiNXEnum.NHIEM_VU.getNameChungloai());
+        }
+    }
+
+    public void ck_kehoachAction(ActionEvent actionEvent) {
+        ck_kehoach.setSelected(true);
+        if (ck_kehoach.isSelected()){
+            ck_khac.setSelected(false);
+            ck_nhiemvu.setSelected(false);
+            setDvnCombobox(LoaiNXEnum.KE_HOACH.getNameChungloai());
+        }
+    }
+
+    // validate
+    @FXML
+    public void soValid(KeyEvent keyEvent) {
+        String text = fx_so.getText();
+        if (!text.matches("[0-9]{0,5}")){
+            fx_so.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
+            validateFiledBol.setSo(false);
+        }else {
+            fx_so.setStyle(null);
+            validateFiledBol.setSo(true);
+        }
+    }
+
+
+    public void lenhKHValid(KeyEvent keyEvent) {
+        String text = fx_lenhkhso.getText();
+        if (!text.matches(".{0,50}")){
+            fx_lenhkhso.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
+            validateFiledBol.setLenhso(false);
+        }else{
+            fx_lenhkhso.setStyle(null);
+            validateFiledBol.setLenhso(true);
+        }
+    }
+
+    public void soXeValid(KeyEvent keyEvent) {
+        String text = fx_soxe.getText();
+        if (!text.matches(".{0,8}")){
+            fx_soxe.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
+            validateFiledBol.setSoxe(false);
+        }else{
+            fx_soxe.setStyle(null);
+            validateFiledBol.setSoxe(true);
+        }
+    }
+
+    public void soKmValid(KeyEvent keyEvent) {
+        String text = fx_sokm.getText();
+        if (!text.matches("[0-9]{0,5}")){
+            fx_sokm.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
+            validateFiledBol.setSo(false);
+        }else {
+            fx_sokm.setStyle(null);
+            validateFiledBol.setSo(true);
+        }
+    }
+
+    public void soGioValid(KeyEvent keyEvent) {
+        String text = fx_sogio.getText();
+        if (!text.matches("[^0A-Za-z][0-9\\:]{0,9}")){
+            fx_sogio.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
+            validateFiledBol.setPhaixuat(false);
+        }else{
+            if (text.length()==2){
+                fx_sogio.setText(text+":");
+                fx_sogio.positionCaret(3);
+            }
+            fx_sogio.setStyle(null);
+            validateFiledBol.setPhaixuat(true);
+        }
+    }
+
+    public void phaixuatValid(KeyEvent keyEvent) {
+        String text = fx_phaixuat.getText();
+        if (!text.matches("[^0A-Za-z][0-9]{0,9}")){
+            fx_phaixuat.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
+            validateFiledBol.setPhaixuat(false);
+        }else{
+            fx_phaixuat.setStyle(null);
+            validateFiledBol.setPhaixuat(true);
+        }
+    }
+
+    public void nhietdoValid(KeyEvent keyEvent) {
+        String text = fx_nhietdothucte.getText();
+        if (!text.matches("[^0A-Za-z][0-9]{0,5}")){
+            fx_nhietdothucte.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
+            validateFiledBol.setNhietdo(false);
+        }else{
+            fx_nhietdothucte.setStyle(null);
+            validateFiledBol.setNhietdo(true);
+        }
+    }
+
+    public void vcfValid(KeyEvent keyEvent) {
+        String text = fx_vcf.getText();
+        if (!text.matches("[^0A-Za-z][0-9]{0,5}")){
+            fx_vcf.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
+            validateFiledBol.setVcf(false);
+        }else{
+            fx_vcf.setStyle(null);
+            validateFiledBol.setVcf(true);
+        }
+    }
+
+    public void tyTrongValid(KeyEvent keyEvent) {
+        String text = fx_tytrong.getText();
+        if (!text.matches("[^0A-Za-z][0-9]{0,5}")){
+            fx_tytrong.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
+            validateFiledBol.setTytrong(false);
+        }else{
+            fx_tytrong.setStyle(null);
+            validateFiledBol.setTytrong(true);
+        }
+    }
+
+    public void thucXuatValid(KeyEvent keyEvent) {
+        String text = fx_thucxuat.getText();
+        if (!text.matches("[^0A-Za-z][0-9]{0,9}")){
+            fx_thucxuat.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
+            validateFiledBol.setThucxuat(false);
+        }else{
+            fx_thucxuat.setStyle(null);
+            validateFiledBol.setThucxuat(true);
+        }
+    }
+
+    public void tfnguoinhanValid(KeyEvent keyEvent) {
+        String text = fx_nguoinhan.getText();
+        if (!text.matches(".{0,50}")){
+            fx_nguoinhan.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
+            validateFiledBol.setSoxe(false);
+        }else{
+            fx_nguoinhan.setStyle(null);
+            validateFiledBol.setSoxe(true);
+        }
     }
 }

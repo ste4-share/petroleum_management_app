@@ -23,6 +23,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -39,7 +43,13 @@ public class DashboardController implements Initializable {
     public static Stage xuatStage;
     public static Stage ctStage;
     public static String so_clicked;
+    private static int before_click_ind;
+    private static int click_ind = 1;
 
+    @FXML
+    private BorderPane borderpane_base;
+    @FXML
+    private HBox nxt_hbox;
     @FXML
     public TableView<TonKho> tb_tonkho;
     @FXML
@@ -56,23 +66,40 @@ public class DashboardController implements Initializable {
     @FXML
     public TableView<TTPhieuModel> tbTTNX;
     @FXML
-    private TableColumn<TTPhieuModel, String> so, loaiphieu, dvvc, tcnhap, hanghoa;
+    private TableColumn<TTPhieuModel, String> so,ngaytao, loaiphieu, hanghoa;
     @FXML
     private TableColumn<TTPhieuModel, String> tong;
     @FXML
     private SoCaiService soCaiService = new SoCaiImp();
-    ObservableList<TTPhieuModel> initialData(){
-        return FXCollections.observableArrayList();
-    }
-
     private LichsuNXKService lichsuNXKService = new LichsuNXKImp();
     private TonKhoService tonKhoService = new TonkhoImp();
     private List<TonKho> tkls;
 
+
+    @FXML
+    private HBox dvi_menu,nxt_menu, loai_xd_menu, haohut_menu, dinhmuc_menu;
+    @FXML
+    private AnchorPane main_menu;
+
+
+
+    ObservableList<TTPhieuModel> initialData(){
+        return FXCollections.observableArrayList();
+    }
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         tkls = new ArrayList<>();
         int index = 0;
+        String cssLayout1 =
+                "-fx-border-color: #aaaaaa;\n" +
+                        "-fx-background-color: #aaaaaa;\n" ;
+        nxt_menu.setStyle(cssLayout1
+        );
+        dvi_menu.setStyle(resetStyle());
+        loai_xd_menu.setStyle(resetStyle());
+        haohut_menu.setStyle(resetStyle());
+        dinhmuc_menu.setStyle(resetStyle());
+
 
         List<TonKho> tonKhoList = tonKhoService.getAll();
         for (TonKho tonKho : tonKhoList) {
@@ -95,31 +122,49 @@ public class DashboardController implements Initializable {
         setColLichSuNXK();
         tb_viewlichsu.setItems(FXCollections.observableArrayList(lichsuXNKS));
         tbTTNX.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
             @Override
             public void handle(MouseEvent event) {
-                try {
-                    TTPhieuModel ttPhieuModel =  tbTTNX.getSelectionModel().getSelectedItem();
-                    so_clicked = ttPhieuModel.getSo();
-                    System.out.println("so :" +so_clicked);
-                    Parent root = null;
+
+                if (click_ind ==2){
                     try {
-                        root = FXMLLoader.load(getClass().getResource("../chitietsc.fxml"));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        TTPhieuModel ttPhieuModel =  tbTTNX.getSelectionModel().getSelectedItem();
+
+                        so_clicked = ttPhieuModel.getSo();
+                        System.out.println("so :" +so_clicked);
+                        Parent root = null;
+                        try {
+                            root = FXMLLoader.load(getClass().getResource("../chitietsc.fxml"));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+
+                        click_ind=1;
+                        ctStage = new Stage();
+                        Scene scene = new Scene(root);
+                        ctStage.setScene(scene);
+                        ctStage.initStyle(StageStyle.DECORATED);
+                        ctStage.initModality(Modality.APPLICATION_MODAL);
+                        ctStage.setTitle("CHI TIẾT");
+                        ctStage.show();
+                    }catch (NullPointerException e){
+                        System.out.println("----so is null----");
+                        e.printStackTrace();
                     }
-                    ctStage = new Stage();
-                    Scene scene = new Scene(root);
-                    ctStage.setScene(scene);
-                    ctStage.initStyle(StageStyle.DECORATED);
-                    ctStage.initModality(Modality.APPLICATION_MODAL);
-                    ctStage.setTitle("CHI TIẾT");
-                    ctStage.show();
-                }catch (NullPointerException e){
-                    e.printStackTrace();
+                }else {
+                    click_ind= click_ind+1;
                 }
+
             }
         });
 
+        String cssLayout =
+                "-fx-border-insets: 5;\n" +
+                "-fx-background-color: #262626;\n" +
+                "-fx-background-radius: 0 150 0 0;\n" ;
+
+        main_menu.setStyle(cssLayout);
     }
 
     private void setTonkhoList(){
@@ -148,7 +193,7 @@ public class DashboardController implements Initializable {
         List<TTPhieuDto> ttPhieuDtoList = soCaiService.getTTPhieu();
         List<TTPhieuModel> ttPhieuModelList = new ArrayList<>();
 
-        ttPhieuDtoList.forEach(item -> ttPhieuModelList.add(new TTPhieuModel(item.getSo(), item.getLoai_phieu(), item.getDvn(), item.getDvvc(),item.getTcn(),item.getHang_hoa(),String.valueOf(item.getTong()))));
+        ttPhieuDtoList.forEach(item -> ttPhieuModelList.add(new TTPhieuModel(item.getSo(),item.getNgaytao(), item.getLoai_phieu(), item.getDvn(), item.getDvvc(),item.getTcn(),item.getHang_hoa(),String.valueOf(item.getTong()))));
         tbTTNX.setItems(FXCollections.observableArrayList(ttPhieuModelList));
     }
 
@@ -175,8 +220,7 @@ public class DashboardController implements Initializable {
     private void setCellVal_TTNX_Refresh(){
         so.setCellValueFactory(item -> new SimpleStringProperty(item.getValue().getSo()));
         loaiphieu.setCellValueFactory(item -> new SimpleStringProperty(item.getValue().getLoai_phieu()));
-        dvvc.setCellValueFactory(item -> new SimpleStringProperty(item.getValue().getDvvc()));
-        tcnhap.setCellValueFactory(item -> new SimpleStringProperty(item.getValue().getTcn()));
+        ngaytao.setCellValueFactory(item -> new SimpleStringProperty(item.getValue().getNgaytao()));
         hanghoa.setCellValueFactory(item -> new SimpleStringProperty(item.getValue().getHang_hoa()));
         tong.setCellValueFactory(item -> new SimpleStringProperty(item.getValue().getTong()));
     }
@@ -191,14 +235,10 @@ public class DashboardController implements Initializable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-//        tbTTNX.getItems().addAll(soCaiService.getTTPhieu());
-//        tbTTNX.setItems(FXCollections.observableArrayList(soCaiService.getTTPhieu()));
-//        tbTTNX.getItems().addAll(soCaiService.getTTPhieu());
-//        tbTTNX.setItems(FXCollections.observableArrayList(soCaiService.getTTPhieu()));
         List<TTPhieuDto> ttPhieuDtoList = soCaiService.getTTPhieu();
         List<TTPhieuModel> ttPhieuModelList = new ArrayList<>();
 
-        ttPhieuDtoList.forEach(item -> ttPhieuModelList.add(new TTPhieuModel(item.getSo(), item.getLoai_phieu(), item.getDvn(), item.getDvvc(),item.getTcn(),item.getHang_hoa(),String.valueOf(item.getTong()))));
+        ttPhieuDtoList.forEach(item -> ttPhieuModelList.add(new TTPhieuModel(item.getSo(),item.getNgaytao(), item.getLoai_phieu(), item.getDvn(), item.getDvvc(),item.getTcn(),item.getHang_hoa(),String.valueOf(item.getTong()))));
         ObservableList<TTPhieuModel> observableList = FXCollections.observableArrayList(ttPhieuModelList);
         tbTTNX.setItems(FXCollections.observableArrayList(ttPhieuModelList));
 
@@ -216,4 +256,76 @@ public class DashboardController implements Initializable {
         xuatStage.show();
     }
 
+    @FXML
+    public void nxt_menu_action(MouseEvent event) {
+        String cssLayout =
+                "-fx-border-color: #aaaaaa;\n" +
+                "-fx-background-color: #aaaaaa;\n" ;
+        nxt_menu.setStyle(cssLayout);
+        dvi_menu.setStyle(resetStyle());
+        loai_xd_menu.setStyle(resetStyle());
+        haohut_menu.setStyle(resetStyle());
+        dinhmuc_menu.setStyle(resetStyle());
+
+        borderpane_base.setCenter(nxt_hbox);
+    }
+
+    @FXML
+    public void dvi_menu_action(MouseEvent event) {
+        String cssLayout =
+                "-fx-border-color: #aaaaaa;\n" +
+                "-fx-background-color: #aaaaaa;\n" ;
+        dvi_menu.setStyle(cssLayout);
+        loai_xd_menu.setStyle(resetStyle());
+        haohut_menu.setStyle(resetStyle());
+        dinhmuc_menu.setStyle(resetStyle());
+        nxt_menu.setStyle(resetStyle());
+
+
+        Label label = new Label("Dvi clicked");
+        borderpane_base.setCenter(label);
+    }
+
+    @FXML
+    public void lxd_menu_action(MouseEvent event) {
+        String cssLayout =
+                "-fx-border-color: #aaaaaa;\n" +
+                        "-fx-background-color: #aaaaaa;\n" ;
+        loai_xd_menu.setStyle(cssLayout);
+        dvi_menu.setStyle(resetStyle());
+        haohut_menu.setStyle(resetStyle());
+        dinhmuc_menu.setStyle(resetStyle());
+        nxt_menu.setStyle(resetStyle());
+    }
+
+    @FXML
+    public void haohut_menu_action(MouseEvent event) {
+        String cssLayout =
+                "-fx-border-color: #aaaaaa;\n" +
+                        "-fx-background-color: #aaaaaa;\n" ;
+        haohut_menu.setStyle(cssLayout);
+        dvi_menu.setStyle(resetStyle());
+        loai_xd_menu.setStyle(resetStyle());
+        dinhmuc_menu.setStyle(resetStyle());
+        nxt_menu.setStyle(resetStyle());
+    }
+
+    @FXML
+    public void dinhmuc_menu_action(MouseEvent event) {
+        String cssLayout =
+                "-fx-border-color: #aaaaaa;\n" +
+                        "-fx-background-color: #aaaaaa;\n" ;
+        dinhmuc_menu.setStyle(cssLayout);
+        dvi_menu.setStyle(resetStyle());
+        haohut_menu.setStyle(resetStyle());
+        loai_xd_menu.setStyle(resetStyle());
+        nxt_menu.setStyle(resetStyle());
+    }
+
+    private String resetStyle(){
+        String cssLayout =
+                "-fx-cursor: hand;\n" +
+                        "-fx-background-color: #262626;\n" ;
+        return cssLayout;
+    }
 }

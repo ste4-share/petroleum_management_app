@@ -5,11 +5,20 @@ public class TTPhieuDto {
     private String loai_phieu;
     private String dvn;
     private String dvvc;
+    private String ngaytao;
     private String tcn;
     private String hang_hoa;
     private int tong;
 
     public TTPhieuDto() {
+    }
+
+    public String getNgaytao() {
+        return ngaytao;
+    }
+
+    public void setNgaytao(String ngaytao) {
+        this.ngaytao = ngaytao;
     }
 
     public String getSo() {

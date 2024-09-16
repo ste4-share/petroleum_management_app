@@ -74,18 +74,21 @@
       <artifactId>spring-core</artifactId>
       <version>5.2.3.RELEASE</version>
     </dependency>
-
-
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi</artifactId>
       <version>5.2.2</version>
     </dependency>
-
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
       <version>5.2.2</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.itextpdf/itextpdf -->
+    <dependency>
+      <groupId>com.itextpdf</groupId>
+      <artifactId>itextpdf</artifactId>
+      <version>5.5.13.3</version>
     </dependency>
 
     <dependency>
@@ -192,10 +195,6 @@
     </dependency>
 
   </dependencies>
-
-
-
-
 
 
   <build>

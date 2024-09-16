@@ -11,9 +11,11 @@ public class TTPhieuModel {
     private final StringProperty tcn= new SimpleStringProperty();
     private final StringProperty hang_hoa= new SimpleStringProperty();
     private final StringProperty tong= new SimpleStringProperty();
+    private final StringProperty ngaytao= new SimpleStringProperty();
 
-    public TTPhieuModel(String so2, String lp, String dvn1, String dvvc1, String tcn1, String hanghoa1, String tong1){
+    public TTPhieuModel(String so2,String ngaytao2, String lp, String dvn1, String dvvc1, String tcn1, String hanghoa1, String tong1){
         so.set(so2);
+        ngaytao.set(ngaytao2);
         loai_phieu.set(lp);
         dvn.set(dvn1);
         dvvc.set(dvvc1);
@@ -31,6 +33,13 @@ public class TTPhieuModel {
 
     public StringProperty soProperty() {
         return so;
+    }
+
+    public String getNgaytao() {
+        return ngaytao.get();
+    }
+    public StringProperty ngaytaoProperty() {
+        return ngaytao;
     }
 
     public String getLoai_phieu() {

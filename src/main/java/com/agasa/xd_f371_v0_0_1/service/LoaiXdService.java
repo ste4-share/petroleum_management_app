@@ -9,4 +9,5 @@ public interface LoaiXdService {
     LoaiXangDau create(LoaiXangDau importDto);
     LoaiXangDau update(LoaiXangDau importDto);
     boolean delete_f(String so);
+    LoaiXangDau findLoaiXdByID(String tenxd);
 }

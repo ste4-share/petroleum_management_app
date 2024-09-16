@@ -2,6 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
@@ -40,6 +42,29 @@
                <children>
                   <VBox prefHeight="491.0" prefWidth="523.0">
                      <children>
+                        <HBox layoutX="10.0" layoutY="10.0" prefHeight="40.0" prefWidth="523.0">
+                           <children>
+                              <Label prefHeight="40.0" prefWidth="197.0" text="Loại xuất:">
+                                 <font>
+                                    <Font size="16.0" />
+                                 </font>
+                              </Label>
+                              <CheckBox fx:id="ck_kehoach" mnemonicParsing="false" onAction="#ck_kehoachAction" prefHeight="40.0" prefWidth="97.0" text="Kế hoạch" />
+                              <CheckBox fx:id="ck_nhiemvu" layoutX="207.0" layoutY="10.0" mnemonicParsing="false" onAction="#ck_nhiemvuAction" prefHeight="40.0" prefWidth="97.0" text="Nhiệm vụ">
+                                 <HBox.margin>
+                                    <Insets left="10.0" />
+                                 </HBox.margin>
+                              </CheckBox>
+                              <CheckBox fx:id="ck_khac" layoutX="304.0" layoutY="10.0" mnemonicParsing="false" onAction="#ck_khacAction" prefHeight="40.0" prefWidth="97.0" text="Khác">
+                                 <HBox.margin>
+                                    <Insets left="10.0" />
+                                 </HBox.margin>
+                              </CheckBox>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
+                        </HBox>
                         <HBox prefHeight="40.0" prefWidth="523.0">
                            <children>
                               <Label prefHeight="40.0" prefWidth="197.0" text="Đơn vị nhận:">
@@ -47,7 +72,7 @@
                                     <Font size="16.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="fx_dvn" prefHeight="40.0" prefWidth="327.0" />
+                              <ComboBox fx:id="cbb_dvn" prefHeight="40.0" prefWidth="326.0" style="-fx-background-color: #ffffff; -fx-border-color: #a8a8a8;" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="10.0" />
@@ -60,7 +85,7 @@
                                     <Font size="16.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="fx_dvvc" prefHeight="40.0" prefWidth="327.0" />
+                              <ComboBox fx:id="cbb_dvvc" prefHeight="40.0" prefWidth="326.0" style="-fx-background-color: #ffffff; -fx-border-color: #a8a8a8;" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="10.0" />
@@ -73,7 +98,7 @@
                                     <Font size="16.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="fx_so" prefHeight="40.0" prefWidth="327.0" />
+                              <TextField fx:id="fx_so" onKeyReleased="#soValid" prefHeight="40.0" prefWidth="327.0" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="10.0" />
@@ -86,7 +111,7 @@
                                     <Font size="16.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="fx_nguoinhan" prefHeight="40.0" prefWidth="327.0" />
+                              <TextField fx:id="fx_nguoinhan" onKeyReleased="#tfnguoinhanValid" prefHeight="40.0" prefWidth="327.0" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="10.0" />
@@ -99,7 +124,7 @@
                                     <Font size="16.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="fx_tcn" prefHeight="40.0" prefWidth="327.0" />
+                              <ComboBox fx:id="cbb_tcn" prefHeight="40.0" prefWidth="326.0" style="-fx-background-color: #ffffff; -fx-border-color: #a8a8a8;" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="10.0" />
@@ -112,7 +137,7 @@
                                     <Font size="16.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="fx_lenhkhso" prefHeight="40.0" prefWidth="327.0" />
+                              <TextField fx:id="fx_lenhkhso" onKeyReleased="#lenhKHValid" prefHeight="40.0" prefWidth="327.0" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="10.0" />
@@ -125,7 +150,7 @@
                                     <Font size="16.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="fx_soxe" prefHeight="40.0" prefWidth="327.0" />
+                              <TextField fx:id="fx_soxe" onKeyReleased="#soXeValid" prefHeight="40.0" prefWidth="327.0" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="10.0" />
@@ -138,7 +163,7 @@
                                     <Font size="16.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="fx_sokm" prefHeight="40.0" prefWidth="327.0" />
+                              <TextField fx:id="fx_sokm" onKeyReleased="#soKmValid" prefHeight="40.0" prefWidth="177.0" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="10.0" />
@@ -151,7 +176,7 @@
                                     <Font size="16.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="fx_sogio" prefHeight="40.0" prefWidth="327.0" />
+                              <TextField fx:id="fx_sogio" onKeyReleased="#soGioValid" prefHeight="40.0" prefWidth="178.0" />
                            </children>
                         </HBox>
                      </children>
@@ -168,7 +193,7 @@
                                     <Font size="16.0" />
                                  </font>
                               </Label>
-                              <DatePicker fx:id="tungay" prefHeight="40.0" prefWidth="155.0" />
+                              <DatePicker fx:id="tungay" editable="false" prefHeight="40.0" prefWidth="155.0" />
                               <Label layoutX="10.0" layoutY="10.0" prefHeight="38.0" prefWidth="97.0" text="Đến ngày:">
                                  <font>
                                     <Font size="16.0" />
@@ -177,7 +202,7 @@
                                     <Insets left="20.0" />
                                  </HBox.margin>
                               </Label>
-                              <DatePicker fx:id="denngay" layoutX="107.0" layoutY="10.0" prefHeight="40.0" prefWidth="155.0" />
+                              <DatePicker fx:id="denngay" editable="false" layoutX="107.0" layoutY="10.0" prefHeight="40.0" prefWidth="155.0" />
                            </children>
                         </HBox>
                         <HBox prefHeight="40.0" prefWidth="523.0">
@@ -187,7 +212,7 @@
                                     <Font size="16.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="fx_tenxd" prefHeight="40.0" prefWidth="327.0" />
+                              <ComboBox fx:id="cbb_tenxd" prefHeight="40.0" prefWidth="326.0" style="-fx-background-color: #ffffff; -fx-border-color: #a8a8a8;" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="10.0" top="10.0" />
@@ -200,7 +225,7 @@
                                     <Font size="16.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="fx_dongia" prefHeight="40.0" prefWidth="327.0" />
+                              <ComboBox fx:id="cbb_dongia" editable="true" onAction="#setActionDongia" prefHeight="40.0" prefWidth="327.0" style="-fx-background-color: #ffffff; -fx-border-color: #a8a8a8;" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="10.0" />
@@ -216,7 +241,7 @@
                                     <Insets />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="fx_phaixuat" prefHeight="40.0" prefWidth="327.0" />
+                              <TextField fx:id="fx_phaixuat" onKeyReleased="#phaixuatValid" prefHeight="40.0" prefWidth="327.0" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="10.0" />
@@ -232,7 +257,7 @@
                                     <Insets />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="fx_nhietdothucte" prefHeight="40.0" prefWidth="327.0" />
+                              <TextField fx:id="fx_nhietdothucte" onKeyReleased="#nhietdoValid" prefHeight="40.0" prefWidth="327.0" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="10.0" />
@@ -248,7 +273,7 @@
                                     <Insets />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="fx_vcf" prefHeight="40.0" prefWidth="327.0" />
+                              <TextField fx:id="fx_vcf" onKeyReleased="#vcfValid" prefHeight="40.0" prefWidth="327.0" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="10.0" />
@@ -264,7 +289,7 @@
                                     <Insets />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="fx_tytrong" prefHeight="40.0" prefWidth="327.0" />
+                              <TextField fx:id="fx_tytrong" onKeyReleased="#tyTrongValid" prefHeight="40.0" prefWidth="327.0" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="10.0" />
@@ -280,7 +305,7 @@
                                     <Insets />
                                  </HBox.margin>
                               </Label>
-                              <TextField fx:id="fx_thucxuat" prefHeight="40.0" prefWidth="327.0" />
+                              <TextField fx:id="fx_thucxuat" onKeyReleased="#thucXuatValid" prefHeight="40.0" prefWidth="327.0" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_RIGHT" prefHeight="89.0" prefWidth="522.0">
@@ -331,10 +356,10 @@
          <children>
             <TableView fx:id="tbXuat" prefHeight="200.0" prefWidth="200.0">
               <columns>
-                <TableColumn fx:id="col_stt" prefWidth="75.0" text="STT" />
-                <TableColumn fx:id="col_tenxd" prefWidth="130.0" text="TÊN XĂNG DẦU" />
-                  <TableColumn fx:id="col_dongia" prefWidth="82.0" text="ĐƠN GIÁ" />
-                  <TableColumn prefWidth="640.0" text="SỐ LƯỢNG">
+                <TableColumn fx:id="col_stt" prefWidth="49.0" text="STT" />
+                <TableColumn fx:id="col_tenxd" prefWidth="156.0" text="TÊN XĂNG DẦU" />
+                  <TableColumn fx:id="col_dongia" prefWidth="134.0" text="ĐƠN GIÁ" />
+                  <TableColumn prefWidth="598.0" text="SỐ LƯỢNG">
                      <columns>
                         <TableColumn fx:id="col_phaixuat" prefWidth="130.0" text="Phái xuất" />
                         <TableColumn fx:id="col_nhietdo" prefWidth="130.0" text="Nhiệt độ" />

@@ -11,4 +11,5 @@ public interface TonKhoService {
     void delete(TonKho tonKho);
     List<TonKho> findByLoaiXD(String loaixd, int mucgia);
     List<TonKho> getTongKho();
+    List<TonKho> findByLoaiXD_nonGia(String loaixd1);
 }

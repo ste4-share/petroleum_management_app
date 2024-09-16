@@ -89,8 +89,9 @@ public class SoCaiImp implements SoCaiService {
     public SoCaiDto create(SoCaiDto soCaiDto) {
         QDatabase.getConnectionDB();
         String sql = "INSERT INTO so_cai (dvi, ngay, ma_xd, ten_xd, chung_loai, loai_phieu, so, theo_lenh_so, nhiem_vu, nguoi_nhan_hang, " +
-                "so_xe, chat_luong, phai_xuat, nhiet_do_tt, ty_trong, he_so_vcf, thuc_xuat, don_gia, thanh_tien, so_km, so_gio,dvvc) " +
-                "VALUES (?, ?, ?,?, ?, ?,?, ?, ?,?, ?, ?,?, ?, ?,?, ?, ?,?, ?,?,?)";
+                "so_xe, chat_luong, phai_xuat, nhiet_do_tt, ty_trong, he_so_vcf, thuc_xuat, don_gia, thanh_tien, so_km, so_gio, dvvc," +
+                "loaixd_id, nguonnx_id, cmt, nguonnx_dvvc_id, sscd, denngay) " +
+                "VALUES (?,?, ?, ?,?, ?, ?,?, ?, ?,?, ?, ?,?, ?, ?,?, ?, ?,?, ?,?,?,?,?,?,?,?)";
         try {
 
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
@@ -114,8 +115,15 @@ public class SoCaiImp implements SoCaiService {
             statement.setDouble(18, soCaiDto.getDon_gia());
             statement.setDouble(19, soCaiDto.getThanh_tien());
             statement.setInt(20, Integer.parseInt(soCaiDto.getSo_km()));
-            statement.setInt(21, Integer.parseInt(soCaiDto.getSo_gio()));
+            statement.setString(21,soCaiDto.getSo_gio());
             statement.setString(22, soCaiDto.getDvvc());
+            statement.setInt(23, soCaiDto.getXd().getId());
+            statement.setInt(24, soCaiDto.getDvn_obj().getId());
+            statement.setString(25, soCaiDto.getCmt());
+            statement.setInt(26, soCaiDto.getDvvc_obj().getId());
+            statement.setString(27, soCaiDto.getSscd());
+            statement.setString(28, soCaiDto.getDenngay());
+
             statement.executeUpdate();
             System.out.println("Record created.");
         } catch (SQLException e) {
@@ -139,7 +147,7 @@ public class SoCaiImp implements SoCaiService {
         QDatabase.getConnectionDB();
         List<TTPhieuDto> result = new ArrayList<>();
 
-        String SQL_SELECT = "select so, loai_phieu, dvi,dvvc,nhiem_vu, string_agg(ten_xd, ', '),count(loai_phieu), SUM(thuc_xuat*don_gia) from so_cai group by so, loai_phieu, dvi, dvvc, nhiem_vu";
+        String SQL_SELECT = "select so,ngay, loai_phieu, dvi,dvvc,nhiem_vu, string_agg(ten_xd, ', '),count(loai_phieu), SUM(thuc_xuat*don_gia) from so_cai group by so,ngay, loai_phieu, dvi, dvvc, nhiem_vu;";
 
         // auto close connection and preparedStatement
         try {
@@ -149,6 +157,7 @@ public class SoCaiImp implements SoCaiService {
             while (resultSet.next()) {
 
                 String so = resultSet.getString("so");
+                String ngaytao = resultSet.getString("ngay");
                 String loai_phieu = resultSet.getString("loai_phieu");
                 String dvi = resultSet.getString("dvi");
                 String dvvc = resultSet.getString("dvvc");
@@ -162,6 +171,7 @@ public class SoCaiImp implements SoCaiService {
                 obj.setLoai_phieu(loai_phieu);
                 obj.setSo(so);
                 obj.setTcn(nhiem_vu);
+                obj.setNgaytao(ngaytao);
                 obj.setTong(tong);
                 result.add(obj);
             }

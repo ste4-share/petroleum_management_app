@@ -1,6 +1,7 @@
 package com.agasa.xd_f371_v0_0_1.service.impl;
 
 import com.agasa.xd_f371_v0_0_1.entity.LoaiXangDau;
+import com.agasa.xd_f371_v0_0_1.entity.NguonNx;
 import com.agasa.xd_f371_v0_0_1.model.QDatabase;
 import com.agasa.xd_f371_v0_0_1.service.LoaiXdService;
 
@@ -64,5 +65,38 @@ public class LoaiXdImp implements LoaiXdService {
     @Override
     public boolean delete_f(String so) {
         return false;
+    }
+
+    @Override
+    public LoaiXangDau findLoaiXdByID(String tenxd1) {
+        QDatabase.getConnectionDB();
+        LoaiXangDau result = new LoaiXangDau();
+
+        String SQL_SELECT = "select * from loai_xd where tenxd=?";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setString(1, tenxd1);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String maxd = resultSet.getString("maxd");
+                String tenxd = resultSet.getString("tenxd");
+                String chungloai = resultSet.getString("chungloai");
+                Date createtime = resultSet.getDate("createtime");
+                String status = resultSet.getString("status");
+
+                result.setId(id);
+                result.setChungloai(chungloai);
+                result.setCreatetime(createtime);
+                result.setTenxd(tenxd);
+                result.setMaxd(maxd);
+                result.setStatus(status);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }

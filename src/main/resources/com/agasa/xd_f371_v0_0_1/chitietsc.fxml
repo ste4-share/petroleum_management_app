@@ -42,6 +42,9 @@
                            <font>
                               <Font size="14.0" />
                            </font>
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
                         </Label>
                         <Label fx:id="lb_dvvc" prefHeight="40.0" prefWidth="345.0" text="Đơn vị nhập">
                            <font>
@@ -69,6 +72,9 @@
                            </font>
                         </Label>
                      </children>
+                     <VBox.margin>
+                        <Insets top="20.0" />
+                     </VBox.margin>
                   </HBox>
                   <HBox layoutX="10.0" layoutY="10.0" prefHeight="40.0" prefWidth="535.0">
                      <children>
@@ -76,6 +82,9 @@
                            <font>
                               <Font size="14.0" />
                            </font>
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
                         </Label>
                         <Label fx:id="lb_dvn" prefHeight="40.0" prefWidth="345.0" text="Đơn vị nhập">
                            <font>
@@ -100,6 +109,9 @@
                            <font>
                               <Font size="14.0" />
                            </font>
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
                         </Label>
                         <Label fx:id="lb_so" prefHeight="40.0" prefWidth="345.0" text="Đơn vị nhập">
                            <font>
@@ -124,6 +136,9 @@
                            <font>
                               <Font size="14.0" />
                            </font>
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
                         </Label>
                         <Label fx:id="lb_nguoinhan" prefHeight="40.0" prefWidth="345.0" text="Đơn vị nhập">
                            <font>
@@ -148,6 +163,9 @@
                            <font>
                               <Font size="14.0" />
                            </font>
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
                         </Label>
                         <Label fx:id="lb_loaiphieu" layoutX="10.0" layoutY="10.0" prefHeight="40.0" prefWidth="345.0" text="nhap">
                            <font>
@@ -168,17 +186,15 @@
                   </HBox>
                   <HBox prefHeight="40.0" prefWidth="535.0">
                      <children>
-                        <Label prefHeight="40.0" prefWidth="530.0">
-                           <font>
-                              <Font name="System Bold" size="14.0" />
-                           </font>
-                        </Label>
                         <Label prefHeight="40.0" prefWidth="185.0" text="Số giờ:">
                            <font>
                               <Font size="14.0" />
                            </font>
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
                         </Label>
-                        <Label fx:id="lb_sogio" prefHeight="40.0" prefWidth="280.0" text="Đơn vị nhập">
+                        <Label fx:id="lb_sogio" prefHeight="40.0" prefWidth="345.0" text="Đơn vị nhập">
                            <font>
                               <Font name="DejaVu Serif Bold" size="13.0" />
                            </font>
@@ -228,6 +244,9 @@
                </children>
             </HBox>
          </children>
+         <padding>
+            <Insets left="10.0" right="10.0" />
+         </padding>
       </VBox>
    </bottom>
 </BorderPane>

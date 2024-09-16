@@ -102,13 +102,51 @@ public class TonkhoImp implements TonKhoService {
         List<TonKho> result = new ArrayList<>();
 
 
-        String SQL_SELECT = "Select * from tonkho where loai_xd=? and mucgia=?";
+        String SQL_SELECT = "Select * from tonkho where loai_xd=? and mucgia=? and soluong>=0";
 
         // auto close connection and preparedStatement
         try {
             PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
             preparedStatement.setString(1, loaixd1);
             preparedStatement.setInt(2, mucgia1);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                int id = resultSet.getInt("id");
+                String loaiXd = resultSet.getString("loai_xd");
+                int soluong = resultSet.getInt("soluong");
+                int mucgia = resultSet.getInt("mucgia");
+                String createtime = resultSet.getString("createtime");
+                String status = resultSet.getString("status");
+                TonKho obj = new TonKho();
+                obj.setId(id);
+                obj.setLoai_xd(loaiXd);
+                obj.setCreatetime(createtime);
+                obj.setSoluong(soluong);
+                obj.setStatus(status);
+                obj.setMucgia(mucgia);
+                result.add(obj);
+            }
+
+        } catch (SQLException e) {
+            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @Override
+    public List<TonKho> findByLoaiXD_nonGia(String loaixd1) {
+        QDatabase.getConnectionDB();
+        List<TonKho> result = new ArrayList<>();
+
+        String SQL_SELECT = "Select * from tonkho where loai_xd=? and soluong>=0";
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setString(1, loaixd1);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {

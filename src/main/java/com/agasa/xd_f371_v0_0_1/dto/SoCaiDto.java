@@ -1,5 +1,8 @@
 package com.agasa.xd_f371_v0_0_1.dto;
 
+import com.agasa.xd_f371_v0_0_1.entity.LoaiXangDau;
+import com.agasa.xd_f371_v0_0_1.entity.NguonNx;
+
 import java.util.Date;
 
 public class SoCaiDto {
@@ -31,8 +34,44 @@ public class SoCaiDto {
     private String denngay;
     private String cmt;
     private String ma_so;
+    private LoaiXangDau xd;
+    private NguonNx dvvc_obj;
+    private NguonNx dvn_obj;
+    private String sscd;
 
     public SoCaiDto() {
+    }
+
+    public String getSscd() {
+        return sscd;
+    }
+
+    public void setSscd(String sscd) {
+        this.sscd = sscd;
+    }
+
+    public LoaiXangDau getXd() {
+        return xd;
+    }
+
+    public void setXd(LoaiXangDau xd) {
+        this.xd = xd;
+    }
+
+    public NguonNx getDvvc_obj() {
+        return dvvc_obj;
+    }
+
+    public void setDvvc_obj(NguonNx dvvc_obj) {
+        this.dvvc_obj = dvvc_obj;
+    }
+
+    public NguonNx getDvn_obj() {
+        return dvn_obj;
+    }
+
+    public void setDvn_obj(NguonNx dvn_obj) {
+        this.dvn_obj = dvn_obj;
     }
 
     public String getMa_so() {
