@@ -128,6 +128,8 @@ public class LoaiXdImp implements LoaiXdService {
                 String chungloai = resultSet.getString("chungloai");
                 Date createtime = resultSet.getDate("timestamp");
                 String status = resultSet.getString("status");
+                String type = resultSet.getString("type");
+                String rType = resultSet.getString("r_type");
 
                 result.setId(id);
                 result.setChungloai(chungloai);
@@ -135,6 +137,8 @@ public class LoaiXdImp implements LoaiXdService {
                 result.setTenxd(tenxd);
                 result.setMaxd(maxd);
                 result.setStatus(status);
+                result.setType(type);
+                result.setRtype(rType);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -162,6 +166,9 @@ public class LoaiXdImp implements LoaiXdService {
                 String chungloai = resultSet.getString("chungloai");
                 Date createtime = resultSet.getDate("timestamp");
                 String status = resultSet.getString("status");
+                String type = resultSet.getString("type");
+                String rType = resultSet.getString("r_type");
+
 
                 LoaiXangDau loaiXangDau = new LoaiXangDau();
                 loaiXangDau.setId(id);
@@ -170,6 +177,8 @@ public class LoaiXdImp implements LoaiXdService {
                 loaiXangDau.setTenxd(tenxd);
                 loaiXangDau.setMaxd(maxd);
                 loaiXangDau.setStatus(status);
+                loaiXangDau.setRtype(rType);
+                loaiXangDau.setType(type);
                 result.add(loaiXangDau);
             }
         } catch (SQLException e) {
@@ -196,6 +205,8 @@ public class LoaiXdImp implements LoaiXdService {
                 String chungloai = resultSet.getString("chungloai");
                 Date createtime = resultSet.getDate("timestamp");
                 String status = resultSet.getString("status");
+                String type = resultSet.getString("type");
+                String rType = resultSet.getString("r_type");
 
                 LoaiXangDau loaiXangDau = new LoaiXangDau();
                 loaiXangDau.setId(id);
@@ -204,6 +215,8 @@ public class LoaiXdImp implements LoaiXdService {
                 loaiXangDau.setTenxd(tenxd);
                 loaiXangDau.setMaxd(maxd);
                 loaiXangDau.setStatus(status);
+                loaiXangDau.setType(type);
+                loaiXangDau.setRtype(rType);
                 result.add(loaiXangDau);
             }
         } catch (SQLException e) {
@@ -232,6 +245,8 @@ public class LoaiXdImp implements LoaiXdService {
                 String chungloai = resultSet.getString("chungloai");
                 Date createtime = resultSet.getDate("timestamp");
                 String status = resultSet.getString("status");
+                String type = resultSet.getString("type");
+                String rType = resultSet.getString("r_type");
 
                 LoaiXangDau loaiXangDau = new LoaiXangDau();
                 loaiXangDau.setId(id);
@@ -240,6 +255,8 @@ public class LoaiXdImp implements LoaiXdService {
                 loaiXangDau.setTenxd(tenxd);
                 loaiXangDau.setMaxd(maxd);
                 loaiXangDau.setStatus(status);
+                loaiXangDau.setRtype(rType);
+                loaiXangDau.setType(type);
                 result.add(loaiXangDau);
             }
         } catch (SQLException e) {

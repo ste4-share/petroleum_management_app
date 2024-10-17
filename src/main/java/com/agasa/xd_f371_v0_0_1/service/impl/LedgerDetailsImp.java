@@ -170,7 +170,6 @@ public class LedgerDetailsImp implements LedgerDetailsService {
             statement.setInt(30, ledgerDetails.getNvu_tructhuoc());
             statement.setInt(31, ledgerDetails.getQuarter_id());
             statement.setInt(32, ledgerDetails.getPhuongtien_id());
-            System.out.println("nnnnnnnnnnnnn: "+ ledgerDetails.getNhiemvu_id());
             statement.setInt(33, ledgerDetails.getNhiemvu_id());
             statement.setInt(34, ledgerDetails.getNguonnx_nvu_id());
             statement.setInt(35, ledgerDetails.getPhuongtien_nvu_id());
@@ -444,8 +443,7 @@ public class LedgerDetailsImp implements LedgerDetailsService {
     public QuantityByTructhuocDTO selectQuantityByTT(String loaiphieu, int xd_id, int tructhuoc_id) {
         QDatabase.getConnectionDB();
 
-        String SQL_SELECT = "SELECT ten_xd, loai_phieu,tructhuoc.name as ttname, sum(thuc_xuat) as ttsum FROM public.ledger_details left join nguonnx_tructhuoc on ledger_details.nguonnx_tructhuoc =nguonnx_tructhuoc.id  left join tructhuoc on tructhuoc.id = nguonnx_tructhuoc.tructhuoc_id where loaixd_id=? and loai_phieu=? and tructhuoc.id=? group by ten_xd, loai_phieu,tructhuoc.name;\n" +
-                "\n";
+        String SQL_SELECT = "SELECT ten_xd, loai_phieu,tructhuoc.name as ttname, sum(thuc_xuat) as ttsum FROM public.ledger_details left join nguonnx_tructhuoc on ledger_details.nguonnx_tructhuoc =nguonnx_tructhuoc.id  left join tructhuoc on tructhuoc.id = nguonnx_tructhuoc.tructhuoc_id where loaixd_id=? and loai_phieu=? and tructhuoc.id=? group by ten_xd, loai_phieu,tructhuoc.name;";
 
         // auto close connection and preparedStatement
         try {
@@ -461,9 +459,9 @@ public class LedgerDetailsImp implements LedgerDetailsService {
                 String ttname = resultSet.getString("ttname");
                 int ttsum = resultSet.getInt("ttsum");
 
-                return new QuantityByTructhuocDTO(tenxd,loai_phieu,ttname,ttsum);
+                QuantityByTructhuocDTO quantityByTructhuocDTO  = new QuantityByTructhuocDTO(tenxd,loai_phieu,ttname,ttsum);
+                return quantityByTructhuocDTO;
             }
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {

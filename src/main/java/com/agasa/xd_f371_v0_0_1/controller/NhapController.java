@@ -184,6 +184,13 @@ public class NhapController implements Initializable {
         });
         cmb_tenxd.setItems(FXCollections.observableList(loaiXdService.getAll()));
         cmb_tenxd.getSelectionModel().selectFirst();
+        cmb_tenxd.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                lxd_id_combobox_selected = cmb_tenxd.getSelectionModel().getSelectedItem().getId();
+                setTonKhoLabel();
+            }
+        });
         setTonKhoLabel();
     }
 
@@ -253,7 +260,7 @@ public class NhapController implements Initializable {
         ledgerDetails.setQuarter_id(DashboardController.findByTime.getId());
         ledgerDetails.setNguonnx_tcn(nguonNxTcn_selected.getId());
         ledgerDetails.setNguonnx_tructhuoc(nguonNxTructhuoc_selected.getId());
-        ledgerDetails.setLoaixd_id(lxd_id_combobox_selected);
+        ledgerDetails.setLoaixd_id(cmb_tenxd.getSelectionModel().getSelectedItem().getId());
         return ledgerDetails;
     }
 
@@ -349,7 +356,6 @@ public class NhapController implements Initializable {
             clearHH();
         }
     }
-
     private void updateInvReport(LedgerDetails ledgerDetails){
         LoaiPhieu lp= loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_NHAP);
         InvReport invReport = new InvReport();
@@ -363,7 +369,7 @@ public class NhapController implements Initializable {
         invReport.setPrice_id(ledgerDetails.getTonkho_id());
         TructhuocLoaiphieu tructhuocLoaiphieu = tructhuocLoaiphieuService.findByTTLPId(nguonNxTructhuoc_selected.getTructhuoc_id(), lp.getId());
         if (tructhuocLoaiphieu!=null){
-            Category category = categoryService.getTitleByttLpId(tructhuocLoaiphieu.getLoaiphieu_id());
+            Category category = categoryService.getTitleByttLpId(tructhuocLoaiphieu.getId());
             if (category!=null){
                 invReport.setReport_header(category.getId());
                 updateInvReportDetail(ledgerDetails, category);
@@ -373,21 +379,27 @@ public class NhapController implements Initializable {
         }else {
             throw new RuntimeException("tructhuocloaiphieu is null");
         }
-
         invReportService.updateReport(invReport);
     }
 
     private void updateInvReportDetail(LedgerDetails ledgerDetails, Category category){
         InvReportDetail invReportDetail = new InvReportDetail();
-        LoaiXangDau loaiXangDau = loaiXdService.findLoaiXdByID_non(lxd_id_combobox_selected);
+        LoaiXangDau loaiXangDau = loaiXdService.findLoaiXdByID_non(cmb_tenxd.getValue().getId());
         if (loaiXangDau!=null){
             invReportDetail.setLoaixd(ledgerDetails.getTen_xd());
-            invReportDetail.setTitle_lxd_lv1(loaiXangDau.getChungloai());
-            invReportDetail.setTitle_lxd_lv2(loaiXangDau.getType());
-            invReportDetail.setTitle_lxd_lv3(loaiXangDau.getRtype());
+            Map<String, String> titleMap = ChungloaiMap.getMapChungloai();
+            invReportDetail.setTitle_lxd_lv1(titleMap.get(loaiXangDau.getChungloai()));
+            invReportDetail.setTitle_lxd_lv2(titleMap.get(loaiXangDau.getType()));
+            invReportDetail.setTitle_lxd_lv3(titleMap.get(loaiXangDau.getRtype()));
             invReportDetail.setTitle_lv1(category.getHeader_lv1());
             invReportDetail.setTitle_lv2(category.getHeader_lv2());
             invReportDetail.setTitle_lv3(category.getHeader_lv3());
+            QuantityByTructhuocDTO quantityByTructhuocDTO = ledgerDetailsService.selectQuantityByTT(ledgerDetails.getLoai_phieu(), ledgerDetails.getLoaixd_id(),nguonNxTructhuoc_selected.getTructhuoc_id());
+            if (quantityByTructhuocDTO!=null) {
+                invReportDetail.setSoluong(quantityByTructhuocDTO.getSoluong());
+            }else {
+                throw new RuntimeException("quantityByTructhuocDTO null");
+            }
             invReportDetailService.updateNew(invReportDetail);
         }else {
             throw new RuntimeException("Loaixd is null");
@@ -416,10 +428,9 @@ public class NhapController implements Initializable {
                         saveMucGia(soCaiDto);
                         saveTonkho(soCaiDto);
                         saveTonkhoTong(soCaiDto);
-                        updateInvReport(soCaiDto);
                         ledgerDetailsService.create(soCaiDto);
+                        updateInvReport(soCaiDto);
                     });
-                    DashboardController.primaryStage.close();
                 } catch (Exception e) {
                     Alert error= new Alert(Alert.AlertType.ERROR);
                     error.setTitle("Lỗi");
@@ -616,7 +627,6 @@ public class NhapController implements Initializable {
     }
 
     private void clearHH(){
-        cmb_tenxd.getSelectionModel().select(0);
         donGiaTf.clear();
         phaiXuatTf.clear();
         thucXuatTf.clear();
