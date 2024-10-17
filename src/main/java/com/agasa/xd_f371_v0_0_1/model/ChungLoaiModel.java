@@ -1,9 +1,10 @@
 package com.agasa.xd_f371_v0_0_1.model;
 
 public enum ChungLoaiModel {
-    NL_XANG_OTO("Nhiên liệu Xăng Ô tô"),
-    DIEZEL("Diezel"),
-    DAUBAY("Dầu bay"),
+    NL_XANG_OTO("NL-XANG-OTO"),
+    XANG("XANG"),
+    DIEZEL("DIEZEL-XANG-OTO"),
+    DAUBAY("DAUBAY"),
     DAUHACAP("Dầu hạ cấp"),
     DMN_MD_DCOTO("Dầu mỡ nhờn mặt đất - Động cơ ô tô"),
     DMN_MD_DTD("Dầu mỡ nhờn mặt đất - Dầu truyền động"),

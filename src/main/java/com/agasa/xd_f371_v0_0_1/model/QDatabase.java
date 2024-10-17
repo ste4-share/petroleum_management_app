@@ -14,7 +14,19 @@ public class QDatabase {
     public static void getConnectionDB(){
         try {
             if (conn == null){
-                conn = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/xd_f371_01", "postgres", "");
+                conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "12345678a");
+            }
+        } catch (SQLException e) {
+            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void getConnectionSQLiteDb(){
+        try {
+            if (conn == null){
+                conn = DriverManager.getConnection("jdbc:sqlite:/ /localhost:5432/postgres", "postgres", "12345678a");
             }
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());

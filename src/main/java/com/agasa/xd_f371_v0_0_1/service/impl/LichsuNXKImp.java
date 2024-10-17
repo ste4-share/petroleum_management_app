@@ -1,8 +1,6 @@
 package com.agasa.xd_f371_v0_0_1.service.impl;
 
 import com.agasa.xd_f371_v0_0_1.dto.LichsuXNK;
-import com.agasa.xd_f371_v0_0_1.dto.SoCaiDto;
-import com.agasa.xd_f371_v0_0_1.entity.LoaiXangDau;
 import com.agasa.xd_f371_v0_0_1.model.QDatabase;
 import com.agasa.xd_f371_v0_0_1.service.LichsuNXKService;
 
@@ -10,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class LichsuNXKImp implements LichsuNXKService {
@@ -19,8 +16,7 @@ public class LichsuNXKImp implements LichsuNXKService {
         QDatabase.getConnectionDB();
         List<LichsuXNK> result = new ArrayList<>();
 
-
-        String SQL_SELECT = "Select * from lichsuxnk";
+        String SQL_SELECT = "Select * from lichsuxnk order by timestamp DESC";
 
         // auto close connection and preparedStatement
         try {

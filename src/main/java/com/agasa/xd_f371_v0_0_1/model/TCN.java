@@ -16,6 +16,7 @@ public class TCN {
         map.put("XHM", "Xuất hạn mức");
         map.put("XBN-TQC", "Xuất báo nợ - Trong Quân chủng");
         map.put("XK", "Xuất khác");
+        map.put("X_KH", "Kế hoạch năm 2024");
 
         return map;
     }

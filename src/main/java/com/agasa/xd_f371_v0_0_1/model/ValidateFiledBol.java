@@ -14,8 +14,64 @@ public class ValidateFiledBol {
     private Boolean nhietdo;
     private Boolean vcf;
     private Boolean tytrong;
+    private Boolean sokm;
+    private Boolean sogio;
+    private Boolean sophut;
+    private Boolean dvn;
 
     public ValidateFiledBol() {
+    }
+
+    public ValidateFiledBol(Boolean so, Boolean nguoinhanhang, Boolean tinhchatnhap, Boolean lenhso, Boolean soxe, Boolean tungay, Boolean denngay, Boolean dongia, Boolean phaixuat, Boolean thucxuat, Boolean nhietdo, Boolean vcf, Boolean tytrong, Boolean sokm, Boolean sogio, Boolean sophut, Boolean dvn) {
+        this.so = so;
+        this.nguoinhanhang = nguoinhanhang;
+        this.tinhchatnhap = tinhchatnhap;
+        this.lenhso = lenhso;
+        this.soxe = soxe;
+        this.tungay = tungay;
+        this.denngay = denngay;
+        this.dongia = dongia;
+        this.phaixuat = phaixuat;
+        this.thucxuat = thucxuat;
+        this.nhietdo = nhietdo;
+        this.vcf = vcf;
+        this.tytrong = tytrong;
+        this.sokm = sokm;
+        this.sogio = sogio;
+        this.sophut = sophut;
+        this.dvn = dvn;
+    }
+
+    public Boolean getSophut() {
+        return sophut;
+    }
+
+    public void setSophut(Boolean sophut) {
+        this.sophut = sophut;
+    }
+
+    public Boolean getDvn() {
+        return dvn;
+    }
+
+    public void setDvn(Boolean dvn) {
+        this.dvn = dvn;
+    }
+
+    public Boolean getSogio() {
+        return sogio;
+    }
+
+    public void setSogio(Boolean sogio) {
+        this.sogio = sogio;
+    }
+
+    public Boolean getSokm() {
+        return sokm;
+    }
+
+    public void setSokm(Boolean sokm) {
+        this.sokm = sokm;
     }
 
     public Boolean getSo() {

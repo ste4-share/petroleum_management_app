@@ -7,11 +7,10 @@ import java.util.List;
 
 public interface NguonNXService {
     List<NguonNx> getAll();
+    List<NguonNx> getAllUnless(String ten_1);
+    List<NguonNx> getAllByLoaiPhieu(int loai_phieu);
     NguonNx create(NguonNx nguonNx);
     NguonNx update(NguonNx nguonNx);
     NguonNx findById(int id);
-    boolean delete_f(String so);
-    List<NguonNx> getAllWithType(String type);
-    NguonNx findNguonNXByName(String name, String loai_tt1);
-    List<NguonNx> nguonLs(List<Integer> id);
+    NguonNx findNguonNXByName_NON(String name);
 }

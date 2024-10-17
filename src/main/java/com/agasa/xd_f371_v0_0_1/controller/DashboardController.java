@@ -3,13 +3,16 @@ package com.agasa.xd_f371_v0_0_1.controller;
 import com.agasa.xd_f371_v0_0_1.dto.LichsuXNK;
 import com.agasa.xd_f371_v0_0_1.dto.TTPhieuDto;
 import com.agasa.xd_f371_v0_0_1.dto.TonKho;
+import com.agasa.xd_f371_v0_0_1.entity.LoaiXangDau;
+import com.agasa.xd_f371_v0_0_1.entity.Quarter;
+import com.agasa.xd_f371_v0_0_1.entity.TonkhoTong;
 import com.agasa.xd_f371_v0_0_1.model.TTPhieuModel;
-import com.agasa.xd_f371_v0_0_1.service.LichsuNXKService;
-import com.agasa.xd_f371_v0_0_1.service.SoCaiService;
-import com.agasa.xd_f371_v0_0_1.service.TonKhoService;
-import com.agasa.xd_f371_v0_0_1.service.impl.LichsuNXKImp;
-import com.agasa.xd_f371_v0_0_1.service.impl.SoCaiImp;
-import com.agasa.xd_f371_v0_0_1.service.impl.TonkhoImp;
+import com.agasa.xd_f371_v0_0_1.service.*;
+import com.agasa.xd_f371_v0_0_1.service.impl.*;
+import com.agasa.xd_f371_v0_0_1.util.TextToNumber;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,24 +21,33 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
+import org.controlsfx.control.textfield.TextFields;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class DashboardController implements Initializable {
 
@@ -43,19 +55,35 @@ public class DashboardController implements Initializable {
     public static Stage xuatStage;
     public static Stage ctStage;
     public static String so_clicked;
-    private static int before_click_ind;
+    private static List<TTPhieuModel> ttp_ls = new ArrayList<>();
+    public static List<TonkhoTong> prepare_addnew_inventory = new ArrayList<>();
+    public static List<TonkhoTong> root_inventory = new ArrayList<>();
+    private static List<LichsuXNK> lichsuXNKS = new ArrayList<>();
+    private static int rowsPerPage = 9;
     private static int click_ind = 1;
+    private boolean addedBySelection = false;
+    private boolean addedBySelection_lstb = false;
 
     @FXML
     private BorderPane borderpane_base;
     @FXML
-    private HBox nxt_hbox;
+    private BarChart<?, ?> bc_barchart;
+
     @FXML
-    public TableView<TonKho> tb_tonkho;
+    private CategoryAxis x;
+    @FXML
+    private NumberAxis y;
+    @FXML
+    private VBox nx_vbox, vb_nxt_tb;
     @FXML
     private TableView<LichsuXNK> tb_viewlichsu;
     @FXML
-    private TableView<TonKho> tb_tkt;
+    private ComboBox<String> cbb_loaiphieu_filter;
+    @FXML
+    private Label lb_from, lb_to,datetime_showing;
+    @FXML
+    private Pagination pagination_tbnxt,pagination_lichsu;
+
     @FXML
     private TableColumn<TonKho, String> col_tkt_loaixd, col_tkt_soluong;
     @FXML
@@ -70,76 +98,50 @@ public class DashboardController implements Initializable {
     @FXML
     private TableColumn<TTPhieuModel, String> tong;
     @FXML
-    private SoCaiService soCaiService = new SoCaiImp();
+    private TextField tf_search_txnt,tf_search_history;
+    @FXML
+    private LedgerDetailsService ledgerDetailsService = new LedgerDetailsImp();
     private LichsuNXKService lichsuNXKService = new LichsuNXKImp();
-    private TonKhoService tonKhoService = new TonkhoImp();
-    private List<TonKho> tkls;
-
+    private QuarterService quarterService = new QuarterImp();
+    private LoaiXdService loaiXdService = new LoaiXdImp();
+    private TonkhoTongService tonkhoTongService = new TonkhoTongImp();
+    public static Quarter findByTime;
 
     @FXML
-    private HBox dvi_menu,nxt_menu, loai_xd_menu, haohut_menu, dinhmuc_menu;
+    private HBox dvi_menu,nxt_menu, loai_xd_menu, haohut_menu, dinhmuc_menu,tonkho_menu,baocao_menu;
     @FXML
     private AnchorPane main_menu;
 
-
-
-    ObservableList<TTPhieuModel> initialData(){
-        return FXCollections.observableArrayList();
-    }
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        tkls = new ArrayList<>();
-        int index = 0;
-        String cssLayout1 =
-                "-fx-border-color: #aaaaaa;\n" +
-                        "-fx-background-color: #aaaaaa;\n" ;
-        nxt_menu.setStyle(cssLayout1
-        );
-        dvi_menu.setStyle(resetStyle());
-        loai_xd_menu.setStyle(resetStyle());
-        haohut_menu.setStyle(resetStyle());
-        dinhmuc_menu.setStyle(resetStyle());
-
-
-        List<TonKho> tonKhoList = tonKhoService.getAll();
-        for (TonKho tonKho : tonKhoList) {
-            tonKho.setStt(index + 1);
-            tkls.add(tonKho);
-            index = index + 1;
-        }
-        setTonkhoList();
-        ObservableList<TonKho> observableList_tonkho = FXCollections.observableList(tonKhoList);
-        tb_tonkho.setItems(observableList_tonkho);
-        setTongTonkhoList();
-
-
-        ObservableList<TonKho> observableList_tongtonkho = FXCollections.observableList(tonKhoService.getTongKho());
-        tb_tkt.setItems(observableList_tongtonkho);
-        tbTTNX.setItems(initialData());
+        ttp_ls = new ArrayList<>();
+        lichsuXNKS = new ArrayList<>();
+        root_inventory = tonkhoTongService.getAll();
+        getDataToChart(root_inventory);
+        getCurrentQuarter();
+        getCurrentTiming();
+        resetStyleField();
+        customStyleMenu();
+        setDataToPhieuCombobox();
         setDataToViewTable();
-
-        List<LichsuXNK> lichsuXNKS = lichsuNXKService.getAll();
         setColLichSuNXK();
-        tb_viewlichsu.setItems(FXCollections.observableArrayList(lichsuXNKS));
+        setUpForSearchCompleteTion();
+        searching();
+        fillDataToLichsuTb();
         tbTTNX.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
             @Override
             public void handle(MouseEvent event) {
-
                 if (click_ind ==2){
                     try {
                         TTPhieuModel ttPhieuModel =  tbTTNX.getSelectionModel().getSelectedItem();
 
                         so_clicked = ttPhieuModel.getSo();
-                        System.out.println("so :" +so_clicked);
                         Parent root = null;
                         try {
                             root = FXMLLoader.load(getClass().getResource("../chitietsc.fxml"));
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
-
-
                         click_ind=1;
                         ctStage = new Stage();
                         Scene scene = new Scene(root);
@@ -149,7 +151,6 @@ public class DashboardController implements Initializable {
                         ctStage.setTitle("CHI TIẾT");
                         ctStage.show();
                     }catch (NullPointerException e){
-                        System.out.println("----so is null----");
                         e.printStackTrace();
                     }
                 }else {
@@ -158,43 +159,137 @@ public class DashboardController implements Initializable {
 
             }
         });
+    }
 
+    private void resetStyleField() {
+        String cssLayout1 =
+                "-fx-border-color: #aaaaaa;\n" +
+                        "-fx-background-color: #aaaaaa;\n" ;
+        nxt_menu.setStyle(cssLayout1
+        );
+        dvi_menu.setStyle(resetStyle());
+        loai_xd_menu.setStyle(resetStyle());
+        haohut_menu.setStyle(resetStyle());
+        dinhmuc_menu.setStyle(resetStyle());
+        baocao_menu.setStyle(resetStyle());
+    }
+
+    private void getCurrentQuarter(){
+        findByTime = quarterService.findByDatetime(LocalDate.now());
+        lb_to.setTextFill(Color.rgb(33, 12, 162));
+        lb_to.setText(findByTime.getEnd_date().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+        lb_from.setTextFill(Color.rgb(33, 12, 162));
+        lb_from.setText(findByTime.getStart_date().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+    }
+
+    private void setDataToPhieuCombobox(){
+        List<String> nx_ = new ArrayList<>();
+        nx_.add("ALL");
+        nx_.add("PHIẾU NHẬP");
+        nx_.add("PHIẾU XUẤT");
+        cbb_loaiphieu_filter.setItems(FXCollections.observableArrayList(nx_));
+        cbb_loaiphieu_filter.getSelectionModel().selectFirst();
+    }
+
+    private void customStyleMenu(){
         String cssLayout =
                 "-fx-border-insets: 5;\n" +
-                "-fx-background-color: #262626;\n" +
-                "-fx-background-radius: 0 150 0 0;\n" ;
-
+                        "-fx-background-color: #262626;\n" +
+                        "-fx-background-radius: 0 150 0 0;\n" ;
         main_menu.setStyle(cssLayout);
     }
 
-    private void setTonkhoList(){
-        col_stt.setCellValueFactory(new PropertyValueFactory<TonKho, String>("stt"));
-        col_mucgia.setCellValueFactory(new PropertyValueFactory<TonKho, String>("mucgia"));
-        col_loaixd.setCellValueFactory(new PropertyValueFactory<TonKho, String>("loai_xd"));
-        col_slton.setCellValueFactory(new PropertyValueFactory<TonKho, String>("soluong"));
+    private void fillDataToLichsuTb(){
+        lichsuXNKS = new ArrayList<>();
+        lichsuXNKS = lichsuNXKService.getAll();
+        lichsuXNKS.forEach(x -> {
+            x.setTonsau_str(TextToNumber.textToNum(String.valueOf(x.getTonsau())));
+            x.setMucgia(TextToNumber.textToNum(x.getMucgia()));
+            x.setSoluong_str(TextToNumber.textToNum(String.valueOf(x.getSoluong())));
+            x.setTontruoc_str(TextToNumber.textToNum(String.valueOf(x.getTontruoc())));
+        });
+        tb_viewlichsu.setItems(FXCollections.observableArrayList(lichsuXNKS));
+        pagination_lichsu.setPageCount((lichsuXNKS.size()/rowsPerPage)+1);
+        pagination_lichsu.setPrefHeight(400);
+        setPagination_lichsu();
+        List<String> search_arr_forLs = new ArrayList<>();
+        for(int i=0; i< lichsuXNKS.size(); i++){
+            search_arr_forLs.add(lichsuXNKS.get(i).getTen_xd());
+        }
+        setUpForSearchCompleteTion_lichsu(search_arr_forLs);
+        searchingFor_lichsuTb();
     }
+
+    private void getDataToChart(List<TonkhoTong> tongs){
+        if (!tongs.isEmpty()){
+            XYChart.Series set1 = new XYChart.Series<>();
+            tongs.forEach(x -> {
+
+                LoaiXangDau loaiXangDau = loaiXdService.findLoaiXdByID_non(x.getId_xd());
+                set1.getData().add(new XYChart.Data<>(loaiXangDau.getTenxd(),x.getTck_sum()));
+            });
+            bc_barchart.getData().addAll(set1);
+            prepare_addnew_inventory = new ArrayList<>();
+        }
+    }
+
+    private void getCurrentTiming(){
+        Timeline clock = new Timeline(new KeyFrame(Duration.ZERO, e ->
+                datetime_showing.setText("Ngày: "+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")))
+        ),
+                new KeyFrame(Duration.seconds(1))
+        );
+        clock.setCycleCount(Animation.INDEFINITE);
+        clock.play();
+    }
+
     private void setColLichSuNXK(){
         col_lsnxk_ngay.setCellValueFactory(new PropertyValueFactory<LichsuXNK, String>("createTime"));
         col_lsnxk_tenxd.setCellValueFactory(new PropertyValueFactory<LichsuXNK, String>("ten_xd"));
         col_lsnxk_loaiphieu.setCellValueFactory(new PropertyValueFactory<LichsuXNK, String>("loai_phieu"));
-        col_lsnxk_tontruoc.setCellValueFactory(new PropertyValueFactory<LichsuXNK, String>("tontruoc"));
-        col_lsnxk_tonsau.setCellValueFactory(new PropertyValueFactory<LichsuXNK, String>("tonsau"));
-        col_lsnxk_soluong.setCellValueFactory(new PropertyValueFactory<LichsuXNK, String>("soluong"));
+        col_lsnxk_tontruoc.setCellValueFactory(new PropertyValueFactory<LichsuXNK, String>("tontruoc_str"));
+        col_lsnxk_tonsau.setCellValueFactory(new PropertyValueFactory<LichsuXNK, String>("tonsau_str"));
+        col_lsnxk_soluong.setCellValueFactory(new PropertyValueFactory<LichsuXNK, String>("soluong_str"));
         col_lsnxk_mucgia.setCellValueFactory(new PropertyValueFactory<LichsuXNK, String>("mucgia"));
-    }
-
-    private void setTongTonkhoList(){
-        col_tkt_loaixd.setCellValueFactory(new PropertyValueFactory<TonKho, String>("loai_xd"));
-        col_tkt_soluong.setCellValueFactory(new PropertyValueFactory<TonKho, String>("sl_tong"));
     }
 
     public void setDataToViewTable(){
         setCellVal_TTNX_Refresh();
-        List<TTPhieuDto> ttPhieuDtoList = soCaiService.getTTPhieu();
-        List<TTPhieuModel> ttPhieuModelList = new ArrayList<>();
+        ttp_ls = new ArrayList<>();
+        List<TTPhieuDto> ttPhieuDtoList = ledgerDetailsService.getTTPhieu();
 
-        ttPhieuDtoList.forEach(item -> ttPhieuModelList.add(new TTPhieuModel(item.getSo(),item.getNgaytao(), item.getLoai_phieu(), item.getDvn(), item.getDvvc(),item.getTcn(),item.getHang_hoa(),String.valueOf(item.getTong()))));
-        tbTTNX.setItems(FXCollections.observableArrayList(ttPhieuModelList));
+        ttPhieuDtoList.forEach(item -> {
+            ttp_ls.add(new TTPhieuModel(item.getSo(), item.getNgaytao(), item.getLoai_phieu().trim().equals("NHAP") ? "Nhập" : "Xuất", item.getDvn(), item.getDvvc(), item.getTcn(), item.getHang_hoa(), TextToNumber.textToNum(String.valueOf(item.getTong()))));
+        });
+        tbTTNX.setItems(FXCollections.observableArrayList(ttp_ls));
+        setPagination_nxt();
+    }
+
+    private void setPagination_nxt(){
+        pagination_tbnxt.setPageFactory(this::createPage);
+        pagination_tbnxt.setPrefHeight(400);
+        pagination_tbnxt.setPageCount((ttp_ls.size()/rowsPerPage) +1);
+    }
+
+    private Node createPage(int pageIndex) {
+        int fromIndex = pageIndex * rowsPerPage;
+        int toIndex = Math.min(fromIndex + rowsPerPage, ttp_ls.size());
+        tbTTNX.setItems(FXCollections.observableArrayList(ttp_ls.subList(fromIndex, toIndex)));
+        return tbTTNX;
+    }
+
+    private void setPagination_lichsu(){
+        pagination_lichsu.setPageFactory(this::createPage_lichsu);
+        pagination_lichsu.setPrefHeight(400);
+        pagination_lichsu.setPageCount((lichsuXNKS.size()/rowsPerPage) +1);
+    }
+
+    private Node createPage_lichsu(int pageIndex) {
+        int fromIndex = pageIndex * rowsPerPage;
+        int toIndex = Math.min(fromIndex + rowsPerPage, lichsuXNKS.size());
+        tb_viewlichsu.setItems(FXCollections.observableArrayList(lichsuXNKS.subList(fromIndex, toIndex)));
+
+        return tb_viewlichsu;
     }
 
     public static Stage getPrimaryStage(){
@@ -213,8 +308,10 @@ public class DashboardController implements Initializable {
         primaryStage.setScene(scene);
         primaryStage.initStyle(StageStyle.DECORATED);
         primaryStage.initModality(Modality.APPLICATION_MODAL);
-        primaryStage.setTitle("Nhập");
-        primaryStage.show();
+        primaryStage.showAndWait();
+        setDataToViewTable();
+        getDataToChart(prepare_addnew_inventory);
+        fillDataToLichsuTb();
     }
 
     private void setCellVal_TTNX_Refresh(){
@@ -223,25 +320,6 @@ public class DashboardController implements Initializable {
         ngaytao.setCellValueFactory(item -> new SimpleStringProperty(item.getValue().getNgaytao()));
         hanghoa.setCellValueFactory(item -> new SimpleStringProperty(item.getValue().getHang_hoa()));
         tong.setCellValueFactory(item -> new SimpleStringProperty(item.getValue().getTong()));
-    }
-
-    public void refresh(){
-        System.out.println("refresh...");
-        tbTTNX.getItems().clear();
-        tbTTNX.refresh();
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../dashboard2.fxml"));
-        try {
-            fxmlLoader.load();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        List<TTPhieuDto> ttPhieuDtoList = soCaiService.getTTPhieu();
-        List<TTPhieuModel> ttPhieuModelList = new ArrayList<>();
-
-        ttPhieuDtoList.forEach(item -> ttPhieuModelList.add(new TTPhieuModel(item.getSo(),item.getNgaytao(), item.getLoai_phieu(), item.getDvn(), item.getDvvc(),item.getTcn(),item.getHang_hoa(),String.valueOf(item.getTong()))));
-        ObservableList<TTPhieuModel> observableList = FXCollections.observableArrayList(ttPhieuModelList);
-        tbTTNX.setItems(FXCollections.observableArrayList(ttPhieuModelList));
-
     }
 
     @FXML
@@ -253,9 +331,11 @@ public class DashboardController implements Initializable {
         xuatStage.initStyle(StageStyle.DECORATED);
         xuatStage.initModality(Modality.APPLICATION_MODAL);
         xuatStage.setTitle("XUẤT");
-        xuatStage.show();
+        xuatStage.showAndWait();
+        setDataToViewTable();
+//        getDataToChart(prepare_addnew_inventory);
+        fillDataToLichsuTb();
     }
-
     @FXML
     public void nxt_menu_action(MouseEvent event) {
         String cssLayout =
@@ -266,26 +346,31 @@ public class DashboardController implements Initializable {
         loai_xd_menu.setStyle(resetStyle());
         haohut_menu.setStyle(resetStyle());
         dinhmuc_menu.setStyle(resetStyle());
+        tonkho_menu.setStyle(resetStyle());
+        baocao_menu.setStyle(resetStyle());
 
-        borderpane_base.setCenter(nxt_hbox);
+        borderpane_base.setCenter(nx_vbox);
     }
-
     @FXML
-    public void dvi_menu_action(MouseEvent event) {
+    public void tonkho_menu_action(MouseEvent event) {
         String cssLayout =
                 "-fx-border-color: #aaaaaa;\n" +
                 "-fx-background-color: #aaaaaa;\n" ;
-        dvi_menu.setStyle(cssLayout);
+        tonkho_menu.setStyle(cssLayout);
         loai_xd_menu.setStyle(resetStyle());
         haohut_menu.setStyle(resetStyle());
         dinhmuc_menu.setStyle(resetStyle());
         nxt_menu.setStyle(resetStyle());
+        dvi_menu.setStyle(resetStyle());
+        baocao_menu.setStyle(resetStyle());
 
-
-        Label label = new Label("Dvi clicked");
-        borderpane_base.setCenter(label);
+        try {
+            HBox nxt_menu_bar = FXMLLoader.load(getClass().getResource("../tonkho.fxml"));
+            borderpane_base.setCenter(nxt_menu_bar);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
-
     @FXML
     public void lxd_menu_action(MouseEvent event) {
         String cssLayout =
@@ -296,8 +381,9 @@ public class DashboardController implements Initializable {
         haohut_menu.setStyle(resetStyle());
         dinhmuc_menu.setStyle(resetStyle());
         nxt_menu.setStyle(resetStyle());
+        tonkho_menu.setStyle(resetStyle());
+        baocao_menu.setStyle(resetStyle());
     }
-
     @FXML
     public void haohut_menu_action(MouseEvent event) {
         String cssLayout =
@@ -308,8 +394,9 @@ public class DashboardController implements Initializable {
         loai_xd_menu.setStyle(resetStyle());
         dinhmuc_menu.setStyle(resetStyle());
         nxt_menu.setStyle(resetStyle());
+        tonkho_menu.setStyle(resetStyle());
+        baocao_menu.setStyle(resetStyle());
     }
-
     @FXML
     public void dinhmuc_menu_action(MouseEvent event) {
         String cssLayout =
@@ -320,6 +407,45 @@ public class DashboardController implements Initializable {
         haohut_menu.setStyle(resetStyle());
         loai_xd_menu.setStyle(resetStyle());
         nxt_menu.setStyle(resetStyle());
+        tonkho_menu.setStyle(resetStyle());
+        baocao_menu.setStyle(resetStyle());
+    }
+    @FXML
+    public void dvi_menu_action(MouseEvent event) {
+        String cssLayout =
+                "-fx-border-color: #aaaaaa;\n" +
+                        "-fx-background-color: #aaaaaa;\n" ;
+        dvi_menu.setStyle(cssLayout);
+        loai_xd_menu.setStyle(resetStyle());
+        haohut_menu.setStyle(resetStyle());
+        dinhmuc_menu.setStyle(resetStyle());
+        nxt_menu.setStyle(resetStyle());
+        baocao_menu.setStyle(resetStyle());
+        try {
+            VBox dvi_menu_bar = FXMLLoader.load(getClass().getResource("../donvi_menu.fxml"));
+            borderpane_base.setCenter(dvi_menu_bar);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @FXML
+    public void baocao_menu_action(MouseEvent mouseEvent) {
+        String cssLayout =
+                "-fx-border-color: #aaaaaa;\n" +
+                        "-fx-background-color: #aaaaaa;\n" ;
+        baocao_menu.setStyle(cssLayout);
+        dvi_menu.setStyle(resetStyle());
+        loai_xd_menu.setStyle(resetStyle());
+        haohut_menu.setStyle(resetStyle());
+        dinhmuc_menu.setStyle(resetStyle());
+        nxt_menu.setStyle(resetStyle());
+
+        try {
+            BorderPane dvi_menu_bar = FXMLLoader.load(getClass().getResource("../baocao.fxml"));
+            borderpane_base.setCenter(dvi_menu_bar);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String resetStyle(){
@@ -328,4 +454,121 @@ public class DashboardController implements Initializable {
                         "-fx-background-color: #262626;\n" ;
         return cssLayout;
     }
+
+    public void loc_phieu(ActionEvent actionEvent) {
+        String lp= cbb_loaiphieu_filter.getValue().trim();
+        if (lp.equals("PHIẾU NHẬP")){
+            List<TTPhieuDto> ttPhieuDtoList = ledgerDetailsService.getTTPhieu_ByLoaiPhieu("N");
+            List<TTPhieuModel> ttPhieuModelList = new ArrayList<>();
+
+            ttPhieuDtoList.forEach(item -> ttPhieuModelList.add(new TTPhieuModel(item.getSo(),item.getNgaytao(), item.getLoai_phieu().trim().equals("N") ? "Nhập" : "Xuất", item.getDvn(), item.getDvvc(),item.getTcn(),item.getHang_hoa(),TextToNumber.textToNum(String.valueOf(item.getTong())))));
+            tbTTNX.setItems(FXCollections.observableArrayList(ttPhieuModelList));
+        }else if (lp.equals("PHIẾU XUẤT")){
+            List<TTPhieuDto> ttPhieuDtoList = ledgerDetailsService.getTTPhieu_ByLoaiPhieu("X");
+            List<TTPhieuModel> ttPhieuModelList = new ArrayList<>();
+
+            ttPhieuDtoList.forEach(item -> ttPhieuModelList.add(new TTPhieuModel(item.getSo(),item.getNgaytao(), item.getLoai_phieu().trim().equals("N") ? "Nhập" : "Xuất", item.getDvn(), item.getDvvc(),item.getTcn(),item.getHang_hoa(),TextToNumber.textToNum(String.valueOf(item.getTong())))));
+            tbTTNX.setItems(FXCollections.observableArrayList(ttPhieuModelList));
+        }else {
+            List<TTPhieuDto> ttPhieuDtoList = ledgerDetailsService.getTTPhieu();
+            List<TTPhieuModel> ttPhieuModelList = new ArrayList<>();
+
+            ttPhieuDtoList.forEach(item -> ttPhieuModelList.add(new TTPhieuModel(item.getSo(),item.getNgaytao(), item.getLoai_phieu().trim().equals("N") ? "Nhập" : "Xuất", item.getDvn(), item.getDvvc(),item.getTcn(),item.getHang_hoa(),TextToNumber.textToNum(String.valueOf(item.getTong())))));
+            tbTTNX.setItems(FXCollections.observableArrayList(ttPhieuModelList));
+        }
+    }
+
+    public void search_phieu_tnxt(ActionEvent actionEvent) {
+    }
+
+    public void search_history(ActionEvent actionEvent) {
+    }
+
+    private void setUpForSearchCompleteTion(){
+        List<String> search_arr = new ArrayList<>();
+        for(int i=0; i< ttp_ls.size(); i++){
+            search_arr.add(ttp_ls.get(i).getSo());
+        }
+        TextFields.bindAutoCompletion(tf_search_txnt, t -> {
+            return search_arr.stream().filter(elem
+                    -> {
+                return String.valueOf(elem).startsWith(t.getUserText().trim());
+            }).collect(Collectors.toList());
+        });
+        tf_search_txnt.setOnKeyPressed(e -> {
+            addedBySelection = false;
+        });
+
+        tf_search_txnt.setOnKeyReleased(e -> {
+            if (tf_search_txnt.getText().trim().isEmpty()){
+                ttp_ls = new ArrayList<>();
+                tbTTNX.setItems(FXCollections.observableArrayList(new ArrayList<>()));
+                List<TTPhieuDto> ttPhieuDtoList = ledgerDetailsService.getTTPhieu();
+
+                ttPhieuDtoList.forEach(item -> {
+                    ttp_ls.add(new TTPhieuModel(item.getSo(), item.getNgaytao(), item.getLoai_phieu().trim().equals("N") ? "Nhập" : "Xuất", item.getDvn(), item.getDvvc(), item.getTcn(), item.getHang_hoa(), TextToNumber.textToNum(String.valueOf(item.getTong()))));
+                });
+                tbTTNX.setItems(FXCollections.observableArrayList(ttp_ls));
+            }
+            addedBySelection = true;
+        });
+    }
+
+    private void searching(){
+        tf_search_txnt.textProperty().addListener(e -> {
+            if (addedBySelection) {
+                List<TTPhieuModel> tkt_buf = ttp_ls.stream().filter(ttp -> ttp.getSo().equals(tf_search_txnt.getText())).toList();
+                ObservableList<TTPhieuModel> observableList = FXCollections.observableArrayList(tkt_buf);
+                tbTTNX.setItems(observableList);
+                addedBySelection = false;
+            }
+        });
+    }
+
+    private void setUpForSearchCompleteTion_lichsu(List<String> search_arr){
+        TextFields.bindAutoCompletion(tf_search_history, t -> {
+            return search_arr.stream().filter(elem
+                    -> {
+                return elem.toLowerCase().trim().startsWith(t.getUserText().toLowerCase().trim());
+            }).collect(Collectors.toList());
+        });
+        tf_search_history.setOnKeyPressed(e -> {
+            addedBySelection_lstb = false;
+        });
+
+        tf_search_history.setOnKeyReleased(e -> {
+            if (tf_search_history.getText().trim().isEmpty()){
+                // reset
+                tb_viewlichsu.setItems(FXCollections.observableArrayList(new ArrayList<>()));
+                lichsuXNKS = lichsuNXKService.getAll();
+                lichsuXNKS.forEach(ttp -> {
+                    ttp.setTonsau_str(TextToNumber.textToNum(String.valueOf(ttp.getTonsau())));
+                    ttp.setSoluong_str(TextToNumber.textToNum(String.valueOf(ttp.getSoluong())));
+                    ttp.setMucgia(TextToNumber.textToNum(ttp.getMucgia()));
+                    ttp.setTontruoc_str(TextToNumber.textToNum(String.valueOf(ttp.getTontruoc())));
+                });
+                tb_viewlichsu.setItems(FXCollections.observableArrayList(lichsuXNKS));
+            }
+            addedBySelection_lstb = true;
+        });
+    }
+
+    private void searchingFor_lichsuTb(){
+        tf_search_history.textProperty().addListener(e -> {
+            if (addedBySelection_lstb) {
+                List<LichsuXNK> tkt_buf = lichsuXNKS.stream().filter(ttp ->
+                    ttp.getTen_xd().equals(tf_search_history.getText())).toList();
+                tkt_buf.forEach(ttp -> {
+                    ttp.setTonsau_str(TextToNumber.textToNum(String.valueOf(ttp.getTonsau())));
+                    ttp.setSoluong_str(TextToNumber.textToNum(String.valueOf(ttp.getSoluong())));
+                    ttp.setTontruoc_str(TextToNumber.textToNum(String.valueOf(ttp.getTontruoc())));
+                });
+                ObservableList<LichsuXNK> observableList = FXCollections.observableArrayList(tkt_buf);
+                tb_viewlichsu.setItems(observableList);
+                addedBySelection_lstb = false;
+            }
+        });
+    }
+
+
 }

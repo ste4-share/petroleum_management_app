@@ -69,6 +69,7 @@ public class TonkhoImp implements TonKhoService {
             System.out.println("Record tonkho created.");
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return tonKho;
     }
@@ -87,6 +88,7 @@ public class TonkhoImp implements TonKhoService {
             System.out.println("Record tonkho updated.");
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return tonKho;
     }
@@ -133,6 +135,7 @@ public class TonkhoImp implements TonKhoService {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return result;
     }
@@ -171,6 +174,7 @@ public class TonkhoImp implements TonKhoService {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return result;
     }
@@ -200,8 +204,10 @@ public class TonkhoImp implements TonKhoService {
 
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            throw new RuntimeException(e);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return result;
     }

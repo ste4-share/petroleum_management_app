@@ -1,10 +1,13 @@
 package com.agasa.xd_f371_v0_0_1.controller;
 
-import com.agasa.xd_f371_v0_0_1.dto.SoCaiDto;
-import com.agasa.xd_f371_v0_0_1.service.SoCaiService;
-import com.agasa.xd_f371_v0_0_1.service.impl.SoCaiImp;
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
+import com.agasa.xd_f371_v0_0_1.entity.LedgerDetails;
+import com.agasa.xd_f371_v0_0_1.service.NhiemVuService;
+import com.agasa.xd_f371_v0_0_1.service.PhuongTienService;
+import com.agasa.xd_f371_v0_0_1.service.LedgerDetailsService;
+import com.agasa.xd_f371_v0_0_1.service.impl.NhiemVuImp;
+import com.agasa.xd_f371_v0_0_1.service.impl.PhuongTienImp;
+import com.agasa.xd_f371_v0_0_1.service.impl.LedgerDetailsImp;
+import com.agasa.xd_f371_v0_0_1.util.TextToNumber;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -12,15 +15,18 @@ import javafx.fxml.Initializable;
 import javafx.print.*;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellCopyPolicy;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.*;
+
 import java.io.*;
-import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.*;
@@ -28,34 +34,38 @@ import java.util.List;
 
 public class ChiTietSCController implements Initializable {
 
-    private SoCaiService soCaiService = new SoCaiImp();
-    private List<SoCaiDto> ls;
+    private LedgerDetailsService ledgerDetailsService = new LedgerDetailsImp();
+    private PhuongTienService phuongTienService = new PhuongTienImp();
+    private NhiemVuService nhiemVuService = new NhiemVuImp();
+    private List<LedgerDetails> ls;
     @FXML
     private VBox vb_root;
 
     @FXML
-    private TableView<SoCaiDto> tbChiTiet;
+    private TableView<LedgerDetails> tbChiTiet;
 
     @FXML
-    private TableColumn<SoCaiDto,String> fct_stt, fct_tenxd, fct_dongia,fct_phaixuat, fct_nhietdo, fct_tytrong, fct_vcf, fct_thucxuat, fct_tong;
+    private TableColumn<LedgerDetails,String> fct_stt, fct_tenxd, fct_dongia,fct_phaixuat, fct_nhietdo, fct_tytrong, fct_vcf, fct_thucxuat, fct_tong;
     @FXML
     private Label lb_dvvc, lb_dvn, lb_so, lb_nguoinhan, lb_tungay, lb_denngay, lb_tcn, lb_lenhkh, lb_soxe, lb_sokm, lb_sogio, lb_loaiphieu;
     @FXML
     private Button exitBtn, printBtn;
-    private Label jobStatus = new Label();
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){
         addNewImport();
         ls = new ArrayList<>();
         int index_val = 0;
 
-        List<SoCaiDto> soCaiDtoList = soCaiService.getChiTietSoCai(DashboardController.so_clicked);
-        for (SoCaiDto soCaiDto : soCaiDtoList) {
-            soCaiDto.setStt(index_val + 1);
-            ls.add(soCaiDto);
+        List<LedgerDetails> ledgerDetailsList = ledgerDetailsService.getChiTietSoCai(DashboardController.so_clicked);
+        for (LedgerDetails ledgerDetails : ledgerDetailsList) {
+            ledgerDetails.setStt(index_val + 1);
+            ledgerDetails.setThuc_xuat_str(TextToNumber.textToNum(String.valueOf(ledgerDetails.getThuc_xuat())));
+            ledgerDetails.setPhai_xuat_str(TextToNumber.textToNum(String.valueOf(ledgerDetails.getPhai_xuat())));
+            ledgerDetails.setThanh_tien_str(TextToNumber.textToNum(String.valueOf(ledgerDetails.getThanh_tien())));
+            ls.add(ledgerDetails);
             index_val = index_val + 1;
         }
-        ObservableList<SoCaiDto> observableList = FXCollections.observableList(soCaiDtoList);
+        ObservableList<LedgerDetails> observableList = FXCollections.observableList(ledgerDetailsList);
         tbChiTiet.setItems(observableList);
         fillDataToLabels();
         exitBtn.setOnAction(actionEvent -> {
@@ -63,7 +73,7 @@ public class ChiTietSCController implements Initializable {
         });
 
         printBtn.setOnAction(actionEvent -> {
-            if (soCaiDtoList.get(0).getLoai_phieu().equals("N")){
+            if (ledgerDetailsList.get(0).getLoai_phieu().equals("N")){
                 System.out.println("Coping ...");
                 copyFileExcel();
                 System.out.println("fill data to report...");
@@ -86,12 +96,26 @@ public class ChiTietSCController implements Initializable {
 
                         wb.write(fileOutputStream);
                         fileOutputStream.close();
+                        ButtonType ok_btn = new ButtonType("OK");
+                        Alert a = new Alert(Alert.AlertType.CONFIRMATION,"Click open file to see report.", ok_btn);
+                        a.setTitle("Open file");
+                        a.showAndWait().ifPresent(response -> {
+                            if (response==ok_btn) {
+                                try {
+                                    Runtime.getRuntime().exec("cmd /c start excel PhieuNhap_Pr.xlsx");
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
                     }
+
                 } catch (FileNotFoundException ex) {
                     throw new RuntimeException(ex);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+
             }else {
                 System.out.println("Coping ...");
                 copyFileExcel_xuat();
@@ -106,7 +130,6 @@ public class ChiTietSCController implements Initializable {
                         wb = new XSSFWorkbook(fileInputStream);
                         new XSSFWorkbook(new FileInputStream(file));
 
-
                         // Now creating Sheets using sheet object
                         XSSFSheet sheet1 = wb.getSheet("phieu_xuat");
 
@@ -115,7 +138,21 @@ public class ChiTietSCController implements Initializable {
 
                         wb.write(fileOutputStream);
                         fileOutputStream.close();
+
+                        ButtonType ok_btn = new ButtonType("OK");
+                        Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Click open file to see report", ok_btn);
+                        a.setTitle("Open file");
+                        a.showAndWait().ifPresent(response -> {
+                            if (response==ok_btn) {
+                                try {
+                                    Runtime.getRuntime().exec("cmd /c start excel PhieuXuat_Pr.xlsx");
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
                     }
+
                 } catch (FileNotFoundException ex) {
                     throw new RuntimeException(ex);
                 } catch (IOException e) {
@@ -164,7 +201,25 @@ public class ChiTietSCController implements Initializable {
         {
             e.printStackTrace();
         }
+    }
 
+    private static void deleteExcelPhieuXuat(){
+        File file = new File("PhieuXuat_Pr.xlsx");
+        try
+        {
+            if(file.delete())                      //returns Boolean value
+            {
+                System.out.println(file.getName() + " deleted");   //getting and printing the file name
+            }
+            else
+            {
+                System.out.println("failed");
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public static void copyFileExcel(){
@@ -185,7 +240,7 @@ public class ChiTietSCController implements Initializable {
     }
 
     public static void copyFileExcel_xuat(){
-        deleteExcel();
+        deleteExcelPhieuXuat();
         File source = new File("baocao.xlsx");
         File dest = new File("PhieuXuat_Pr.xlsx");
         if (source.exists()){
@@ -219,7 +274,7 @@ public class ChiTietSCController implements Initializable {
         }
 
         int row_num = 12;
-        int thanh_tien = 0;
+        Long thanh_tien = 0L;
         for (int i = 0; i< ls.size(); i++) {
 
             setCEll(sheet, String.valueOf(i+1), row_num,1);
@@ -252,8 +307,8 @@ public class ChiTietSCController implements Initializable {
         setCEll(sheet, "ABC", 8,3);
         setCEll(sheet, ls.get(0).getDenngay(), 3,10);
         setCEll(sheet, ls.get(0).getSo_xe(), 4,10);
-        setCEll(sheet, ls.get(0).getSo_km(), 6,10);
-        setCEll(sheet, ls.get(0).getSo_gio(), 7,10);
+        setCEll(sheet, String.valueOf(ls.get(0).getSo_km()), 6,10);
+        setCEll(sheet, String.valueOf(ls.get(0).getSo_gio()), 7,10);
         setCEll(sheet, ls.get(0).getSo(), 3,7);
         setCEll(sheet, ls.get(0).getNgay(), 4,7);
 
@@ -262,7 +317,7 @@ public class ChiTietSCController implements Initializable {
         }
 
         int row_num = 12;
-        int thanh_tien = 0;
+        Long thanh_tien = 0L;
         for (int i = 0; i< ls.size(); i++) {
 
             setCEll(sheet, String.valueOf(i+1), row_num,1);
@@ -295,6 +350,13 @@ public class ChiTietSCController implements Initializable {
     private void setCEll(XSSFSheet sheet, String value, int row_num, int cell_num){
         Row row =  sheet.getRow(row_num);
         Cell cell = row.getCell(cell_num);
+        try {
+            int num = Integer.parseInt(value);
+            cell.setCellType(CellType.NUMERIC);
+        } catch (NumberFormatException e) {
+            cell.setCellType(CellType.STRING);
+        }
+
         cell.setCellValue(value);
     }
 
@@ -315,28 +377,36 @@ public class ChiTietSCController implements Initializable {
     }
 
     private void addNewImport(){
-        fct_stt.setCellValueFactory(new PropertyValueFactory<SoCaiDto, String>("stt"));
-        fct_tenxd.setCellValueFactory(new PropertyValueFactory<SoCaiDto, String>("ten_xd"));
-        fct_dongia.setCellValueFactory(new PropertyValueFactory<SoCaiDto, String>("don_gia"));
-        fct_phaixuat.setCellValueFactory(new PropertyValueFactory<SoCaiDto, String>("phai_xuat"));
-        fct_thucxuat.setCellValueFactory(new PropertyValueFactory<SoCaiDto, String>("thuc_xuat"));
-        fct_nhietdo.setCellValueFactory(new PropertyValueFactory<SoCaiDto, String>("nhiet_do_tt"));
-        fct_vcf.setCellValueFactory(new PropertyValueFactory<SoCaiDto, String>("he_so_vcf"));
-        fct_tytrong.setCellValueFactory(new PropertyValueFactory<SoCaiDto, String>("ty_trong"));
-        fct_tong.setCellValueFactory(new PropertyValueFactory<SoCaiDto, String>("thanh_tien"));
+        fct_stt.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("stt"));
+        fct_tenxd.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("ten_xd"));
+        fct_dongia.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("don_gia"));
+        fct_phaixuat.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("phai_xuat_str"));
+        fct_thucxuat.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("thuc_xuat_str"));
+        fct_nhietdo.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("nhiet_do_tt"));
+        fct_vcf.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("he_so_vcf"));
+        fct_tytrong.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("ty_trong"));
+        fct_tong.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("thanh_tien_str"));
     }
 
     private void fillDataToLabels(){
         lb_dvvc.setText(ls.get(0).getDvvc());
-        lb_dvn.setText(ls.get(0).getDvi());
+        if (ls.get(0).getNhiemvu_id()==0){
+            System.out.println("nhiemvu = 0");
+            lb_dvn.setText(ls.get(0).getDvi());
+            lb_tcn.setText(ls.get(0).getNhiem_vu());
+        }else {
+            lb_dvn.setText(phuongTienService.findPhuongTienById(ls.get(0).getPhuongtien_id()).getName());
+            lb_tcn.setText(nhiemVuService.findById(ls.get(0).getNhiemvu_id()).getTen_nv() + " - " + nhiemVuService.findById(ls.get(0).getNhiemvu_id()).getChi_tiet());
+        }
+
         lb_so.setText(ls.get(0).getSo());
         lb_nguoinhan.setText(ls.get(0).getNguoi_nhan_hang());
         lb_lenhkh.setText(ls.get(0).getTheo_lenh_so());
         lb_soxe.setText(ls.get(0).getSo_xe());
         lb_tcn.setText(ls.get(0).getNhiem_vu());
         lb_tungay.setText(ls.get(0).getNgay());
-        lb_sokm.setText(ls.get(0).getSo_km());
-        lb_sogio.setText(ls.get(0).getSo_gio());
+        lb_sokm.setText(String.valueOf(ls.get(0).getSo_km()));
+        lb_sogio.setText(String.valueOf(ls.get(0).getSo_gio()));
         lb_loaiphieu.setText(ls.get(0).getLoai_phieu().equals("N") ? "Phiếu nhập" : "Phiếu xuất");
         lb_denngay.setText("32/12/2024");
     }

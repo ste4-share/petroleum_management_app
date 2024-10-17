@@ -1,14 +1,14 @@
 package com.agasa.xd_f371_v0_0_1.service;
 
-import com.agasa.xd_f371_v0_0_1.entity.ChiTietNhiemVu;
+import com.agasa.xd_f371_v0_0_1.entity.ChitietNhiemVu;
+import com.agasa.xd_f371_v0_0_1.entity.NhiemVu;
 
 import java.util.List;
 
 public interface ChiTietNhiemVuService {
-    List<ChiTietNhiemVu> getAll();
-    ChiTietNhiemVu create(ChiTietNhiemVu chiTietNhiemVu);
-    ChiTietNhiemVu update(ChiTietNhiemVu chiTietNhiemVu);
-    ChiTietNhiemVu findCtnvByID(String chiTietNhiemVu);
-    ChiTietNhiemVu findById(int id);
-    ChiTietNhiemVu findByTenNv(String tennv, String ct);
+    List<ChitietNhiemVu> getAll();
+    ChitietNhiemVu create(ChitietNhiemVu nhiemVu);
+    ChitietNhiemVu update(ChitietNhiemVu nhiemVu);
+    ChitietNhiemVu findById(int id);
+    List<ChitietNhiemVu> findByTenNv(int nv_id);
 }

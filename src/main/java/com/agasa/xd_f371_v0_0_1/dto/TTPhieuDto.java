@@ -8,7 +8,7 @@ public class TTPhieuDto {
     private String ngaytao;
     private String tcn;
     private String hang_hoa;
-    private int tong;
+    private Long tong;
 
     public TTPhieuDto() {
     }
@@ -69,11 +69,11 @@ public class TTPhieuDto {
         this.hang_hoa = hang_hoa;
     }
 
-    public int getTong() {
+    public Long getTong() {
         return tong;
     }
 
-    public void setTong(int tong) {
+    public void setTong(Long tong) {
         this.tong = tong;
     }
 }

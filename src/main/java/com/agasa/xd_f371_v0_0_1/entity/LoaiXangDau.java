@@ -9,10 +9,27 @@ public class LoaiXangDau {
     private String chungloai;
     private Date createtime;
     private String status;
+    private String type;
+    private String Rtype;
 
     public LoaiXangDau() {
     }
 
+    public String getRtype() {
+        return Rtype;
+    }
+
+    public void setRtype(String rtype) {
+        Rtype = rtype;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public int getId() {
         return id;

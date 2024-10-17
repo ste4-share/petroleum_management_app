@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="676.0" prefWidth="874.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.agasa.xd_f371_v0_0_1.controller.BaoCaoController">
+   <center>
+      <VBox prefHeight="569.0" prefWidth="743.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox prefHeight="257.0" prefWidth="600.0">
+               <children>
+                  <ComboBox fx:id="loaiphieu_cbb" onAction="#lp_onselected" prefWidth="150.0" />
+                  <VBox>
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin>
+                     <children>
+                        <Label prefHeight="34.0" prefWidth="134.0" text="Catalog" />
+                        <TableView fx:id="category_tb" prefHeight="257.0" prefWidth="775.0">
+                          <columns>
+                            <TableColumn fx:id="col_categ_id" prefWidth="75.0" text="id" />
+                            <TableColumn fx:id="col_categ_title" prefWidth="75.0" text="title" />
+                              <TableColumn fx:id="col_categ_lv2" prefWidth="75.0" text="lv2" />
+                              <TableColumn fx:id="col_categ_lv3" prefWidth="75.0" text="lv3" />
+                          </columns>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
+                        </TableView>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <VBox prefHeight="192.0" prefWidth="580.0">
+                     <children>
+                        <Label text="tructhuoc_loaiphieu" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <TableView fx:id="tb_tructhuocloaiphieu" prefHeight="269.0" prefWidth="874.0">
+              <columns>
+                <TableColumn fx:id="col_ttlp_id" prefWidth="75.0" text="id" />
+                <TableColumn fx:id="col_ttlp_ttid" prefWidth="75.0" text="tructhuoc_id" />
+                  <TableColumn fx:id="col_ttlp_lpid" prefWidth="75.0" text="loaiphieu_id" />
+                  <TableColumn fx:id="col_ttlp_type" prefWidth="75.0" text="type" />
+                  <TableColumn fx:id="col_ttlp_name" prefWidth="75.0" text="name" />
+              </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+         </children>
+      </VBox>
+   </center>
+</BorderPane>

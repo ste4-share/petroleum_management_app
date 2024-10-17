@@ -9,9 +9,37 @@ public class LichsuXNK {
     private int soluong;
     private int tonsau;
     private String mucgia;
+
     private String createTime;
+    private String tontruoc_str;
+    private String soluong_str;
+    private String tonsau_str;
 
     public LichsuXNK() {
+    }
+
+    public String getTontruoc_str() {
+        return tontruoc_str;
+    }
+
+    public void setTontruoc_str(String tontruoc_str) {
+        this.tontruoc_str = tontruoc_str;
+    }
+
+    public String getSoluong_str() {
+        return soluong_str;
+    }
+
+    public void setSoluong_str(String soluong_str) {
+        this.soluong_str = soluong_str;
+    }
+
+    public String getTonsau_str() {
+        return tonsau_str;
+    }
+
+    public void setTonsau_str(String tonsau_str) {
+        this.tonsau_str = tonsau_str;
     }
 
     public String getMucgia() {
