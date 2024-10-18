@@ -2,12 +2,14 @@ package com.agasa.xd_f371_v0_0_1.controller;
 
 import com.agasa.xd_f371_v0_0_1.dto.LichsuXNK;
 import com.agasa.xd_f371_v0_0_1.dto.QuantityByTructhuocDTO;
+import com.agasa.xd_f371_v0_0_1.dto.TitleDto;
 import com.agasa.xd_f371_v0_0_1.entity.LedgerDetails;
 import com.agasa.xd_f371_v0_0_1.dto.TonKho;
 import com.agasa.xd_f371_v0_0_1.entity.*;
 import com.agasa.xd_f371_v0_0_1.model.*;
 import com.agasa.xd_f371_v0_0_1.service.*;
 import com.agasa.xd_f371_v0_0_1.service.impl.*;
+import com.agasa.xd_f371_v0_0_1.util.Common;
 import com.agasa.xd_f371_v0_0_1.util.TextToNumber;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -25,12 +27,14 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.controlsfx.control.textfield.TextFields;
+import org.jfree.util.Log;
 
 import java.io.*;
 import java.net.URL;
 import java.text.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class NhapController implements Initializable {
@@ -45,6 +49,7 @@ public class NhapController implements Initializable {
     private static NguonNx_tructhuoc nguonNxTructhuoc_selected = new NguonNx_tructhuoc();
     private static Tcn pre_createNewTcn = new Tcn();
     private boolean addedBySelection_lstb = false;
+    Logger logger = Logger.getLogger(NhapController.class.getName());
 
     @FXML
     private TextField soTf, recvTf,tcNhap,lenhKHso,soXe,
@@ -359,7 +364,6 @@ public class NhapController implements Initializable {
     private void updateInvReport(LedgerDetails ledgerDetails){
         LoaiPhieu lp= loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_NHAP);
         InvReport invReport = new InvReport();
-        invReport.setQuantity(ledgerDetails.getThuc_xuat());
         invReport.setPetroleum_id(ledgerDetails.getLoaixd_id());
         invReport.setInventory_id(ledgerDetails.getTonkhotong_id());
         QuantityByTructhuocDTO quantityByTructhuocDTO = ledgerDetailsService.selectQuantityByTT(lp.getType(),ledgerDetails.getLoaixd_id(), nguonNxTructhuoc_selected.getTructhuoc_id());
@@ -368,13 +372,16 @@ public class NhapController implements Initializable {
         }
         invReport.setPrice_id(ledgerDetails.getTonkho_id());
         TructhuocLoaiphieu tructhuocLoaiphieu = tructhuocLoaiphieuService.findByTTLPId(nguonNxTructhuoc_selected.getTructhuoc_id(), lp.getId());
-        if (tructhuocLoaiphieu!=null){
+        if (tructhuocLoaiphieu!=null) {
             Category category = categoryService.getTitleByttLpId(tructhuocLoaiphieu.getId());
+
             if (category!=null){
+                InvReport report = invReportService.findByPetroleum(ledgerDetails.getLoaixd_id(),DashboardController.findByTime.getId(), category.getId());
                 invReport.setReport_header(category.getId());
-                updateInvReportDetail(ledgerDetails, category);
+                updateInvReportDetail(ledgerDetails, category, report);
+                updateAllRowInv(ledgerDetails);
             }else{
-                throw new RuntimeException("tructhuocloaiphieu is null");
+                throw new RuntimeException("category is null");
             }
         }else {
             throw new RuntimeException("tructhuocloaiphieu is null");
@@ -382,7 +389,7 @@ public class NhapController implements Initializable {
         invReportService.updateReport(invReport);
     }
 
-    private void updateInvReportDetail(LedgerDetails ledgerDetails, Category category){
+    private void updateInvReportDetail(LedgerDetails ledgerDetails, Category category, InvReport report){
         InvReportDetail invReportDetail = new InvReportDetail();
         LoaiXangDau loaiXangDau = loaiXdService.findLoaiXdByID_non(cmb_tenxd.getValue().getId());
         if (loaiXangDau!=null){
@@ -394,6 +401,7 @@ public class NhapController implements Initializable {
             invReportDetail.setTitle_lv1(category.getHeader_lv1());
             invReportDetail.setTitle_lv2(category.getHeader_lv2());
             invReportDetail.setTitle_lv3(category.getHeader_lv3());
+            invReportDetail.setInv_report_id(report.getId());
             QuantityByTructhuocDTO quantityByTructhuocDTO = ledgerDetailsService.selectQuantityByTT(ledgerDetails.getLoai_phieu(), ledgerDetails.getLoaixd_id(),nguonNxTructhuoc_selected.getTructhuoc_id());
             if (quantityByTructhuocDTO!=null) {
                 invReportDetail.setSoluong(quantityByTructhuocDTO.getSoluong());
@@ -405,6 +413,25 @@ public class NhapController implements Initializable {
             throw new RuntimeException("Loaixd is null");
         }
     }
+
+    private void updateAllRowInv(LedgerDetails ledgerDetails){
+        List<InvReport> invReports = invReportService.getAllByPetroleumId(ledgerDetails.getLoaixd_id());
+        if (!invReports.isEmpty()){
+            for(int i = 0; i< invReports.size(); i++){
+                InvReport invReport = invReports.get(i);
+                TitleDto category = categoryService.getTitleById(invReport.getReport_header());
+                TonkhoTong tonkhoTong = tonkhoTongService.findById(ledgerDetails.getTonkhotong_id());
+                InvReportDetail invReportDetail = invReportDetailService.findByReportId(invReports.get(i).getId());
+                if (Common.getInvCatalogField(category, tonkhoTong,invReport, invReportDetail)){
+                    invReportService.updateReport(invReport);
+                    invReportDetailService.updateNew(invReportDetail);
+                }
+            }
+        }
+    }
+
+
+
     @FXML
     public void btnImport(ActionEvent actionEvent) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -722,20 +749,15 @@ public class NhapController implements Initializable {
         }
     }
     private void saveTonkhoTong(LedgerDetails ledgerDetails){
-        List<TonkhoTong> tonkhoTong = tonkhoTongService.findByQuarterAndXdAll(ledgerDetails.getQuarter_id(), ledgerDetails.getXd().getId());
-        if (tonkhoTong.isEmpty()) {
-            //add new tonkho_tong
-            createNewTonKho_Tong(ledgerDetails);
-            List<TonkhoTong> tonkhoTongList = tonkhoTongService.findByQuarterAndXdAll(ledgerDetails.getQuarter_id(), ledgerDetails.getXd().getId());
-            if (!tonkhoTongList.isEmpty()){
-                ledgerDetails.setTonkhotong_id(tonkhoTongList.get(0).getId());
-            }else {
-                throw new RuntimeException("tonkho tong not found");
-            }
-        } else {
-            updateTonKho_Tong(ledgerDetails, tonkhoTong.get(0).getTck_sum() + ledgerDetails.getThuc_xuat());
-            ledgerDetails.setTonkhotong_id(tonkhoTong.get(0).getId());
+        TonkhoTong tonkhoTong = tonkhoTongService.findByQuarterAndXdAll(ledgerDetails.getQuarter_id(), ledgerDetails.getXd().getId());
+        if (tonkhoTong!=null){
+            int tck = tonkhoTong.getTck_nvdx() + ledgerDetails.getThuc_xuat();
+            updateTonKho_Tong(tonkhoTong,tck);
+            ledgerDetails.setTonkhotong_id(tonkhoTong.getId());
+        }else{
+            throw  new NullPointerException("tonkho tong is null");
         }
+
     }
 
     @FXML
@@ -777,24 +799,9 @@ public class NhapController implements Initializable {
         tonKhoService.update(tonKho);
     }
 
-    private void createNewTonKho_Tong(LedgerDetails ledgerDetails){
-        TonkhoTong tonkhoTong = new TonkhoTong();
-        tonkhoTong.setId_quarter(ledgerDetails.getQuarter_id());
-        tonkhoTong.setId_xd(ledgerDetails.getXd().getId());
-        tonkhoTong.setTck_sum(ledgerDetails.getThuc_xuat());
-        tonkhoTong.setTck_nvdx(ledgerDetails.getThuc_xuat());
-        tonkhoTong.setTck_sscd(0);
-        DashboardController.prepare_addnew_inventory.add(tonkhoTong);
-        tonkhoTongService.create(tonkhoTong);
-    }
-
-    private void updateTonKho_Tong(LedgerDetails ledgerDetails, int sl_ton){
-        TonkhoTong tonkhoTong = new TonkhoTong();
-        tonkhoTong.setId_quarter(ledgerDetails.getQuarter_id());
-        tonkhoTong.setId_xd(ledgerDetails.getXd().getId());
-        tonkhoTong.setTck_sum(sl_ton);
-        tonkhoTong.setTck_nvdx(sl_ton);
-        tonkhoTong.setTck_sscd(0);
+    private void updateTonKho_Tong(TonkhoTong tonkhoTong, int tck){
+        tonkhoTong.setTck_sum(tck + tonkhoTong.getTck_sscd());
+        tonkhoTong.setTck_nvdx(tck);
         DashboardController.prepare_addnew_inventory.add(tonkhoTong);
         tonkhoTongService.update(tonkhoTong);
     }
@@ -940,12 +947,12 @@ public class NhapController implements Initializable {
     }
 
     private void setTonKhoLabel(){
-        List<TonkhoTong> tonkhoTongList = tonkhoTongService.findByQuarterAndXdAll(DashboardController.findByTime.getId(), cmb_tenxd.getSelectionModel().getSelectedItem().getId());
-        if (tonkhoTongList.isEmpty()){
-            lb_tontheoxd.setText("Số lượng tồn: " + 0 + " (Lit)");
-        }else{
-            String sl_ton = TextToNumber.textToNum(String.valueOf(tonkhoTongList.get(0).getTck_sum()));
+        TonkhoTong tonkhoTong = tonkhoTongService.findByQuarterAndXdAll(DashboardController.findByTime.getId(), cmb_tenxd.getSelectionModel().getSelectedItem().getId());
+        if (tonkhoTong!=null){
+            String sl_ton = TextToNumber.textToNum(String.valueOf(tonkhoTong.getTck_sum()));
             lb_tontheoxd.setText("Số lượng tồn: "+ sl_ton +" (Lit)");
+        }else{
+            throw new NullPointerException("tonkho is null");
         }
     }
 

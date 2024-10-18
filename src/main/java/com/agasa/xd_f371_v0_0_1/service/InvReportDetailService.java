@@ -9,6 +9,6 @@ public interface InvReportDetailService {
     List<InvReportDetail> getAll();
     int createNew(InvReportDetail invReportDetail);
     int updateNew(InvReportDetail invReportDetail);
-    List<InvReportDetail> findByTenXd(String lxd, String title1,String title3);
+    InvReportDetail findByReportId(int reportId);
     Map<String, Map<String, Long>> getTkMap();
 }

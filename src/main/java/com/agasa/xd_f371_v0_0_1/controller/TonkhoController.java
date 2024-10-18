@@ -6,6 +6,7 @@ import com.agasa.xd_f371_v0_0_1.model.ChungLoaiModel;
 import com.agasa.xd_f371_v0_0_1.model.ChungloaiMap;
 import com.agasa.xd_f371_v0_0_1.service.*;
 import com.agasa.xd_f371_v0_0_1.service.impl.*;
+import com.agasa.xd_f371_v0_0_1.util.Common;
 import com.agasa.xd_f371_v0_0_1.util.TextToNumber;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -514,6 +515,34 @@ public class TonkhoController implements Initializable {
     }
 
     @FXML
+    public void mockdataAction(ActionEvent actionEvent) {
+        mockInventoryData();
+    }
+
+    private void mockInventoryData(){
+        int tondk_nvdx_mock = 20000;
+        int tondk_sscd_mock = 20000;
+        int tondk_sum_mock = tondk_sscd_mock+tondk_nvdx_mock;
+        for (LoaiXangDau loaiXangDau : loaiXdService.getAll()) {
+
+            TonkhoTong tonkhoTong = new TonkhoTong();
+            tonkhoTong.setId_quarter(DashboardController.findByTime.getId());
+            tonkhoTong.setId_xd(loaiXangDau.getId());
+            tonkhoTong.setAmount(0);
+
+            tonkhoTong.setTdk_nvdx(tondk_nvdx_mock);
+            tonkhoTong.setTdk_sscd(tondk_sscd_mock);
+            tonkhoTong.setTdk_sum(tondk_sum_mock);
+
+            tonkhoTong.setTck_nvdx(tondk_nvdx_mock);
+            tonkhoTong.setTck_sscd(tondk_sscd_mock);
+            tonkhoTong.setTck_sum(tondk_sum_mock);
+            tonkhoTongService.create(tonkhoTong);
+        }
+        fillDataToTableTonkho();
+    }
+
+    @FXML
     public void mapDataNxt(ActionEvent actionEvent) {
         initMap();
     }
@@ -522,21 +551,24 @@ public class TonkhoController implements Initializable {
         List<LoaiXangDau> loaiXangDauList = loaiXdService.getAll();
         List<Category> categories = categoryService.getAll();
         try {
+            int quarter_id = DashboardController.findByTime.getId();
             for (int i =0; i< loaiXangDauList.size(); i++){
+                TonkhoTong tonkhoTong = tonkhoTongService.findByQuarterAndXdAll(quarter_id, loaiXangDauList.get(i).getId());
                 for (int j=0; j< categories.size(); j++){
+                    Category catelos = categories.get(j);
                     InvReport invReport = new InvReport();
-                    invReport.setQuantity(0);
+                    InvReportDetail invReportDetail = new InvReportDetail();
+                    TitleDto titleDto = new TitleDto(catelos.getHeader_lv1(), catelos.getHeader_lv2(),catelos.getHeader_lv3());
+
+                    Common.getInvCatalogField(titleDto, tonkhoTong, invReport, invReportDetail);
                     invReport.setReport_header(categories.get(j).getId());
                     invReport.setPetroleum_id(loaiXangDauList.get(i).getId());
                     invReport.setQuarter_id(DashboardController.findByTime.getId());
                     invReportService.create(invReport);
+                    InvReport invReport1 = invReportService.findByPetroleum(invReport.getPetroleum_id(), invReport.getQuarter_id(), invReport.getReport_header());
 
-                    // create detail
-                    TitleDto titleDto = categoryService.getTitleById(categories.get(j).getTructhuoc_id());
-
-                    InvReportDetail invReportDetail = new InvReportDetail();
+                    //inventory detail
                     invReportDetail.setLoaixd(loaiXangDauList.get(i).getTenxd());
-                    invReportDetail.setSoluong(0);
                     invReportDetail.setTitle_lv1(titleDto.getLv1());
                     invReportDetail.setTitle_lv2(titleDto.getLv2());
                     invReportDetail.setTitle_lv3(titleDto.getLv3());
@@ -544,6 +576,7 @@ public class TonkhoController implements Initializable {
                     invReportDetail.setTitle_lxd_lv1(titleMap.get(loaiXangDauList.get(i).getChungloai()));
                     invReportDetail.setTitle_lxd_lv2(titleMap.get(loaiXangDauList.get(i).getType()));
                     invReportDetail.setTitle_lxd_lv3(titleMap.get(loaiXangDauList.get(i).getRtype()));
+                    invReportDetail.setInv_report_id(invReport1.getId());
                     invReportDetailService.createNew(invReportDetail);
                 }
             }
@@ -551,6 +584,7 @@ public class TonkhoController implements Initializable {
             throw new RuntimeException(e);
         }
     }
+
 
     private void updateMap(){
         InvReport invReport = new InvReport();
@@ -562,4 +596,6 @@ public class TonkhoController implements Initializable {
         List<InvReportDetail> list = invReportDetailService.getAll();
 
     }
+
+
 }

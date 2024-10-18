@@ -8,7 +8,8 @@ import java.util.List;
 public interface TonkhoTongService {
     List<TonkhoTong> getAll();
     List<TonkhoTong> findByQuarterAll(int quarter_id);
+    TonkhoTong findById(int tonkhotongId);
     TonkhoTong create(TonkhoTong tonkhoTong);
     TonkhoTong update(TonkhoTong tonkhoTong);
-    List<TonkhoTong> findByQuarterAndXdAll(int quarter_id1, int xd_id1);
+    TonkhoTong findByQuarterAndXdAll(int quarter_id1, int xd_id1);
 }

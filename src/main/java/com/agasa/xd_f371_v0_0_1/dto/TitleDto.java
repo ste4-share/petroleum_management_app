@@ -9,6 +9,12 @@ public class TitleDto {
     public TitleDto() {
     }
 
+    public TitleDto(String lv1, String lv2, String lv3) {
+        this.lv1 = lv1;
+        this.lv2 = lv2;
+        this.lv3 = lv3;
+    }
+
     public String getLv1() {
         return lv1;
     }

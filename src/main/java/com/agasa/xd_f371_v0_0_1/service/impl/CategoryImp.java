@@ -101,18 +101,14 @@ public class CategoryImp implements CategoryService {
     @Override
     public TitleDto getTitleById(int catalog) {
         QDatabase.getConnectionDB();
-
-
-        String SQL_SELECT = "Select * from category where tructhuoc_lp_id=?";
+        String SQL_SELECT = "Select * from category where id=?";
 
         // auto close connection and preparedStatement
         try {
             PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
             preparedStatement.setInt(1, catalog);
             ResultSet resultSet = preparedStatement.executeQuery();
-
             while (resultSet.next()) {
-
                 String headerLv1 = resultSet.getString("header_lv1");
                 String headerLv2 = resultSet.getString("header_lv2");
                 String headerLv3 = resultSet.getString("header_lv3");

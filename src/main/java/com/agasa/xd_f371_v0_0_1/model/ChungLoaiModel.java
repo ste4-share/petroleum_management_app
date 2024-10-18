@@ -14,6 +14,10 @@ public enum ChungLoaiModel {
     DMN_HK_DDC("Dầu mỡ nhờn hàng không - Dầu động cơ"),
     DMN_HK_DTL("Dầu mỡ nhờn hàng không - Dầu thủy lực"),
     DMN_HK_DK("Dầu mỡ nhờn hàng không - Dầu khác"),
+    NVDX("DT cho NV đột xuất"),
+    SSCD("DT SSCD"),
+    TDK("Tồn đầu kỳ"),
+    TCK("Tồn cuối kỳ"),
     DMN_HK_MN("Dầu mỡ nhờn hàng không - Mỡ nhờn");
 
     public final String name;

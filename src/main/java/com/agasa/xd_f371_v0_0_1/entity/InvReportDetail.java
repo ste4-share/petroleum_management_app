@@ -10,17 +10,30 @@ public class InvReportDetail {
     private String title_lxd_lv1;
     private String title_lxd_lv2;
     private String title_lxd_lv3;
+    private int inv_report_id;
 
     public InvReportDetail() {
     }
 
-    public InvReportDetail(int id, String loaixd, int soluong, String title_lv1, String title_lv2, String title_lv3) {
+    public InvReportDetail(int id, String loaixd, int soluong, String title_lv1, String title_lv2, String title_lv3, String title_lxd_lv1, String title_lxd_lv2, String title_lxd_lv3, int inv_report_id) {
         this.id = id;
         this.loaixd = loaixd;
         this.soluong = soluong;
         this.title_lv1 = title_lv1;
         this.title_lv2 = title_lv2;
         this.title_lv3 = title_lv3;
+        this.title_lxd_lv1 = title_lxd_lv1;
+        this.title_lxd_lv2 = title_lxd_lv2;
+        this.title_lxd_lv3 = title_lxd_lv3;
+        this.inv_report_id = inv_report_id;
+    }
+
+    public int getInv_report_id() {
+        return inv_report_id;
+    }
+
+    public void setInv_report_id(int inv_report_id) {
+        this.inv_report_id = inv_report_id;
     }
 
     public String getTitle_lxd_lv1() {

@@ -55,6 +55,49 @@ public class InvReportImp implements InvReportService {
     }
 
     @Override
+    public List<InvReport> getAllByPetroleumId(int petroleumID) {
+        QDatabase.getConnectionDB();
+        List<InvReport> result = new ArrayList<>();
+
+
+        String SQL_SELECT = "Select * from inv_report where petroleum_id=?";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1,petroleumID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                int id = resultSet.getInt("id");
+                int petroleumId = resultSet.getInt("petroleum_id");
+                int quarterId = resultSet.getInt("quarter_id");
+                int inventoryId = resultSet.getInt("inventory_id");
+                int reportHeader = resultSet.getInt("report_header");
+                int quantity = resultSet.getInt("quantity");
+                int priceId = resultSet.getInt("price_id");
+                InvReport invReport = new InvReport();
+                invReport.setId(id);
+                invReport.setPetroleum_id(petroleumId);
+                invReport.setQuantity(quarterId);
+                invReport.setInventory_id(inventoryId);
+                invReport.setReport_header(reportHeader);
+                invReport.setQuantity(quantity);
+                invReport.setPrice_id(priceId);
+                result.add(invReport);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
     public int updateReport(InvReport invReport) {
         String SQL_SELECT = "update inv_report set inventory_id=?, quantity=?,price_id=? where petroleum_id=? and quarter_id=? and report_header=?";
 

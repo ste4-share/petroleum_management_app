@@ -2,9 +2,11 @@ package com.agasa.xd_f371_v0_0_1.controller;
 
 import com.agasa.xd_f371_v0_0_1.dto.*;
 import com.agasa.xd_f371_v0_0_1.entity.*;
+import com.agasa.xd_f371_v0_0_1.fatory.CommonFactory;
 import com.agasa.xd_f371_v0_0_1.model.*;
 import com.agasa.xd_f371_v0_0_1.service.*;
 import com.agasa.xd_f371_v0_0_1.service.impl.*;
+import com.agasa.xd_f371_v0_0_1.util.Common;
 import com.agasa.xd_f371_v0_0_1.util.TextToNumber;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,7 +29,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class XuatController implements Initializable {
+public class XuatController extends CommonFactory implements Initializable {
 
     private static int stt = 0;
     private static final String DEFAUL_NGUONNX = "f Bộ";
@@ -40,7 +42,6 @@ public class XuatController implements Initializable {
     private static Mucgia mucgia_id_selected_mucgia_cbb = new Mucgia();
     private static Mucgia mucgia_id_selected_mucgia_cbb_nv = new Mucgia();
     private static List<Tcn> tcx_ls_buf = new ArrayList<>();
-    private static NhiemVu ctnv_selected_by_tcn = new NhiemVu();
     private static NguonNx_tructhuoc nguonNxTructhuoc_selected = new NguonNx_tructhuoc();
     private static NguonNx_tructhuoc nguonNxTructhuoc_selected_nv = new NguonNx_tructhuoc();
     private static List<NhiemVu> nhiemvu_ls_buf = new ArrayList<>();
@@ -100,7 +101,6 @@ public class XuatController implements Initializable {
     private PhuongTienService phuongTienService = new PhuongTienImp();
     private NguonNx_tructhuocService nguonNxTructhuocService = new NguonNx_tructhuocImp();
     private NguonNx_tcnService nguonNxTcnService = new NguonNx_tcnImp();
-    private TrucThuocService trucThuocService = new TrucThuocImp();
     private TcnService tcnService = new TcnImp();
     private LedgerService ledgerService = new LedgerImp();
     private LoaiPhieuService loaiPhieuService = new LoaiPhieuImp();
@@ -234,6 +234,7 @@ public class XuatController implements Initializable {
                         saveTonkhoTong(soCaiDto);
                         saveTonkho(soCaiDto);
                         ledgerDetailsService.create(soCaiDto);
+                        updateInvReport(soCaiDto, nguonNxTructhuoc_selected.getTructhuoc_id());
                     });
                     ls_socai = new ArrayList<>();
                     DashboardController.xuatStage.close();
@@ -283,20 +284,13 @@ public class XuatController implements Initializable {
         }
     }
     private void saveTonkhoTong(LedgerDetails ledgerDetails){
-        List<TonkhoTong> tonkhoTong = tonkhoTongService.findByQuarterAndXdAll(ledgerDetails.getQuarter_id(), ledgerDetails.getXd().getId());
-        if (tonkhoTong.isEmpty()) {
-            //add new tonkho_tong
-            createNewTonKho_Tong(ledgerDetails);
-            List<TonkhoTong> tonkhoTongList = tonkhoTongService.findByQuarterAndXdAll(ledgerDetails.getQuarter_id(), ledgerDetails.getXd().getId());
-            if (!tonkhoTongList.isEmpty()){
-                ledgerDetails.setTonkhotong_id(tonkhoTongList.get(0).getId());
-            }else {
-                throw new RuntimeException("tonkho tong not found");
-            }
-        } else {
-            //update ton kho
-            updateTonKho_Tong(ledgerDetails, tonkhoTong.get(0));
-            ledgerDetails.setTonkhotong_id(tonkhoTong.get(0).getId());
+        TonkhoTong tonkhoTong = tonkhoTongService.findByQuarterAndXdAll(ledgerDetails.getQuarter_id(), ledgerDetails.getXd().getId());
+        if (tonkhoTong!=null) {
+            int tck = tonkhoTong.getTck_nvdx() - ledgerDetails.getThuc_xuat();
+            updateTonKho_Tong(tonkhoTong, tck);
+            ledgerDetails.setTonkhotong_id(tonkhoTong.getId());
+        }else{
+            throw new NullPointerException("tonkhotong is null");
         }
     }
     private void saveTonkho(LedgerDetails ledgerDetails){
@@ -641,9 +635,10 @@ public class XuatController implements Initializable {
                             soCaiDto.setLedger_id(0);
                         }
                         saveMucgia(soCaiDto);
-                        saveTonkhoTong(soCaiDto);
                         saveTonkho(soCaiDto);
+                        saveTonkhoTong(soCaiDto);
                         ledgerDetailsService.create(soCaiDto);
+                        updateInvReport(soCaiDto, nguonNxTructhuoc_selected_nv.getTructhuoc_id());
                     });
                     ls_socai = new ArrayList<>();
                     DashboardController.xuatStage.close();
@@ -929,20 +924,10 @@ public class XuatController implements Initializable {
         lichsuXNK.setMucgia(String.valueOf(ledgerDetails.getDon_gia()));
         lichsuNXKService.createNew(lichsuXNK);
     }
-    private void createNewTonKho_Tong(LedgerDetails ledgerDetails){
-        TonkhoTong tonkhoTong = new TonkhoTong();
-        tonkhoTong.setId_quarter(ledgerDetails.getQuarter_id());
-        tonkhoTong.setId_xd(ledgerDetails.getXd().getId());
-        tonkhoTong.setTck_sum(ledgerDetails.getThuc_xuat()*(-1));
-        tonkhoTong.setTck_nvdx(ledgerDetails.getThuc_xuat()*(-1));
-        tonkhoTong.setTck_sscd(0);
-        tonkhoTongService.create(tonkhoTong);
 
-    }
-
-    private void updateTonKho_Tong(LedgerDetails ledgerDetails, TonkhoTong tonkhoTong){
-        tonkhoTong.setTck_sum(tonkhoTong.getTck_sum()- ledgerDetails.getThuc_xuat());
-        tonkhoTong.setTck_nvdx(tonkhoTong.getTck_nvdx()- ledgerDetails.getThuc_xuat());
+    private void updateTonKho_Tong(TonkhoTong tonkhoTong, int tck){
+        tonkhoTong.setTck_sum(tck + tonkhoTong.getTck_sscd());
+        tonkhoTong.setTck_nvdx(tck);
         tonkhoTongService.update(tonkhoTong);
     }
 
@@ -1054,4 +1039,5 @@ public class XuatController implements Initializable {
         System.out.println("dvn_: "+  cbb_dvn_xk.getSelectionModel().getSelectedItem().getTen());
 
     }
+
 }

@@ -42,6 +42,7 @@ public class invReportDetailImp implements InvReportDetailService {
                 String lxdlv1 = resultSet.getString("title_lxd_lv1");
                 String lxdlv2 = resultSet.getString("title_lxd_lv2");
                 String lxdlv3 = resultSet.getString("title_lxd_lv3");
+                int report_id = resultSet.getInt("inv_report_id");
                 InvReportDetail invReport = new InvReportDetail();
                 invReport.setId(id);
                 invReport.setLoaixd(loaixd);
@@ -52,6 +53,7 @@ public class invReportDetailImp implements InvReportDetailService {
                 invReport.setTitle_lxd_lv1(lxdlv1);
                 invReport.setTitle_lxd_lv2(lxdlv2);
                 invReport.setTitle_lxd_lv3(lxdlv3);
+                invReport.setInv_report_id(report_id);
                 result.add(invReport);
             }
 
@@ -66,7 +68,7 @@ public class invReportDetailImp implements InvReportDetailService {
 
     @Override
     public int createNew(InvReportDetail invReportDetail) {
-        String SQL_SELECT = "insert into inv_report_detail(loaixd,soluong,title_lv1,title_lv2,title_lv3,title_lxd_lv1,title_lxd_lv2,title_lxd_lv3) values(?,?,?,?,?,?,?,?)";
+        String SQL_SELECT = "insert into inv_report_detail(loaixd,soluong,title_lv1,title_lv2,title_lv3,title_lxd_lv1,title_lxd_lv2,title_lxd_lv3,inv_report_id) values(?,?,?,?,?,?,?,?,?)";
 
         // auto close connection and preparedStatement
         try {
@@ -79,6 +81,7 @@ public class invReportDetailImp implements InvReportDetailService {
             preparedStatement.setString(6, invReportDetail.getTitle_lxd_lv1());
             preparedStatement.setString(7, invReportDetail.getTitle_lxd_lv2());
             preparedStatement.setString(8, invReportDetail.getTitle_lxd_lv3());
+            preparedStatement.setInt(9, invReportDetail.getInv_report_id());
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -90,7 +93,7 @@ public class invReportDetailImp implements InvReportDetailService {
 
     @Override
     public int updateNew(InvReportDetail invReportDetail) {
-        String SQL_SELECT = "update inv_report_detail set soluong=?,title_lv1=?,title_lv2=?,title_lv3=?,title_lxd_lv1=?,title_lxd_lv2=?,title_lxd_lv3=? where loaixd=? and title_lv1=? and title_lv3=?";
+        String SQL_SELECT = "update inv_report_detail set soluong=?,title_lv1=?,title_lv2=?,title_lv3=?,title_lxd_lv1=?,title_lxd_lv2=?,title_lxd_lv3=? where inv_report_id=?";
 
         // auto close connection and preparedStatement
         try {
@@ -102,9 +105,7 @@ public class invReportDetailImp implements InvReportDetailService {
             preparedStatement.setString(5, invReportDetail.getTitle_lxd_lv1());
             preparedStatement.setString(6, invReportDetail.getTitle_lxd_lv2());
             preparedStatement.setString(7, invReportDetail.getTitle_lxd_lv3());
-            preparedStatement.setString(8, invReportDetail.getLoaixd());
-            preparedStatement.setString(9, invReportDetail.getTitle_lv1());
-            preparedStatement.setString(10, invReportDetail.getTitle_lv3());
+            preparedStatement.setInt(8, invReportDetail.getInv_report_id());
 
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
@@ -117,19 +118,14 @@ public class invReportDetailImp implements InvReportDetailService {
     }
 
     @Override
-    public List<InvReportDetail> findByTenXd(String lxd, String title1, String title3) {
+    public InvReportDetail findByReportId(int reportId) {
         QDatabase.getConnectionDB();
-        List<InvReportDetail> result = new ArrayList<>();
-
-
-        String SQL_SELECT = "Select * from inv_report_detail where loaixd=? and title_lv1=? and title_lv3=?";
+        String SQL_SELECT = "Select * from inv_report_detail where inv_report_id=?";
 
         // auto close connection and preparedStatement
         try {
             PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
-            preparedStatement.setString(1,lxd);
-            preparedStatement.setString(2,title1);
-            preparedStatement.setString(3, title3);
+            preparedStatement.setInt(1,reportId);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
@@ -143,6 +139,7 @@ public class invReportDetailImp implements InvReportDetailService {
                 String lxdlv1 = resultSet.getString("title_lxd_lv1");
                 String lxdlv2 = resultSet.getString("title_lxd_lv2");
                 String lxdlv3 = resultSet.getString("title_lxd_lv3");
+                int report_id = resultSet.getInt("inv_report_id");
                 InvReportDetail invReport = new InvReportDetail();
                 invReport.setId(id);
                 invReport.setLoaixd(loaixd);
@@ -153,7 +150,8 @@ public class invReportDetailImp implements InvReportDetailService {
                 invReport.setTitle_lxd_lv1(lxdlv1);
                 invReport.setTitle_lxd_lv2(lxdlv2);
                 invReport.setTitle_lxd_lv3(lxdlv3);
-                result.add(invReport);
+                invReport.setInv_report_id(report_id);
+                return invReport;
             }
 
         } catch (SQLException e) {
@@ -162,7 +160,7 @@ public class invReportDetailImp implements InvReportDetailService {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        return result;
+        return null;
     }
 
     @Override
