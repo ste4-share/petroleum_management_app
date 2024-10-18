@@ -194,9 +194,12 @@ public class QuarterImp implements QuarterService {
 
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            throw new RuntimeException(e);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return result;
     }
+
+
 }

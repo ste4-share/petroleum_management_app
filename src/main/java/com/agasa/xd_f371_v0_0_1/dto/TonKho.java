@@ -8,18 +8,41 @@ public class TonKho {
     private int mucgia;
     private String createtime;
     private String status;
-    private int sl_tong;
+    private int quarter_id;
+    private int loaixd_id;
+    private int mucgia_id;
+
+
+    public TonKho() {
+    }
+
+
+    public int getLoaixd_id() {
+        return loaixd_id;
+    }
+
+    public void setLoaixd_id(int loaixd_id) {
+        this.loaixd_id = loaixd_id;
+    }
+
+    public int getMucgia_id() {
+        return mucgia_id;
+    }
+
+    public void setMucgia_id(int mucgia_id) {
+        this.mucgia_id = mucgia_id;
+    }
 
     public int getId() {
         return id;
     }
 
-    public int getSl_tong() {
-        return sl_tong;
+    public int getQuarter_id() {
+        return quarter_id;
     }
 
-    public void setSl_tong(int sl_tong) {
-        this.sl_tong = sl_tong;
+    public void setQuarter_id(int quarter_id) {
+        this.quarter_id = quarter_id;
     }
 
     public int getStt() {

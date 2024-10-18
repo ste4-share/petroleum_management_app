@@ -1,15 +1,22 @@
 package com.agasa.xd_f371_v0_0_1.fatory;
 
 import com.agasa.xd_f371_v0_0_1.controller.DashboardController;
+import com.agasa.xd_f371_v0_0_1.dto.LichsuXNK;
 import com.agasa.xd_f371_v0_0_1.dto.QuantityByTructhuocDTO;
 import com.agasa.xd_f371_v0_0_1.dto.TitleDto;
+import com.agasa.xd_f371_v0_0_1.dto.TonKho;
 import com.agasa.xd_f371_v0_0_1.entity.*;
 import com.agasa.xd_f371_v0_0_1.model.ChungloaiMap;
 import com.agasa.xd_f371_v0_0_1.model.LoaiPhieu_cons;
+import com.agasa.xd_f371_v0_0_1.model.MucGiaEnum;
 import com.agasa.xd_f371_v0_0_1.service.*;
 import com.agasa.xd_f371_v0_0_1.service.impl.*;
 import com.agasa.xd_f371_v0_0_1.util.Common;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +30,9 @@ public class CommonFactory {
     protected InvReportService invReportService = new InvReportImp();
     protected LoaiXdService loaiXdService = new LoaiXdImp();
     protected TonkhoTongService tonkhoTongService = new TonkhoTongImp();
+    protected TonKhoService tonKhoService = new TonkhoImp();
+    protected MucgiaService mucgiaService = new MucgiaImp();
+    protected LichsuNXKService lichsuNXKService = new LichsuNXKImp();
 
     protected void updateInvReport(LedgerDetails ledgerDetails, int tt_id){
         LoaiPhieu lp= loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_XUAT);
@@ -91,5 +101,64 @@ public class CommonFactory {
                 }
             }
         }
+    }
+
+    protected void createNewMucgia(LedgerDetails ledgerDetails, int quantity){
+        Mucgia mucgia = new Mucgia();
+        mucgia.setPrice(ledgerDetails.getDon_gia());
+        mucgia.setAmount(quantity);
+        mucgia.setQuarter_id(ledgerDetails.getQuarter_id());
+        mucgia.setItem_id(ledgerDetails.getXd().getId());
+        mucgia.setStatus(MucGiaEnum.IN_STOCK.getStatus());
+        mucgiaService.createNew(mucgia);
+    }
+    protected void updateMucgia(int quantity, Mucgia mucgia_existed){
+        if (quantity ==0){
+            mucgia_existed.setStatus(MucGiaEnum.OUT_STOCK.getStatus());
+            mucgia_existed.setAmount(quantity);
+        } else if (quantity<0) {
+            mucgia_existed.setStatus(MucGiaEnum.SUPER_OUT_STOCK.getStatus());
+            mucgia_existed.setAmount(quantity);
+        }else {
+            mucgia_existed.setStatus(MucGiaEnum.IN_STOCK.getStatus());
+            mucgia_existed.setAmount(quantity);
+        }
+        mucgiaService.updateMucGia(mucgia_existed);
+    }
+
+
+    protected void updateTonKho(TonKho tonKho, int soluong){
+        tonKho.setSoluong(soluong);
+        tonKhoService.update(tonKho);
+    }
+    protected TonKho createNewTonKho(LedgerDetails ledgerDetails, int soluong){
+        TonKho tonKho = new TonKho();
+        tonKho.setLoai_xd(ledgerDetails.getTen_xd().trim());
+        tonKho.setMucgia(ledgerDetails.getDon_gia());
+        tonKho.setSoluong(soluong);
+        Mucgia mucgia = mucgiaService.findMucgiaByGia(ledgerDetails.getLoaixd_id(),DashboardController.findByTime.getId(),ledgerDetails.getDon_gia());
+        tonKho.setMucgia_id(mucgia.getId());
+        tonKho.setLoaixd_id(ledgerDetails.getLoaixd_id());
+        tonKho.setQuarter_id(DashboardController.findByTime.getId());
+        // get current day
+        String pattern = "MM/dd/yyyy HH:mm:ss";
+        DateFormat df = new SimpleDateFormat(pattern);
+        Date today = Calendar.getInstance().getTime();
+        String todayAsString = df.format(today);
+        tonKho.setCreatetime(todayAsString);
+        tonKho.setStatus("CREATED");
+        return tonKhoService.create(tonKho);
+    }
+
+    protected void createNewTransaction(LedgerDetails ledgerDetails, int tontruoc, int tonsau){
+        LichsuXNK lichsuXNK = new LichsuXNK();
+        lichsuXNK.setTen_xd(ledgerDetails.getTen_xd());
+        lichsuXNK.setLoai_phieu(ledgerDetails.getLoai_phieu());
+        lichsuXNK.setSoluong(ledgerDetails.getThuc_xuat());
+        lichsuXNK.setCreateTime(ledgerDetails.getNgay());
+        lichsuXNK.setTontruoc(tontruoc);
+        lichsuXNK.setTonsau(tonsau);
+        lichsuXNK.setMucgia(String.valueOf(ledgerDetails.getDon_gia()));
+        lichsuNXKService.createNew(lichsuXNK);
     }
 }

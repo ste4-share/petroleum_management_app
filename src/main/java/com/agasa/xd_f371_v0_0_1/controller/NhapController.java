@@ -6,6 +6,7 @@ import com.agasa.xd_f371_v0_0_1.dto.TitleDto;
 import com.agasa.xd_f371_v0_0_1.entity.LedgerDetails;
 import com.agasa.xd_f371_v0_0_1.dto.TonKho;
 import com.agasa.xd_f371_v0_0_1.entity.*;
+import com.agasa.xd_f371_v0_0_1.fatory.CommonFactory;
 import com.agasa.xd_f371_v0_0_1.model.*;
 import com.agasa.xd_f371_v0_0_1.service.*;
 import com.agasa.xd_f371_v0_0_1.service.impl.*;
@@ -37,7 +38,7 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class NhapController implements Initializable {
+public class NhapController extends CommonFactory implements Initializable {
     private static List<LedgerDetails> ls_socai;
     private static int stt = 0;
     private static int dvvc_id =0;
@@ -361,76 +362,6 @@ public class NhapController implements Initializable {
             clearHH();
         }
     }
-    private void updateInvReport(LedgerDetails ledgerDetails){
-        LoaiPhieu lp= loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_NHAP);
-        InvReport invReport = new InvReport();
-        invReport.setPetroleum_id(ledgerDetails.getLoaixd_id());
-        invReport.setInventory_id(ledgerDetails.getTonkhotong_id());
-        QuantityByTructhuocDTO quantityByTructhuocDTO = ledgerDetailsService.selectQuantityByTT(lp.getType(),ledgerDetails.getLoaixd_id(), nguonNxTructhuoc_selected.getTructhuoc_id());
-        if (quantityByTructhuocDTO!=null){
-            invReport.setQuantity(quantityByTructhuocDTO.getSoluong());
-        }
-        invReport.setPrice_id(ledgerDetails.getTonkho_id());
-        TructhuocLoaiphieu tructhuocLoaiphieu = tructhuocLoaiphieuService.findByTTLPId(nguonNxTructhuoc_selected.getTructhuoc_id(), lp.getId());
-        if (tructhuocLoaiphieu!=null) {
-            Category category = categoryService.getTitleByttLpId(tructhuocLoaiphieu.getId());
-
-            if (category!=null){
-                InvReport report = invReportService.findByPetroleum(ledgerDetails.getLoaixd_id(),DashboardController.findByTime.getId(), category.getId());
-                invReport.setReport_header(category.getId());
-                updateInvReportDetail(ledgerDetails, category, report);
-                updateAllRowInv(ledgerDetails);
-            }else{
-                throw new RuntimeException("category is null");
-            }
-        }else {
-            throw new RuntimeException("tructhuocloaiphieu is null");
-        }
-        invReportService.updateReport(invReport);
-    }
-
-    private void updateInvReportDetail(LedgerDetails ledgerDetails, Category category, InvReport report){
-        InvReportDetail invReportDetail = new InvReportDetail();
-        LoaiXangDau loaiXangDau = loaiXdService.findLoaiXdByID_non(cmb_tenxd.getValue().getId());
-        if (loaiXangDau!=null){
-            invReportDetail.setLoaixd(ledgerDetails.getTen_xd());
-            Map<String, String> titleMap = ChungloaiMap.getMapChungloai();
-            invReportDetail.setTitle_lxd_lv1(titleMap.get(loaiXangDau.getChungloai()));
-            invReportDetail.setTitle_lxd_lv2(titleMap.get(loaiXangDau.getType()));
-            invReportDetail.setTitle_lxd_lv3(titleMap.get(loaiXangDau.getRtype()));
-            invReportDetail.setTitle_lv1(category.getHeader_lv1());
-            invReportDetail.setTitle_lv2(category.getHeader_lv2());
-            invReportDetail.setTitle_lv3(category.getHeader_lv3());
-            invReportDetail.setInv_report_id(report.getId());
-            QuantityByTructhuocDTO quantityByTructhuocDTO = ledgerDetailsService.selectQuantityByTT(ledgerDetails.getLoai_phieu(), ledgerDetails.getLoaixd_id(),nguonNxTructhuoc_selected.getTructhuoc_id());
-            if (quantityByTructhuocDTO!=null) {
-                invReportDetail.setSoluong(quantityByTructhuocDTO.getSoluong());
-            }else {
-                throw new RuntimeException("quantityByTructhuocDTO null");
-            }
-            invReportDetailService.updateNew(invReportDetail);
-        }else {
-            throw new RuntimeException("Loaixd is null");
-        }
-    }
-
-    private void updateAllRowInv(LedgerDetails ledgerDetails){
-        List<InvReport> invReports = invReportService.getAllByPetroleumId(ledgerDetails.getLoaixd_id());
-        if (!invReports.isEmpty()){
-            for(int i = 0; i< invReports.size(); i++){
-                InvReport invReport = invReports.get(i);
-                TitleDto category = categoryService.getTitleById(invReport.getReport_header());
-                TonkhoTong tonkhoTong = tonkhoTongService.findById(ledgerDetails.getTonkhotong_id());
-                InvReportDetail invReportDetail = invReportDetailService.findByReportId(invReports.get(i).getId());
-                if (Common.getInvCatalogField(category, tonkhoTong,invReport, invReportDetail)){
-                    invReportService.updateReport(invReport);
-                    invReportDetailService.updateNew(invReportDetail);
-                }
-            }
-        }
-    }
-
-
 
     @FXML
     public void btnImport(ActionEvent actionEvent) {
@@ -453,10 +384,11 @@ public class NhapController implements Initializable {
                         }
                         // add new so_cai
                         saveMucGia(soCaiDto);
-                        saveTonkho(soCaiDto);
-                        saveTonkhoTong(soCaiDto);
+                        savetk(soCaiDto);
+                        savetkt(soCaiDto);
+                        saveLichsunxk(soCaiDto);
                         ledgerDetailsService.create(soCaiDto);
-                        updateInvReport(soCaiDto);
+                        updateInvReport(soCaiDto, nguonNxTructhuoc_selected.getTructhuoc_id());
                     });
                 } catch (Exception e) {
                     Alert error= new Alert(Alert.AlertType.ERROR);
@@ -475,6 +407,54 @@ public class NhapController implements Initializable {
                 error.showAndWait();
             }
         }
+    }
+
+    private void saveLichsunxk(LedgerDetails soCaiDto) {
+        int quarter_id = DashboardController.findByTime.getId();
+        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia());
+        TonKho tonKho =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
+        int tonsau = tonKho.getSoluong()+ soCaiDto.getThuc_xuat();
+        int tontruoc = tonKho.getSoluong();
+        createNewTransaction(soCaiDto, tontruoc, tonsau);
+    }
+
+    private void savetk(LedgerDetails soCaiDto) {
+        int quarter_id = DashboardController.findByTime.getId();
+        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia());
+        TonKho tonKho =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
+        if (tonKho==null){
+            createNewTonKho(soCaiDto, soCaiDto.getThuc_xuat());
+            TonKho tonKho1 =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
+            soCaiDto.setTonkho_id(tonKho1.getId());
+        }else{
+            int soluong = tonKho.getSoluong() + soCaiDto.getThuc_xuat();
+            updateTonKho(tonKho, soluong);
+            soCaiDto.setTonkho_id(tonKho.getId());
+        }
+    }
+
+    private void saveMucGia(LedgerDetails soCaiDto){
+        Mucgia mucgia_existed = mucgiaService.findMucgiaByGia(soCaiDto.getXd().getId(), soCaiDto.getQuarter_id(), soCaiDto.getDon_gia());
+        if (mucgia_existed==null){
+            createNewMucgia(soCaiDto, soCaiDto.getThuc_xuat());
+        }else{
+            int quantityPerPrice = mucgia_existed.getAmount() - soCaiDto.getThuc_xuat();
+            updateMucgia(quantityPerPrice, mucgia_existed);
+        }
+    }
+
+    private void savetkt(LedgerDetails soCaiDto) {
+        TonkhoTong tonkhoTong = tonkhoTongService.findByQuarterAndXdAll(soCaiDto.getQuarter_id(), soCaiDto.getXd().getId());
+        if (tonkhoTong!=null) {
+            int tck = tonkhoTong.getTck_nvdx() + soCaiDto.getThuc_xuat();
+            tonkhoTong.setTck_sum(tck + tonkhoTong.getTck_sscd());
+            tonkhoTong.setTck_nvdx(tck);
+            tonkhoTongService.update(tonkhoTong);
+            soCaiDto.setTonkhotong_id(tonkhoTong.getId());
+        }else{
+            throw new NullPointerException("tonkhotong is null");
+        }
+
     }
 
     private void createNewLedger() {
@@ -712,110 +692,10 @@ public class NhapController implements Initializable {
         }
     }
 
-    private void saveMucGia(LedgerDetails ledgerDetails){
-        List<Mucgia> mucgiaList = mucgiaService.findMucgiaByGia(ledgerDetails.getXd().getId(), ledgerDetails.getQuarter_id(), ledgerDetails.getDon_gia());
-        if (mucgiaList.isEmpty()){
-            //add new mucgia
-            Mucgia mucgia = new Mucgia();
-            mucgia.setPrice(ledgerDetails.getDon_gia());
-            mucgia.setAmount(ledgerDetails.getThuc_xuat());
-            mucgia.setQuarter_id(ledgerDetails.getQuarter_id());
-            mucgia.setItem_id(ledgerDetails.getXd().getId());
-            mucgia.setStatus(MucGiaEnum.IN_STOCK.getStatus());
-            mucgiaService.createNew(mucgia);
-        }
-        else {
-            Mucgia mucgia = mucgiaList.get(0);
-            mucgia.setAmount(mucgia.getAmount() + ledgerDetails.getThuc_xuat());
-            mucgiaService.updateMucGia(mucgia);
-        }
-    }
-    private void saveTonkho(LedgerDetails ledgerDetails){
-        List<TonKho> tonKhos =tonKhoService.findByLoaiXD(ledgerDetails.getTen_xd().trim(), ledgerDetails.getDon_gia());
-        if (tonKhos.isEmpty()){
-            //add new tonkho
-            createNewTonKho(ledgerDetails);
-            List<TonKho> tonKhos_new =tonKhoService.findByLoaiXD(ledgerDetails.getTen_xd().trim(), ledgerDetails.getDon_gia());
-            if (!tonKhos_new.isEmpty()){
-                ledgerDetails.setTonkho_id(tonKhos_new.get(0).getId());
-            }else {
-                throw new RuntimeException("Ton kho is empty");
-            }
-        }
-        else {
-            int sl_ton_truoc = tonKhos.get(0).getSoluong();
-            updateTonKho(ledgerDetails, sl_ton_truoc);
-            ledgerDetails.setTonkho_id(tonKhos.get(0).getId());
-        }
-    }
-    private void saveTonkhoTong(LedgerDetails ledgerDetails){
-        TonkhoTong tonkhoTong = tonkhoTongService.findByQuarterAndXdAll(ledgerDetails.getQuarter_id(), ledgerDetails.getXd().getId());
-        if (tonkhoTong!=null){
-            int tck = tonkhoTong.getTck_nvdx() + ledgerDetails.getThuc_xuat();
-            updateTonKho_Tong(tonkhoTong,tck);
-            ledgerDetails.setTonkhotong_id(tonkhoTong.getId());
-        }else{
-            throw  new NullPointerException("tonkho tong is null");
-        }
-
-    }
 
     @FXML
     public void btnCancel(ActionEvent actionEvent) {
         DashboardController.primaryStage.close();
-    }
-
-    private void createNewTonKho(LedgerDetails ledgerDetails){
-        createNewTransaction(ledgerDetails, 0, ledgerDetails.getThuc_xuat());
-        TonKho tonKho = new TonKho();
-        tonKho.setLoai_xd(ledgerDetails.getTen_xd().trim());
-        tonKho.setMucgia(ledgerDetails.getDon_gia());
-        tonKho.setSoluong(ledgerDetails.getThuc_xuat());
-        // get current day
-        String pattern = "MM/dd/yyyy HH:mm:ss";
-        DateFormat df = new SimpleDateFormat(pattern);
-        Date today = Calendar.getInstance().getTime();
-        String todayAsString = df.format(today);
-        tonKho.setCreatetime(todayAsString);
-        tonKho.setStatus("CREATED");
-        tonKhoService.create(tonKho);
-    }
-
-    private void updateTonKho(LedgerDetails ledgerDetails, int sl_tt){
-        int sl_nhap = ledgerDetails.getThuc_xuat();
-        int sl_ton_sau = sl_tt + sl_nhap;
-        createNewTransaction(ledgerDetails, sl_tt, sl_ton_sau);
-        TonKho tonKho = new TonKho();
-        tonKho.setLoai_xd(ledgerDetails.getTen_xd().trim());
-        tonKho.setMucgia(ledgerDetails.getDon_gia());
-        tonKho.setSoluong(sl_ton_sau);
-        // get current day
-        String pattern = "MM-dd-yyyy HH:mm:ss";
-        DateFormat df = new SimpleDateFormat(pattern);
-        Date today = Calendar.getInstance().getTime();
-        String todayAsString = df.format(today);
-        tonKho.setCreatetime(todayAsString);
-        tonKho.setStatus("CREATED");
-        tonKhoService.update(tonKho);
-    }
-
-    private void updateTonKho_Tong(TonkhoTong tonkhoTong, int tck){
-        tonkhoTong.setTck_sum(tck + tonkhoTong.getTck_sscd());
-        tonkhoTong.setTck_nvdx(tck);
-        DashboardController.prepare_addnew_inventory.add(tonkhoTong);
-        tonkhoTongService.update(tonkhoTong);
-    }
-
-    private void createNewTransaction(LedgerDetails ledgerDetails, int tontruoc, int tonsau){
-        LichsuXNK lichsuXNK = new LichsuXNK();
-        lichsuXNK.setTen_xd(ledgerDetails.getTen_xd());
-        lichsuXNK.setLoai_phieu(ledgerDetails.getLoai_phieu().equals("N") ? "Nhập" : "Xuất");
-        lichsuXNK.setSoluong(ledgerDetails.getThuc_xuat());
-        lichsuXNK.setCreateTime(ledgerDetails.getNgay());
-        lichsuXNK.setTontruoc(tontruoc);
-        lichsuXNK.setMucgia(String.valueOf(ledgerDetails.getDon_gia()));
-        lichsuXNK.setTonsau(tonsau);
-        lichsuNXKService.createNew(lichsuXNK);
     }
 
     @FXML
@@ -952,7 +832,7 @@ public class NhapController implements Initializable {
             String sl_ton = TextToNumber.textToNum(String.valueOf(tonkhoTong.getTck_sum()));
             lb_tontheoxd.setText("Số lượng tồn: "+ sl_ton +" (Lit)");
         }else{
-            throw new NullPointerException("tonkho is null");
+            lb_tontheoxd.setText("Số lượng tồn: "+ 0 +" (Lit)");
         }
     }
 

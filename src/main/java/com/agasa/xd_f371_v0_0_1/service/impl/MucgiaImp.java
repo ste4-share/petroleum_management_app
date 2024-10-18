@@ -55,9 +55,8 @@ public class MucgiaImp implements MucgiaService {
     }
 
     @Override
-    public List<Mucgia> findMucgiaByGia(int id_xd, int id_quarter, int gia) {
+    public Mucgia findMucgiaByGia(int id_xd, int id_quarter, int gia) {
         QDatabase.getConnectionDB();
-        List<Mucgia> result = new ArrayList<>();
 
         String SQL_SELECT = "Select * from mucgia where quarter_id=? and item_id=? and price=?";
         // auto close connection and preparedStatement
@@ -84,7 +83,7 @@ public class MucgiaImp implements MucgiaService {
                 mucgia.setAmount(amount);
                 mucgia.setQuarter_id(quarter_id);
                 mucgia.setItem_id(item_id);
-                result.add(mucgia);
+                return mucgia;
             }
 
         } catch (SQLException e) {
@@ -94,7 +93,7 @@ public class MucgiaImp implements MucgiaService {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        return result;
+        return null;
     }
 
     @Override

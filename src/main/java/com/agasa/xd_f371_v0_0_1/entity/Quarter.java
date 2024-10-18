@@ -16,6 +16,7 @@ public class Quarter {
     public Quarter() {
     }
 
+
     public int getId() {
         return id;
     }

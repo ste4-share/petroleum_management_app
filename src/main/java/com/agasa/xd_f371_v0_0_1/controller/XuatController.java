@@ -231,8 +231,9 @@ public class XuatController extends CommonFactory implements Initializable {
                             soCaiDto.setLedger_id(0);
                         }
                         saveMucgia(soCaiDto);
-                        saveTonkhoTong(soCaiDto);
-                        saveTonkho(soCaiDto);
+                        savetk(soCaiDto);
+                        savetkt(soCaiDto);
+                        saveLichsuxnk(soCaiDto);
                         ledgerDetailsService.create(soCaiDto);
                         updateInvReport(soCaiDto, nguonNxTructhuoc_selected.getTructhuoc_id());
                     });
@@ -255,58 +256,19 @@ public class XuatController extends CommonFactory implements Initializable {
         cbb_dvn_xk.setOnAction(event -> {
         });
     }
-    private void saveMucgia(LedgerDetails ledgerDetails){
-        List<Mucgia> mucgiaList = mucgiaService.findMucgiaByGia(ledgerDetails.getXd().getId(), ledgerDetails.getQuarter_id(), ledgerDetails.getDon_gia());
-        if (mucgiaList.isEmpty()){
-            //add new mucgia
-            Mucgia mucgia = new Mucgia();
-            mucgia.setPrice(ledgerDetails.getDon_gia());
-            mucgia.setAmount(ledgerDetails.getThuc_xuat()*(-1));
-            mucgia.setQuarter_id(ledgerDetails.getQuarter_id());
-            mucgia.setItem_id(ledgerDetails.getXd().getId());
-            mucgia.setStatus(MucGiaEnum.IN_STOCK.getStatus());
-            mucgiaService.createNew(mucgia);
-        }
-        else {
-            Mucgia mucgia = mucgiaList.get(0);
-            int sl_ton = mucgia.getAmount() - ledgerDetails.getThuc_xuat();
-            if (sl_ton ==0){
-                mucgia.setStatus(MucGiaEnum.OUT_STOCK.getStatus());
-                mucgia.setAmount(0);
-            } else if (sl_ton<0) {
-                mucgia.setStatus(MucGiaEnum.SUPER_OUT_STOCK.getStatus());
-                mucgia.setAmount(sl_ton);
-            }else {
-                mucgia.setStatus(MucGiaEnum.IN_STOCK.getStatus());
-                mucgia.setAmount(sl_ton);
-            }
-            mucgiaService.updateMucGia(mucgia);
-        }
-    }
-    private void saveTonkhoTong(LedgerDetails ledgerDetails){
-        TonkhoTong tonkhoTong = tonkhoTongService.findByQuarterAndXdAll(ledgerDetails.getQuarter_id(), ledgerDetails.getXd().getId());
-        if (tonkhoTong!=null) {
-            int tck = tonkhoTong.getTck_nvdx() - ledgerDetails.getThuc_xuat();
-            updateTonKho_Tong(tonkhoTong, tck);
-            ledgerDetails.setTonkhotong_id(tonkhoTong.getId());
+
+    private void savetk(LedgerDetails soCaiDto) {
+        int quarter_id = DashboardController.findByTime.getId();
+        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia());
+        TonKho tonKho =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
+        if (tonKho==null){
+            createNewTonKho(soCaiDto, soCaiDto.getThuc_xuat());
+            TonKho tonKho1 =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
+            soCaiDto.setTonkho_id(tonKho1.getId());
         }else{
-            throw new NullPointerException("tonkhotong is null");
-        }
-    }
-    private void saveTonkho(LedgerDetails ledgerDetails){
-        List<TonKho> tonKhos =tonKhoService.findByLoaiXD(ledgerDetails.getTen_xd(), ledgerDetails.getDon_gia());
-        if (tonKhos.isEmpty()){
-            createNewTonKho(ledgerDetails);
-            List<TonKho> tonKhos_new =tonKhoService.findByLoaiXD(ledgerDetails.getTen_xd().trim(), ledgerDetails.getDon_gia());
-            if (!tonKhos_new.isEmpty()){
-                ledgerDetails.setTonkho_id(tonKhos_new.get(0).getId());
-            }else {
-                throw new RuntimeException("Ton kho is empty");
-            }
-        }else {
-            int sl_ton_truoc = tonKhos.get(0).getSoluong();
-            updateTonKho(ledgerDetails, sl_ton_truoc);
-            ledgerDetails.setTonkho_id(tonKhos.get(0).getId());
+            int soluong = tonKho.getSoluong() - soCaiDto.getThuc_xuat();
+            updateTonKho(tonKho, soluong);
+            soCaiDto.setTonkho_id(tonKho.getId());
         }
     }
 
@@ -497,6 +459,7 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setNguonnx_tructhuoc(nguonNxTructhuoc_selected.getId());
             ledgerDetails.setNguonnx_tcn(nguonNxTcn_selected_tab_k.getId());
             ledgerDetails.setDvvc_obj(cbb_dvx_k.getSelectionModel().getSelectedItem());
+            ledgerDetails.setLoaixd_id(cbb_tenxd_k.getSelectionModel().getSelectedItem().getId());
         } catch (NullPointerException e) {
             throw new NullPointerException(e.getMessage());
         }
@@ -504,10 +467,10 @@ public class XuatController extends CommonFactory implements Initializable {
     }
     private void setDongia_k_Label() {
         try {
-            tonKhos_pref = tonKhoService.findByLoaiXD(cbb_tenxd_k.getSelectionModel().getSelectedItem().getTenxd(), mucgia_id_selected_mucgia_cbb.getPrice());
+            tonKhos_pref = tonKhoService.findByLoaiXD(cbb_tenxd_k.getSelectionModel().getSelectedItem().getId(), mucgia_id_selected_mucgia_cbb.getPrice());
             if (!tonKhos_pref.isEmpty()){
                 lb_slt_k.setText("Số lượng tồn: "+ TextToNumber.textToNum(String.valueOf(tonKhos_pref.get(0).getSoluong())));
-            }else{
+            } else {
                 lb_slt_k.setText("Số lượng tồn: "+ "000");
             }
         }catch (Exception e){
@@ -515,7 +478,7 @@ public class XuatController extends CommonFactory implements Initializable {
         }
     }
     private void setDongia_nv_Label() {
-        tonKhos_pref = tonKhoService.findByLoaiXD(cbb_tenxd_nv.getSelectionModel().getSelectedItem().getTenxd(), mucgia_id_selected_mucgia_cbb_nv.getPrice());
+        tonKhos_pref = tonKhoService.findByLoaiXD(cbb_tenxd_nv.getSelectionModel().getSelectedItem().getId(), mucgia_id_selected_mucgia_cbb_nv.getPrice());
         if (!tonKhos_pref.isEmpty()){
             lb_slt_nv.setText("Số lượng tồn: "+ TextToNumber.textToNum(String.valueOf(tonKhos_pref.get(0).getSoluong())));
         }else{
@@ -634,9 +597,11 @@ public class XuatController extends CommonFactory implements Initializable {
                         }else{
                             soCaiDto.setLedger_id(0);
                         }
+
                         saveMucgia(soCaiDto);
-                        saveTonkho(soCaiDto);
-                        saveTonkhoTong(soCaiDto);
+                        savetk(soCaiDto);
+                        savetkt(soCaiDto);
+                        saveLichsuxnk(soCaiDto);
                         ledgerDetailsService.create(soCaiDto);
                         updateInvReport(soCaiDto, nguonNxTructhuoc_selected_nv.getTructhuoc_id());
                     });
@@ -656,6 +621,38 @@ public class XuatController extends CommonFactory implements Initializable {
         cbb_tenxd_nv.setOnAction(event -> {
             setDongiaCombobox_tab_nv(cbb_tenxd_nv.getSelectionModel().getSelectedItem().getId());
         });
+    }
+
+    private void saveLichsuxnk(LedgerDetails soCaiDto) {
+        int quarter_id = DashboardController.findByTime.getId();
+        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia());
+        TonKho tonKho =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
+        int tonsau = tonKho.getSoluong() - soCaiDto.getThuc_xuat();
+        int tontruoc = tonKho.getSoluong();
+        createNewTransaction(soCaiDto, tontruoc, tonsau);
+    }
+
+    private void savetkt(LedgerDetails soCaiDto) {
+        TonkhoTong tonkhoTong = tonkhoTongService.findByQuarterAndXdAll(soCaiDto.getQuarter_id(), soCaiDto.getXd().getId());
+        if (tonkhoTong!=null) {
+            int tck = tonkhoTong.getTck_nvdx()- soCaiDto.getThuc_xuat();
+            tonkhoTong.setTck_sum(tck + tonkhoTong.getTck_sscd());
+            tonkhoTong.setTck_nvdx(tck);
+            tonkhoTongService.update(tonkhoTong);
+            soCaiDto.setTonkhotong_id(tonkhoTong.getId());
+        }else{
+            throw new NullPointerException("tonkhotong is null");
+        }
+    }
+
+    private void saveMucgia(LedgerDetails soCaiDto){
+        Mucgia mucgia_existed = mucgiaService.findMucgiaByGia(soCaiDto.getXd().getId(), soCaiDto.getQuarter_id(), soCaiDto.getDon_gia());
+        if (mucgia_existed==null){
+            createNewMucgia(soCaiDto, soCaiDto.getThuc_xuat()*(-1));
+        }else{
+            int quantityPerPrice = mucgia_existed.getAmount() - soCaiDto.getThuc_xuat();
+            updateMucgia(quantityPerPrice, mucgia_existed);
+        }
     }
 
     private void createNewLedger(String so, LocalDate tungay, LocalDate denngay) {
@@ -876,60 +873,17 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setPhuongtien_nvu_id(phuongTienNhiemVu_selected.getId());
             ledgerDetails.setPhuongtien_id(pt_id_selected_by_cbb);
             ledgerDetails.setDvvc_obj(cbb_dvx_nv.getSelectionModel().getSelectedItem());
+            ledgerDetails.setLoaixd_id(cbb_tenxd_nv.getSelectionModel().getSelectedItem().getId());
         } catch (NullPointerException e) {
             throw new NullPointerException(e.getMessage());
         }
         return ledgerDetails;
     }
-    private void createNewTonKho(LedgerDetails ledgerDetails){
-        createNewTransaction(ledgerDetails, 0, ledgerDetails.getThuc_xuat()*(-1));
-        TonKho tonKho = new TonKho();
-        tonKho.setLoai_xd(ledgerDetails.getTen_xd().trim());
-        tonKho.setMucgia(ledgerDetails.getDon_gia());
-        tonKho.setSoluong(ledgerDetails.getThuc_xuat());
-        // get current day
-        String pattern = "MM/dd/yyyy HH:mm:ss";
-        DateFormat df = new SimpleDateFormat(pattern);
-        Date today = Calendar.getInstance().getTime();
-        String todayAsString = df.format(today);
-        tonKho.setCreatetime(todayAsString);
-        tonKho.setStatus("CREATED");
-        tonKhoService.create(tonKho);
-    }
-    private void updateTonKho(LedgerDetails ledgerDetails, int sl_tt){
-        int sl_xuat = ledgerDetails.getThuc_xuat();
-        int sl_ton_sau = sl_tt - sl_xuat;
-        createNewTransaction(ledgerDetails, sl_tt, sl_ton_sau);
-        TonKho tonKho = new TonKho();
-        tonKho.setLoai_xd(ledgerDetails.getTen_xd().trim());
-        tonKho.setMucgia(ledgerDetails.getDon_gia());
-        tonKho.setSoluong(sl_ton_sau);
-        // get current day
-        String pattern = "MM-dd-yyyy HH:mm:ss";
-        DateFormat df = new SimpleDateFormat(pattern);
-        Date today = Calendar.getInstance().getTime();
-        String todayAsString = df.format(today);
-        tonKho.setCreatetime(todayAsString);
-        tonKho.setStatus("CREATED");
-        tonKhoService.update(tonKho);
-    }
-    private void createNewTransaction(LedgerDetails ledgerDetails, int tontruoc, int tonsau){
-        LichsuXNK lichsuXNK = new LichsuXNK();
-        lichsuXNK.setTen_xd(ledgerDetails.getTen_xd());
-        lichsuXNK.setLoai_phieu(ledgerDetails.getLoai_phieu().equals("N") ? "Nhập" : "Xuất");
-        lichsuXNK.setSoluong(ledgerDetails.getThuc_xuat());
-        lichsuXNK.setCreateTime(ledgerDetails.getNgay());
-        lichsuXNK.setTontruoc(tontruoc);
-        lichsuXNK.setTonsau(tonsau);
-        lichsuXNK.setMucgia(String.valueOf(ledgerDetails.getDon_gia()));
-        lichsuNXKService.createNew(lichsuXNK);
-    }
 
-    private void updateTonKho_Tong(TonkhoTong tonkhoTong, int tck){
-        tonkhoTong.setTck_sum(tck + tonkhoTong.getTck_sscd());
-        tonkhoTong.setTck_nvdx(tck);
-        tonkhoTongService.update(tonkhoTong);
-    }
+
+
+
+
 
     private void setnguonNx_Tcn(int tcn_id, int nguonnx_id){
         nguonNxTcn_selected_tab_k.setTcn_id(tcn_id);
