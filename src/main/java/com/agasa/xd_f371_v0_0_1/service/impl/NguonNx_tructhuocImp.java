@@ -1,11 +1,9 @@
 package com.agasa.xd_f371_v0_0_1.service.impl;
 
 import com.agasa.xd_f371_v0_0_1.dto.NguonNxTrucThuocDTO;
-import com.agasa.xd_f371_v0_0_1.entity.NguonNxTcn;
 import com.agasa.xd_f371_v0_0_1.entity.NguonNx_tructhuoc;
 import com.agasa.xd_f371_v0_0_1.entity.TrucThuoc;
 import com.agasa.xd_f371_v0_0_1.model.QDatabase;
-import com.agasa.xd_f371_v0_0_1.service.NguonNx_tcnService;
 import com.agasa.xd_f371_v0_0_1.service.NguonNx_tructhuocService;
 
 import java.sql.PreparedStatement;

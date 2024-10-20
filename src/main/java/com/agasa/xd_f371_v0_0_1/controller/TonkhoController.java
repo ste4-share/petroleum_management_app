@@ -1,6 +1,7 @@
 package com.agasa.xd_f371_v0_0_1.controller;
 
 import com.agasa.xd_f371_v0_0_1.dto.TitleDto;
+import com.agasa.xd_f371_v0_0_1.dto.TonKho;
 import com.agasa.xd_f371_v0_0_1.entity.*;
 import com.agasa.xd_f371_v0_0_1.model.ChungLoaiModel;
 import com.agasa.xd_f371_v0_0_1.model.ChungloaiMap;
@@ -69,12 +70,14 @@ public class TonkhoController implements Initializable {
 
     private QuarterService quarterService = new QuarterImp();
     private TonkhoTongService tonkhoTongService = new TonkhoTongImp();
+    private TonKhoService tonKhoService = new TonkhoImp();
     private LoaiXdService loaiXdService = new LoaiXdImp();
     private LedgerDetailsService ledgerDetailsService = new LedgerDetailsImp();
     private TrucThuocService trucThuocService = new TrucThuocImp();
     private InvReportService invReportService = new InvReportImp();
     private InvReportDetailService invReportDetailService = new invReportDetailImp();
     private CategoryService categoryService = new CategoryImp();
+    private MucgiaService mucgiaService = new MucgiaImp();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -525,6 +528,7 @@ public class TonkhoController implements Initializable {
         int tondk_sum_mock = tondk_sscd_mock+tondk_nvdx_mock;
         for (LoaiXangDau loaiXangDau : loaiXdService.getAll()) {
 
+            // mock tonkhotong
             TonkhoTong tonkhoTong = new TonkhoTong();
             tonkhoTong.setId_quarter(DashboardController.findByTime.getId());
             tonkhoTong.setId_xd(loaiXangDau.getId());
@@ -537,6 +541,25 @@ public class TonkhoController implements Initializable {
             tonkhoTong.setTck_nvdx(tondk_nvdx_mock);
             tonkhoTong.setTck_sscd(tondk_sscd_mock);
             tonkhoTong.setTck_sum(tondk_sum_mock);
+
+            //mock mucgia
+            Mucgia mucgia = new Mucgia();
+            mucgia.setQuarter_id(DashboardController.findByTime.getId());
+            mucgia.setAmount(40000);
+            mucgia.setPrice(142857);
+            mucgia.setItem_id(loaiXangDau.getId());
+            mucgia.setStatus("ACTIVE");
+            mucgiaService.createNew(mucgia);
+            Mucgia mucgia1 = mucgiaService.findMucgiaByGia(loaiXangDau.getId(),DashboardController.findByTime.getId(), mucgia.getPrice());
+
+            //mock tonkho
+            TonKho tonKho = new TonKho();
+            tonKho.setLoaixd_id(loaiXangDau.getId());
+            tonKho.setMucgia_id(mucgia1.getId());
+            tonKho.setSoluong(40000);
+            tonKho.setMucgia(142857);
+            tonKho.setLoai_xd(loaiXangDau.getTenxd());
+            tonKhoService.create(tonKho);
             tonkhoTongService.create(tonkhoTong);
         }
         fillDataToTableTonkho();
@@ -584,18 +607,4 @@ public class TonkhoController implements Initializable {
             throw new RuntimeException(e);
         }
     }
-
-
-    private void updateMap(){
-        InvReport invReport = new InvReport();
-
-//        invReportService.updateReport();
-    }
-
-    private void getTkMap(){
-        List<InvReportDetail> list = invReportDetailService.getAll();
-
-    }
-
-
 }

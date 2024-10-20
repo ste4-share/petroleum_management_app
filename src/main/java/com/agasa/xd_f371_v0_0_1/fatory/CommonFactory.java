@@ -15,13 +15,9 @@ import com.agasa.xd_f371_v0_0_1.util.Common;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CommonFactory {
-
     protected LoaiPhieuService loaiPhieuService = new LoaiPhieuImp();
     protected LedgerDetailsService ledgerDetailsService = new LedgerDetailsImp();
     protected TructhuocLoaiphieuService tructhuocLoaiphieuService = new Tructhuoc_LoaiphieuImp();
@@ -33,10 +29,14 @@ public class CommonFactory {
     protected TonKhoService tonKhoService = new TonkhoImp();
     protected MucgiaService mucgiaService = new MucgiaImp();
     protected LichsuNXKService lichsuNXKService = new LichsuNXKImp();
+    protected static LoaiPhieu lp_id_pre = new LoaiPhieu();
+    protected static List<Tcn> ls_tcn = new ArrayList<>();
+    protected static Tcn pre_createNewTcn = new Tcn();
 
     protected void updateInvReport(LedgerDetails ledgerDetails, int tt_id){
-        LoaiPhieu lp= loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_XUAT);
+        LoaiPhieu lp= loaiPhieuService.findLoaiPhieuByType(ledgerDetails.getLoai_phieu());
         InvReport invReport = new InvReport();
+
         invReport.setPetroleum_id(ledgerDetails.getLoaixd_id());
         invReport.setInventory_id(ledgerDetails.getTonkhotong_id());
         QuantityByTructhuocDTO quantityByTructhuocDTO = ledgerDetailsService.selectQuantityByTT(lp.getType(),ledgerDetails.getLoaixd_id(), tt_id);
@@ -47,7 +47,7 @@ public class CommonFactory {
         TructhuocLoaiphieu tructhuocLoaiphieu = tructhuocLoaiphieuService.findByTTLPId(tt_id, lp.getId());
         if (tructhuocLoaiphieu!=null) {
             Category category = categoryService.getTitleByttLpId(tructhuocLoaiphieu.getId());
-
+            System.out.println("cate: " + category.getId());
             if (category!=null){
                 InvReport report = invReportService.findByPetroleum(ledgerDetails.getLoaixd_id(), DashboardController.findByTime.getId(), category.getId());
                 invReport.setReport_header(category.getId());

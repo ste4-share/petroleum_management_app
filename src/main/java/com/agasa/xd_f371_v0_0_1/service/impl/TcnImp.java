@@ -30,18 +30,19 @@ public class TcnImp implements TcnService {
                 String name = resultSet.getString("name");
                 int concert = resultSet.getInt("concert");
                 String status = resultSet.getString("status");
+                int loaiphieuId = resultSet.getInt("loaiphieu_id");
                 Tcn obj = new Tcn();
                 obj.setId(id);
                 obj.setName(name);
                 obj.setConcert(concert);
                 obj.setStatus(status);
+                obj.setLoaiphieu_id(loaiphieuId);
                 result.add(obj);
             }
 
-        } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return result;
     }
@@ -65,18 +66,54 @@ public class TcnImp implements TcnService {
                 String name = resultSet.getString("name");
                 int concert = resultSet.getInt("concert");
                 String status = resultSet.getString("status");
+                int loaiphieuId = resultSet.getInt("loaiphieu_id");
                 Tcn obj = new Tcn();
                 obj.setId(id);
                 obj.setName(name);
                 obj.setConcert(concert);
                 obj.setStatus(status);
+                obj.setLoaiphieu_id(loaiphieuId);
                 result.add(obj);
             }
 
-        } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        return result;
+    }
+
+    @Override
+    public List<Tcn> getAllByBillTypeId(int billId) {
+        QDatabase.getConnectionDB();
+        List<Tcn> result = new ArrayList<>();
+
+
+        String SQL_SELECT = "SELECT * FROM tcn where loaiphieu_id=?;";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1,billId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                int concert = resultSet.getInt("concert");
+                String status = resultSet.getString("status");
+                int loaiphieuId = resultSet.getInt("loaiphieu_id");
+                Tcn obj = new Tcn();
+                obj.setId(id);
+                obj.setName(name);
+                obj.setConcert(concert);
+                obj.setStatus(status);
+                obj.setLoaiphieu_id(loaiphieuId);
+                result.add(obj);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return result;
     }
@@ -87,13 +124,9 @@ public class TcnImp implements TcnService {
     }
 
     @Override
-    public List<Tcn> findByName(String sear_name) {
+    public Tcn findByName(String sear_name) {
         QDatabase.getConnectionDB();
-        List<Tcn> list = new ArrayList<>();
-
         String SQL_SELECT = "select * from tcn where name=?";
-
-        // auto close connection and preparedStatement
         try {
             PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
             preparedStatement.setString(1, sear_name);
@@ -103,33 +136,30 @@ public class TcnImp implements TcnService {
                 String name = resultSet.getString("name");
                 int concert = resultSet.getInt("concert");
                 String status = resultSet.getString("status");
-                Tcn obj = new Tcn();
-                obj.setId(id);
-                obj.setName(name);
-                obj.setConcert(concert);
-                obj.setStatus(status);
-
-                list.add(obj);
+                int loaiphieuId = resultSet.getInt("loaiphieu_id");
+                return new Tcn(id,loaiphieuId, name, concert, status);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-        return list;
+        return null;
     }
 
     @Override
     public Tcn create(Tcn tcn) {
         QDatabase.getConnectionDB();
-        String sql = "insert into tcn(name, concert, status) values(?,?,?)";
+        String sql = "insert into tcn(name, concert, status, loaiphieu_id) values(?,?,?,?)";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
             statement.setString(1, tcn.getName());
             statement.setInt(2, tcn.getConcert());
             statement.setString(3, tcn.getStatus());
+            statement.setInt(4, tcn.getLoaiphieu_id());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return tcn;
     }

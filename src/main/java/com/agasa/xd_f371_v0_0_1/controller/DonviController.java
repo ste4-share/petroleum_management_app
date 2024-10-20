@@ -47,7 +47,6 @@ public class DonviController implements Initializable {
     private NguonNx_tructhuocService nguonNxTructhuocService = new NguonNx_tructhuocImp();
     private LoaiPhieuService loaiPhieuService = new LoaiPhieuImp();
     private TcnService tcnService = new TcnImp();
-    private NguonNx_tcnService nguonNxTcnService = new NguonNx_tcnImp();
 
 
     @Override
@@ -175,11 +174,10 @@ public class DonviController implements Initializable {
     @FXML
     public void addnnxtcn(ActionEvent actionEvent) {
         NguonNxTcn nguonNxTcn = new NguonNxTcn();
-        try{
+        try {
             nguonNxTcn.setLoaiphieu_id(loaiphieuCbb.getSelectionModel().getSelectedItem().getId());
             nguonNxTcn.setTcn_id(tb_tcn.getSelectionModel().getSelectedItem().getId());
             nguonNxTcn.setNguonnx_id(tb_donvi.getSelectionModel().getSelectedItem().getId());
-            nguonNxTcnService.createNew(nguonNxTcn);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -195,7 +193,6 @@ public class DonviController implements Initializable {
                     nguonNxTcn.setLoaiphieu_id(loaiphieuCbb.getSelectionModel().getSelectedItem().getId());
                     nguonNxTcn.setTcn_id(tcn.getId());
                     nguonNxTcn.setNguonnx_id(x.getId());
-                    nguonNxTcnService.createNew(nguonNxTcn);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

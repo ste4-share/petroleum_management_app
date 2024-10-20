@@ -42,14 +42,10 @@ public class NhapController extends CommonFactory implements Initializable {
     private static List<LedgerDetails> ls_socai;
     private static int stt = 0;
     private static int dvvc_id =0;
-    private static int tructhuc_id_combobox_selected =0;
     private static int lxd_id_combobox_selected =0;
     private static ValidateFiledBol validateFiledBol = new ValidateFiledBol(true, true,true, true,true, true,true, true,true, true,true, true,true, true,true,true,true);
     private static int click_index;
-    private static NguonNxTcn nguonNxTcn_selected = new NguonNxTcn();
     private static NguonNx_tructhuoc nguonNxTructhuoc_selected = new NguonNx_tructhuoc();
-    private static Tcn pre_createNewTcn = new Tcn();
-    private boolean addedBySelection_lstb = false;
     Logger logger = Logger.getLogger(NhapController.class.getName());
 
     @FXML
@@ -71,22 +67,15 @@ public class NhapController extends CommonFactory implements Initializable {
     private ComboBox<LoaiXangDau> cmb_tenxd;
 
     private TonKhoService tonKhoService = new TonkhoImp();
-    private LichsuNXKService lichsuNXKService = new LichsuNXKImp();
     private LoaiXdService loaiXdService = new LoaiXdImp();
     private LedgerDetailsService ledgerDetailsService = new LedgerDetailsImp();
     private NguonNXService nguonNXService = new NguonNXImp();
     private TonkhoTongService tonkhoTongService = new TonkhoTongImp();
     private MucgiaService mucgiaService = new MucgiaImp();
     private TcnService tcnService = new TcnImp();
-    private NguonNx_tcnService nguonNxTcnService = new NguonNx_tcnImp();
     private NguonNx_tructhuocService nguonNxTructhuocService = new NguonNx_tructhuocImp();
-    private TrucThuocService trucThuocService = new TrucThuocImp();
     private LedgerService ledgerService = new LedgerImp();
     private LoaiPhieuService loaiPhieuService = new LoaiPhieuImp();
-    private InvReportService invReportService = new InvReportImp();
-    private InvReportDetailService invReportDetailService = new invReportDetailImp();
-    private TructhuocLoaiphieuService tructhuocLoaiphieuService = new Tructhuoc_LoaiphieuImp();
-    private CategoryService categoryService = new CategoryImp();
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -94,6 +83,8 @@ public class NhapController extends CommonFactory implements Initializable {
         stt=0;
         ls_socai = new ArrayList<>();
         tableView.setItems(FXCollections.observableArrayList(new ArrayList<>()));
+        lp_id_pre = loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_NHAP);
+        ls_tcn = tcnService.getAllByBillTypeId(lp_id_pre.getId());
 
         setTenXDToCombobox();
         setDvvcCombobox();
@@ -125,16 +116,14 @@ public class NhapController extends CommonFactory implements Initializable {
             clearHH();
             addbtn.setDisable(false);
         });
-
         setUpForSearchCompleteTion();
-        searchingFor_tcn();
     }
 
     private void setUpForSearchCompleteTion(){
         List<String> search_arr = new ArrayList<>();
-        List<Tcn> tcnList = tcnService.getAllByName(LoaiPhieu_cons.NHAP);
-        for(int i = 0; i< tcnList.size(); i++){
-            search_arr.add(tcnList.get(i).getName());
+
+        for(int i = 0; i< ls_tcn.size(); i++){
+            search_arr.add(ls_tcn.get(i).getName());
         }
         TextFields.bindAutoCompletion(tcNhap, t -> {
             return search_arr.stream().filter(elem
@@ -142,36 +131,22 @@ public class NhapController extends CommonFactory implements Initializable {
                 return elem.toLowerCase().startsWith(t.getUserText().toLowerCase().trim());
             }).collect(Collectors.toList());
         });
-        tcNhap.setOnKeyPressed(e -> {
-            addedBySelection_lstb = false;
-        });
+    }
 
-        tcNhap.setOnKeyReleased(e -> {
-            String text = tcNhap.getText().trim();
-            pre_createNewTcn.setName(text);
-            pre_createNewTcn.setConcert(1);
+    private void recognized_tcn(){
+        List<Tcn> tcnList = ls_tcn.stream().filter(x -> tcNhap.getText().toLowerCase().trim().equals(x.getName().toLowerCase().trim())).toList();
+        if (!tcnList.isEmpty()){
+            pre_createNewTcn = tcnList.get(0);
+        } else {
             pre_createNewTcn.setStatus("ACTIVE");
-            addedBySelection_lstb = true;
-        });
+            pre_createNewTcn.setName(tcNhap.getText());
+            pre_createNewTcn.setLoaiphieu_id(lp_id_pre.getId());
+            pre_createNewTcn.setConcert(1);
+            tcnService.create(pre_createNewTcn);
+            pre_createNewTcn = tcnService.findByName(tcNhap.getText());
+        }
     }
 
-    private void searchingFor_tcn(){
-        tcNhap.textProperty().addListener(e -> {
-            if (addedBySelection_lstb) {
-                List<Tcn> tcnList = tcnService.findByName(tcNhap.getText().trim());
-                if (!tcnList.isEmpty()){
-                    pre_createNewTcn = tcnList.get(0);
-                    setnguonNx_Tcn(pre_createNewTcn.getId(), cmb_dvvc.getValue().getId());
-                }
-                addedBySelection_lstb= false;
-            }
-        });
-    }
-
-    private void setnguonNx_Tcn(int tcn_id, int nguonnx_id){
-        nguonNxTcn_selected.setTcn_id(tcn_id);
-        nguonNxTcn_selected.setNguonnx_id(nguonnx_id);
-    }
 
     private void setTenXDToCombobox(){
         cmb_tenxd.setConverter(new StringConverter<LoaiXangDau>() {
@@ -244,8 +219,7 @@ public class NhapController extends CommonFactory implements Initializable {
         ledgerDetails.setDvi(cmb_dvn.getSelectionModel().getSelectedItem().getTen());
         ledgerDetails.setNgay(tungay.getValue().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
         ledgerDetails.setTen_xd(cmb_tenxd.getSelectionModel().getSelectedItem().getTenxd());
-        LoaiPhieu loaiPhieu = loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_NHAP);
-        ledgerDetails.setLoai_phieu(loaiPhieu.getType());
+        ledgerDetails.setLoai_phieu(lp_id_pre.getType());
         ledgerDetails.setSo(soTf.getText());
         ledgerDetails.setTheo_lenh_so(lenhKHso.getText());
         ledgerDetails.setNhiem_vu(tcNhap.getText());
@@ -264,7 +238,6 @@ public class NhapController extends CommonFactory implements Initializable {
         ledgerDetails.setDvn_obj(cmb_dvn.getSelectionModel().getSelectedItem());
         ledgerDetails.setDenngay(denngay.getValue().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
         ledgerDetails.setQuarter_id(DashboardController.findByTime.getId());
-        ledgerDetails.setNguonnx_tcn(nguonNxTcn_selected.getId());
         ledgerDetails.setNguonnx_tructhuoc(nguonNxTructhuoc_selected.getId());
         ledgerDetails.setLoaixd_id(cmb_tenxd.getSelectionModel().getSelectedItem().getId());
         return ledgerDetails;
@@ -293,51 +266,6 @@ public class NhapController extends CommonFactory implements Initializable {
         tbThanhTien.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("thanh_tien"));
     }
 
-    private void identify_NguonNX_tcn(){
-        String text = tcNhap.getText().trim();
-        List<Tcn> tcnList = tcnService.findByName(text);
-        LoaiPhieu loaiPhieu = loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_NHAP);
-        NguonNx dvvc = cmb_dvvc.getValue();
-        if (tcnList.isEmpty()){
-            tcnService.create(pre_createNewTcn);
-            List<Tcn> pretcn = tcnService.findByName(text);
-            if (!pretcn.isEmpty()){
-                pre_createNewTcn.setId(pretcn.get(0).getId());
-                setnguonNx_Tcn(pre_createNewTcn.getId(), dvvc.getId());
-                nguonNxTcn_selected.setTcn_id(pre_createNewTcn.getId());
-                nguonNxTcn_selected.setNguonnx_id(dvvc.getId());
-                nguonNxTcn_selected.setLoaiphieu_id(loaiPhieu.getId());
-                nguonNxTcnService.createNew(nguonNxTcn_selected);
-                List<NguonNxTcn> list = nguonNxTcnService.findByNnxTcn_( dvvc.getId(),loaiPhieu.getId(), nguonNxTcn_selected.getTcn_id());
-                if (!list.isEmpty()){
-                    nguonNxTcn_selected = list.get(0);
-                }else{
-                    throw new RuntimeException("one error had occur");
-                }
-            }else{
-                System.out.println("--Tcn not found--line [300]--formnhap");
-            }
-        }else{
-            setnguonNx_Tcn(tcnList.get(0).getId(), dvvc.getId());
-            List<NguonNxTcn> list = nguonNxTcnService.findByNnxTcn_( dvvc.getId(),loaiPhieu.getId(),tcnList.get(0).getId());
-            if (list.isEmpty()) {
-                NguonNxTcn nguonNxTcn = new NguonNxTcn();
-                nguonNxTcn.setNguonnx_id(dvvc.getId());
-                nguonNxTcn.setTcn_id(tcnList.get(0).getId());
-                nguonNxTcn.setLoaiphieu_id(loaiPhieu.getId());
-                nguonNxTcnService.createNew(nguonNxTcn);
-                List<NguonNxTcn> list2 = nguonNxTcnService.findByNnxTcn_(dvvc.getId(), loaiPhieu.getId(),nguonNxTcn.getTcn_id());
-                if (!list2.isEmpty()) {
-                    nguonNxTcn_selected = list2.get(0);
-                } else {
-                    throw new RuntimeException("có lỗi xảy ra.");
-                }
-            }else{
-                nguonNxTcn_selected = list.get(0);
-            }
-        }
-    }
-
     private void identify_nguonnx_tructhuoc(){
         NguonNx_tructhuoc nguonNxTructhuoc = nguonNxTructhuocService.findNguonnx_tructhuocByNnx_lp(cmb_dvvc.getSelectionModel().getSelectedItem().getId(), loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_NHAP).getId());
         if (nguonNxTructhuoc != null){
@@ -350,7 +278,6 @@ public class NhapController extends CommonFactory implements Initializable {
     @FXML
     private void btnInsert(ActionEvent event){
         if (validField()){
-            identify_NguonNX_tcn();
             identify_nguonnx_tructhuoc();
             LedgerDetails ledgerDetails = getDataFromField();
             stt = stt+1;
@@ -387,6 +314,8 @@ public class NhapController extends CommonFactory implements Initializable {
                         savetk(soCaiDto);
                         savetkt(soCaiDto);
                         saveLichsunxk(soCaiDto);
+                        recognized_tcn();
+                        soCaiDto.setTcn_id(pre_createNewTcn.getId());
                         ledgerDetailsService.create(soCaiDto);
                         updateInvReport(soCaiDto, nguonNxTructhuoc_selected.getTructhuoc_id());
                     });

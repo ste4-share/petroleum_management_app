@@ -57,7 +57,6 @@ public class LedgerDetailsImp implements LedgerDetailsService {
                 int nguonnx_id = resultSet.getInt("nguonnx_id");
                 int nguonnx_dvvc_id = resultSet.getInt("nguonnx_dvvc_id");
                 String denngay = resultSet.getString("denngay");
-                int nguonnx_tcn = resultSet.getInt("nguonnx_tcn");
                 int nguonnx_tructhuoc = resultSet.getInt("nguonnx_tructhuoc");
                 int nvu_tcn_id = resultSet.getInt("nvu_tcn_id");
                 int nvu_tructhuoc = resultSet.getInt("nvu_tructhuoc");
@@ -98,7 +97,6 @@ public class LedgerDetailsImp implements LedgerDetailsService {
 
                 obj.setXd(loaiXdService.findLoaiXdByID_non(loaixd_id));
                 obj.setDenngay(denngay);
-                obj.setNguonnx_tcn(nguonnx_tcn);
                 obj.setNguonnx_tructhuoc(nguonnx_tructhuoc);
                 obj.setNvu_tructhuoc(nvu_tructhuoc);
                 obj.setNvu_tcn_id(nvu_tcn_id);
@@ -128,8 +126,8 @@ public class LedgerDetailsImp implements LedgerDetailsService {
         QDatabase.getConnectionDB();
         String sql = "INSERT INTO ledger_details (dvi, ngay, ma_xd, ten_xd, chung_loai, loai_phieu, so, theo_lenh_so, nhiem_vu, nguoi_nhan_hang, " +
                 "so_xe, chat_luong, phai_xuat, nhiet_do_tt, ty_trong, he_so_vcf, thuc_xuat, don_gia, thanh_tien, so_km, so_gio, dvvc," +
-                "loaixd_id, nguonnx_id, nguonnx_dvvc_id, denngay, nguonnx_tcn,nguonnx_tructhuoc," +
-                "nvu_tcn_id,nvu_tructhuoc,quarter_id,phuongtien_id,nhiemvu_id,nguonnx_nvu_id,phuongtien_nvu_id,so_phut,tonkhotong_id,tonkho_id,ledger_id) " +
+                "loaixd_id, nguonnx_id, nguonnx_dvvc_id, denngay,nguonnx_tructhuoc," +
+                "nvu_tcn_id,nvu_tructhuoc,quarter_id,phuongtien_id,nhiemvu_id,nguonnx_nvu_id,phuongtien_nvu_id,so_phut,tonkhotong_id,tonkho_id,ledger_id, tcn_id) " +
                 "VALUES (?, ?,?, ?, ?,?, ?, ?, ?, ?,?,?,?,?, ?,?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
@@ -164,19 +162,19 @@ public class LedgerDetailsImp implements LedgerDetailsService {
             statement.setInt(23, ledgerDetails.getXd().getId());
             statement.setInt(25, ledgerDetails.getDvvc_obj().getId());
             statement.setString(26, ledgerDetails.getDenngay());
-            statement.setInt(27, ledgerDetails.getNguonnx_tcn());
-            statement.setInt(28, ledgerDetails.getNguonnx_tructhuoc());
-            statement.setInt(29, ledgerDetails.getNvu_tcn_id());
-            statement.setInt(30, ledgerDetails.getNvu_tructhuoc());
-            statement.setInt(31, ledgerDetails.getQuarter_id());
-            statement.setInt(32, ledgerDetails.getPhuongtien_id());
-            statement.setInt(33, ledgerDetails.getNhiemvu_id());
-            statement.setInt(34, ledgerDetails.getNguonnx_nvu_id());
-            statement.setInt(35, ledgerDetails.getPhuongtien_nvu_id());
-            statement.setInt(36, ledgerDetails.getSo_phut());
-            statement.setInt(37, ledgerDetails.getTonkhotong_id());
-            statement.setInt(38, ledgerDetails.getTonkho_id());
-            statement.setInt(39, ledgerDetails.getLedger_id());
+            statement.setInt(27, ledgerDetails.getNguonnx_tructhuoc());
+            statement.setInt(28, ledgerDetails.getNvu_tcn_id());
+            statement.setInt(29, ledgerDetails.getNvu_tructhuoc());
+            statement.setInt(30, ledgerDetails.getQuarter_id());
+            statement.setInt(31, ledgerDetails.getPhuongtien_id());
+            statement.setInt(32, ledgerDetails.getNhiemvu_id());
+            statement.setInt(33, ledgerDetails.getNguonnx_nvu_id());
+            statement.setInt(34, ledgerDetails.getPhuongtien_nvu_id());
+            statement.setInt(35, ledgerDetails.getSo_phut());
+            statement.setInt(36, ledgerDetails.getTonkhotong_id());
+            statement.setInt(37, ledgerDetails.getTonkho_id());
+            statement.setInt(38, ledgerDetails.getLedger_id());
+            statement.setInt(39, ledgerDetails.getTcn_id());
 
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -269,7 +267,7 @@ public class LedgerDetailsImp implements LedgerDetailsService {
             }
 
         } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException(e);
         } catch (Exception e) {
             e.printStackTrace();
@@ -319,7 +317,6 @@ public class LedgerDetailsImp implements LedgerDetailsService {
                 int nguonnx_id = resultSet.getInt("nguonnx_id");
                 int nguonnx_dvvc_id = resultSet.getInt("nguonnx_dvvc_id");
                 String denngay = resultSet.getString("denngay");
-                int nguonnx_tcn = resultSet.getInt("nguonnx_tcn");
                 int nguonnx_tructhuoc = resultSet.getInt("nguonnx_tructhuoc");
                 int nvu_tcn_id = resultSet.getInt("nvu_tcn_id");
                 int nvu_tructhuoc = resultSet.getInt("nvu_tructhuoc");
@@ -359,7 +356,6 @@ public class LedgerDetailsImp implements LedgerDetailsService {
                 obj.setDvvc(dvvc);
                 obj.setXd(loaiXdService.findLoaiXdByID_non(loaixd_id));
                 obj.setDenngay(denngay);
-                obj.setNguonnx_tcn(nguonnx_tcn);
                 obj.setNguonnx_tructhuoc(nguonnx_tructhuoc);
                 obj.setNvu_tructhuoc(nvu_tructhuoc);
                 obj.setNvu_tcn_id(nvu_tcn_id);
@@ -430,7 +426,7 @@ public class LedgerDetailsImp implements LedgerDetailsService {
             }
 
         } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException(e);
         } catch (Exception e) {
             e.printStackTrace();

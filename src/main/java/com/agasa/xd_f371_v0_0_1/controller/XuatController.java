@@ -92,7 +92,6 @@ public class XuatController extends CommonFactory implements Initializable {
 
     private TonKhoService tonKhoService = new TonkhoImp();
     private NhiemVuService nhiemVuService = new NhiemVuImp();
-    private LichsuNXKService lichsuNXKService = new LichsuNXKImp();
     private LoaiXdService loaiXdService = new LoaiXdImp();
     private LedgerDetailsService ledgerDetailsService = new LedgerDetailsImp();
     private NguonNXService nguonNXService = new NguonNXImp();
@@ -100,7 +99,6 @@ public class XuatController extends CommonFactory implements Initializable {
     private MucgiaService mucgiaService = new MucgiaImp();
     private PhuongTienService phuongTienService = new PhuongTienImp();
     private NguonNx_tructhuocService nguonNxTructhuocService = new NguonNx_tructhuocImp();
-    private NguonNx_tcnService nguonNxTcnService = new NguonNx_tcnImp();
     private TcnService tcnService = new TcnImp();
     private LedgerService ledgerService = new LedgerImp();
     private LoaiPhieuService loaiPhieuService = new LoaiPhieuImp();
@@ -112,6 +110,8 @@ public class XuatController extends CommonFactory implements Initializable {
         phuongtien_ls_buf = phuongTienService.getAll();
         nhiemvu_ls_buf = nhiemVuService.getAll();
         chiTietNhiemVuDTO_list = nhiemVuService.getNvAndCtnv();
+        lp_id_pre = loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_XUAT);
+        ls_tcn = tcnService.getAllByBillTypeId(lp_id_pre.getId());
         tabKhac_assignment();
         setActionForTab();
     }
@@ -135,7 +135,6 @@ public class XuatController extends CommonFactory implements Initializable {
         setDvnCombobox_tab_k();
         setDvxCombobox_tab_k();
         setUpTcx_tab_k_ForSearchCompleteTion();
-        searchingFor_tcx();
         //tab_nhiemvu
 
         if (click_index == -1 || ls_socai.isEmpty()){
@@ -155,7 +154,6 @@ public class XuatController extends CommonFactory implements Initializable {
             }
         });
         addBtn_k.setOnAction(actionEvent -> {
-            identify_NguonNX_tcn_tab_k();
             identify_nguonnx_tructhuoc();
             LedgerDetails ledgerDetails = getDataFromField_tab_k();
             stt = ls_socai.size();
@@ -209,7 +207,6 @@ public class XuatController extends CommonFactory implements Initializable {
                         click_index = -1;
                         stt = 0;
                     }
-
                 } else if (response==cancel) {
                     System.out.println("CAncel");
                 }
@@ -234,7 +231,10 @@ public class XuatController extends CommonFactory implements Initializable {
                         savetk(soCaiDto);
                         savetkt(soCaiDto);
                         saveLichsuxnk(soCaiDto);
+                        recognized_tcx();
+                        soCaiDto.setTcn_id(pre_createNewTcn.getId());
                         ledgerDetailsService.create(soCaiDto);
+
                         updateInvReport(soCaiDto, nguonNxTructhuoc_selected.getTructhuoc_id());
                     });
                     ls_socai = new ArrayList<>();
@@ -275,9 +275,8 @@ public class XuatController extends CommonFactory implements Initializable {
     // tab khac
     private void setUpTcx_tab_k_ForSearchCompleteTion(){
         List<String> search_arr = new ArrayList<>();
-        List<Tcn> tcnList = tcnService.getAllByName(LoaiPhieu_cons.XUAT);
-        for(int i = 0; i< tcnList.size(); i++){
-            search_arr.add(tcnList.get(i).getName());
+        for(int i = 0; i< ls_tcn.size(); i++){
+            search_arr.add(ls_tcn.get(i).getName());
         }
         TextFields.bindAutoCompletion(tcx_tf_k, t -> {
             return search_arr.stream().filter(elem
@@ -285,29 +284,19 @@ public class XuatController extends CommonFactory implements Initializable {
                 return elem.toLowerCase().startsWith(t.getUserText().toLowerCase().trim());
             }).collect(Collectors.toList());
         });
-        tcx_tf_k.setOnKeyPressed(e -> {
-            addedBySelection_lstb = false;
-        });
-
-        tcx_tf_k.setOnKeyReleased(e -> {
-            String text = tcx_tf_k.getText().trim();
-            pre_createNewTcn_tab_k.setName(text);
-            pre_createNewTcn_tab_k.setConcert(1);
-            pre_createNewTcn_tab_k.setStatus("ACTIVE");
-            addedBySelection_lstb = true;
-        });
     }
-    private void searchingFor_tcx(){
-        tcx_tf_k.textProperty().addListener(e -> {
-            if (addedBySelection_lstb) {
-                List<Tcn> tcnList = tcnService.findByName(tcx_tf_k.getText().trim());
-                if (!tcnList.isEmpty()){
-                    pre_createNewTcn_tab_k = tcnList.get(0);
-                    setnguonNx_Tcn(pre_createNewTcn_tab_k.getId(), cbb_dvn_xk.getSelectionModel().getSelectedItem().getId());
-                }
-                addedBySelection_lstb= false;
-            }
-        });
+    private void recognized_tcx(){
+        List<Tcn> tcnList = ls_tcn.stream().filter(x -> tcx_tf_k.getText().toLowerCase().trim().equals(x.getName().toLowerCase().trim())).toList();
+        if (!tcnList.isEmpty()){
+            pre_createNewTcn = tcnList.get(0);
+        } else {
+            pre_createNewTcn.setStatus("ACTIVE");
+            pre_createNewTcn.setName(tcx_tf_k.getText());
+            pre_createNewTcn.setLoaiphieu_id(lp_id_pre.getId());
+            pre_createNewTcn.setConcert(1);
+            tcnService.create(pre_createNewTcn);
+            pre_createNewTcn = tcnService.findByName(tcx_tf_k.getText());
+        }
     }
     private void setTenXDToCombobox_tab_k(){
         cbb_tenxd_k.setConverter(new StringConverter<LoaiXangDau>() {
@@ -457,7 +446,6 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setXd(cbb_tenxd_k.getSelectionModel().getSelectedItem());
             ledgerDetails.setQuarter_id(DashboardController.findByTime.getId());
             ledgerDetails.setNguonnx_tructhuoc(nguonNxTructhuoc_selected.getId());
-            ledgerDetails.setNguonnx_tcn(nguonNxTcn_selected_tab_k.getId());
             ledgerDetails.setDvvc_obj(cbb_dvx_k.getSelectionModel().getSelectedItem());
             ledgerDetails.setLoaixd_id(cbb_tenxd_k.getSelectionModel().getSelectedItem().getId());
         } catch (NullPointerException e) {
@@ -467,7 +455,7 @@ public class XuatController extends CommonFactory implements Initializable {
     }
     private void setDongia_k_Label() {
         try {
-            tonKhos_pref = tonKhoService.findByLoaiXD(cbb_tenxd_k.getSelectionModel().getSelectedItem().getId(), mucgia_id_selected_mucgia_cbb.getPrice());
+            tonKhos_pref = tonKhoService.findByLoaiXD(cbb_tenxd_k.getSelectionModel().getSelectedItem().getId(), mucgia_id_selected_mucgia_cbb.getId());
             if (!tonKhos_pref.isEmpty()){
                 lb_slt_k.setText("Số lượng tồn: "+ TextToNumber.textToNum(String.valueOf(tonKhos_pref.get(0).getSoluong())));
             } else {
@@ -478,7 +466,7 @@ public class XuatController extends CommonFactory implements Initializable {
         }
     }
     private void setDongia_nv_Label() {
-        tonKhos_pref = tonKhoService.findByLoaiXD(cbb_tenxd_nv.getSelectionModel().getSelectedItem().getId(), mucgia_id_selected_mucgia_cbb_nv.getPrice());
+        tonKhos_pref = tonKhoService.findByLoaiXD(cbb_tenxd_nv.getSelectionModel().getSelectedItem().getId(), mucgia_id_selected_mucgia_cbb_nv.getId());
         if (!tonKhos_pref.isEmpty()){
             lb_slt_nv.setText("Số lượng tồn: "+ TextToNumber.textToNum(String.valueOf(tonKhos_pref.get(0).getSoluong())));
         }else{
@@ -890,54 +878,6 @@ public class XuatController extends CommonFactory implements Initializable {
         nguonNxTcn_selected_tab_k.setNguonnx_id(nguonnx_id);
     }
 
-    private void identify_NguonNX_tcn_tab_k(){
-        String text = tcx_tf_k.getText();
-        int dvn_id = cbb_dvn_xk.getSelectionModel().getSelectedItem().getId();
-        int loaiphieu_id = loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_XUAT).getId();
-        if (!text.trim().isEmpty()){
-            List<Tcn> tcnList = tcnService.findByName(text);
-            if (tcnList.isEmpty()){
-                tcnService.create(pre_createNewTcn_tab_k);
-                List<Tcn> pretcn = tcnService.findByName(text);
-                if (!pretcn.isEmpty()){
-                    int tcn_id = pretcn.get(0).getId();
-                    pre_createNewTcn_tab_k.setId(tcn_id);
-                    setnguonNx_Tcn(tcn_id, dvn_id);
-                    nguonNxTcn_selected_tab_k.setTcn_id(tcn_id);
-                    nguonNxTcn_selected_tab_k.setNguonnx_id(dvn_id);
-                    nguonNxTcn_selected_tab_k.setLoaiphieu_id(loaiphieu_id);
-                    nguonNxTcnService.createNew(nguonNxTcn_selected_tab_k);
-                    List<NguonNxTcn> list = nguonNxTcnService.findByNnxTcn_(dvn_id,loaiphieu_id,tcn_id);
-                    if (!list.isEmpty()){
-                        nguonNxTcn_selected_tab_k = list.get(0);
-                    }else{
-                        throw new RuntimeException("error had occur");
-                    }
-                }else{
-                    throw new RuntimeException("error had occur");
-                }
-            }else{
-                int tcn_id = tcnList.get(0).getId();
-                setnguonNx_Tcn(pre_createNewTcn_tab_k.getId(), dvn_id);
-                List<NguonNxTcn> list = nguonNxTcnService.findByNnxTcn_(dvn_id,loaiphieu_id,tcn_id);
-                if (list.isEmpty()) {
-                    NguonNxTcn nguonNxTcn = new NguonNxTcn();
-                    nguonNxTcn.setNguonnx_id(dvn_id);
-                    nguonNxTcn.setTcn_id(pre_createNewTcn_tab_k.getId());
-                    nguonNxTcn.setLoaiphieu_id(loaiphieu_id);
-                    nguonNxTcnService.createNew(nguonNxTcn);
-                    List<NguonNxTcn> list2 = nguonNxTcnService.findByNnxTcn_(dvn_id,loaiphieu_id,tcn_id);
-                    if (!list2.isEmpty()) {
-                        nguonNxTcn_selected_tab_k = list2.get(0);
-                    } else {
-                        throw new RuntimeException("error had occur");
-                    }
-                }else{
-                    nguonNxTcn_selected_tab_k = list.get(0);
-                }
-            }
-        }
-    }
     private void identify_nguonnx_tructhuoc(){
         int id_dvn_xk =  cbb_dvn_xk.getSelectionModel().getSelectedItem().getId();
         int lp_id = loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_XUAT).getId();

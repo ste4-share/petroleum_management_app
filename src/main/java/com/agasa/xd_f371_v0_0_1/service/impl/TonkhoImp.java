@@ -89,9 +89,10 @@ public class TonkhoImp implements TonKhoService {
         try {
 
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
-            statement.setInt(1, tonKho.getMucgia_id());
-            statement.setInt(2, tonKho.getLoaixd_id());
-            statement.setInt(3, tonKho.getQuarter_id());
+            statement.setInt(1, tonKho.getSoluong());
+            statement.setInt(2, tonKho.getMucgia_id());
+            statement.setInt(3, tonKho.getLoaixd_id());
+            statement.setInt(4, tonKho.getQuarter_id());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

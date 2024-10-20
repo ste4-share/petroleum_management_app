@@ -42,7 +42,7 @@ public class LedgerDetails {
     private int nvu_tcn_id;
     private int nvu_tructhuoc;
     private int nguonnx_tructhuoc;
-    private int nguonnx_tcn;
+    private int tcn_id;
     private int phuongtien_id;
     private int phuongtien_nvu_id;
     private int nguonnx_nvu_id;
@@ -52,6 +52,14 @@ public class LedgerDetails {
     private int ledger_id;
 
     public LedgerDetails() {
+    }
+
+    public int getTcn_id() {
+        return tcn_id;
+    }
+
+    public void setTcn_id(int tcn_id) {
+        this.tcn_id = tcn_id;
     }
 
     public int getLoaixd_id() {
@@ -132,14 +140,6 @@ public class LedgerDetails {
 
     public void setNguonnx_tructhuoc(int nguonnx_tructhuoc) {
         this.nguonnx_tructhuoc = nguonnx_tructhuoc;
-    }
-
-    public int getNguonnx_tcn() {
-        return nguonnx_tcn;
-    }
-
-    public void setNguonnx_tcn(int nguonnx_tcn) {
-        this.nguonnx_tcn = nguonnx_tcn;
     }
 
     public int getNhiemvu_id() {

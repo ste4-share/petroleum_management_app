@@ -151,7 +151,6 @@ public class MucgiaImp implements MucgiaService {
             statement.setInt(4, mucgia.getItem_id());
             statement.setString(5, mucgia.getStatus());
             statement.executeUpdate();
-            System.out.println("Record quarter updated.");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

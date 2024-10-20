@@ -7,8 +7,9 @@ import java.util.List;
 public interface TcnService {
     List<Tcn> getAll();
     List<Tcn> getAllByName(String norx);
+    List<Tcn> getAllByBillTypeId(int billId);
     Tcn findByID(int id);
-    List<Tcn> findByName(String searName);
+    Tcn findByName(String searName);
     Tcn create(Tcn tcn);
     Tcn update(Tcn tcn);
     void delete(int id);
