@@ -6,6 +6,7 @@ public class Tcn {
     private String name;
     private int concert;
     private String status;
+    private String lp;
 
     public Tcn() {
     }
@@ -16,6 +17,14 @@ public class Tcn {
         this.name = name;
         this.concert = concert;
         this.status = status;
+    }
+
+    public String getLp() {
+        return lp;
+    }
+
+    public void setLp(String lp) {
+        this.lp = lp;
     }
 
     public int getLoaiphieu_id() {

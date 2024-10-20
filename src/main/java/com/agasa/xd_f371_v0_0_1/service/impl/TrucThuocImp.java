@@ -99,7 +99,6 @@ public class TrucThuocImp implements TrucThuocService {
     @Override
     public TrucThuoc findById(int id) {
         QDatabase.getConnectionDB();
-        TrucThuoc trucThuoc = new TrucThuoc();
         String sql = "select * from tructhuoc where id=?";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
@@ -110,18 +109,17 @@ public class TrucThuocImp implements TrucThuocService {
                 int id1 = resultSet.getInt("id");
                 String name2 = resultSet.getString("name");
                 String type = resultSet.getString("type");
-
-
+                TrucThuoc trucThuoc = new TrucThuoc();
                 trucThuoc.setId(id1);
                 trucThuoc.setName(name2);
                 trucThuoc.setType(type);
-
+                return trucThuoc;
             }
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        return trucThuoc;
+        return null;
     }
 
     @Override

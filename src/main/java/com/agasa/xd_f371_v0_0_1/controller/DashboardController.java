@@ -383,6 +383,12 @@ public class DashboardController implements Initializable {
         nxt_menu.setStyle(resetStyle());
         tonkho_menu.setStyle(resetStyle());
         baocao_menu.setStyle(resetStyle());
+        try {
+            VBox lxd_menu_bar = FXMLLoader.load(getClass().getResource("../petroleum_menu.fxml"));
+            borderpane_base.setCenter(lxd_menu_bar);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     @FXML
     public void haohut_menu_action(MouseEvent event) {
@@ -409,6 +415,12 @@ public class DashboardController implements Initializable {
         nxt_menu.setStyle(resetStyle());
         tonkho_menu.setStyle(resetStyle());
         baocao_menu.setStyle(resetStyle());
+        try {
+            VBox norm_menu = FXMLLoader.load(getClass().getResource("../norm_menu.fxml"));
+            borderpane_base.setCenter(norm_menu);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     @FXML
     public void dvi_menu_action(MouseEvent event) {

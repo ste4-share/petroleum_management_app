@@ -181,17 +181,15 @@
                                        <columns>
                                           <TableColumn fx:id="col_stt_qt" prefWidth="75.0" text="STT" />
                                           <TableColumn fx:id="col_ma_qt" prefWidth="78.0" text="Mã" />
-                                          <TableColumn fx:id="col_tenxd_qt" prefWidth="174.0" text="Tên Xăng Dầu">
-                                             <columns>
-                                                <TableColumn prefWidth="435.0" text="Tồn đầu kỳ">
-                                                   <columns>
-                                                      <TableColumn fx:id="col_nvdx_tdk" prefWidth="119.0" text="NV đột xuất" />
-                                                      <TableColumn fx:id="col_sscd_tdk" prefWidth="119.0" text="SSCD" />
-                                                      <TableColumn fx:id="col_sum_tdk" prefWidth="119.0" text="Cộng" />
-                                                   </columns>
-                                                </TableColumn>
-                                             </columns></TableColumn>
+                                          <TableColumn fx:id="col_tenxd_qt" prefWidth="174.0" text="Tên Xăng Dầu" />
                                           <TableColumn fx:id="col_chungloai_qt" prefWidth="119.0" text="Chủng loại" />
+                                          <TableColumn prefWidth="435.0" text="Tồn đầu kỳ">
+                                             <columns>
+                                                <TableColumn fx:id="col_nvdx_tdk" prefWidth="119.0" text="NV đột xuất" />
+                                                <TableColumn fx:id="col_sscd_tdk" prefWidth="119.0" text="SSCD" />
+                                                <TableColumn fx:id="col_sum_tdk" prefWidth="119.0" text="Cộng" />
+                                             </columns>
+                                          </TableColumn>
                                           <TableColumn prefWidth="279.0" text="Tồn cuối kỳ">
                                              <columns>
                                                 <TableColumn fx:id="col_nvdx_tck" prefWidth="119.0" text="NV đột xuất" />

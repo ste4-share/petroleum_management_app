@@ -14,6 +14,7 @@ public interface NguonNx_tructhuocService {
     List<TrucThuoc> findAllTrucThuocByNguonNx(int nguonnx_id, int tructhuocId);
     NguonNx_tructhuoc findNguonnx_tructhuocByNnx_lp(int nguonnx_id, int loaiPhieu);
     List<NguonNxTrucThuocDTO> findAllRelationship(int nguonnx_id);
+    List<Integer> findAllBillType(int nguonnx_id);
     NguonNx_tructhuoc createNew(NguonNx_tructhuoc nguonNxTructhuoc);
     NguonNx_tructhuoc update(NguonNx_tructhuoc nguonNxTructhuoc);
     int delete(NguonNx_tructhuoc nguonNxTructhuoc);
