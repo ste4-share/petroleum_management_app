@@ -34,7 +34,7 @@ public class DonviController implements Initializable {
     @FXML
     private TableView<Tcn> tb_property;
     @FXML
-    private TableColumn<NguonNx, String> col_name_unit,col_create_time;
+        private TableColumn<NguonNx, String> col_name_unit,col_create_time;
     @FXML
     private TableColumn<Tcn, String> col_property_name,col_property_btype  ,col_property_status;
 
@@ -61,7 +61,6 @@ public class DonviController implements Initializable {
         tb_property.setItems(FXCollections.observableList(tcnService.getAll()));
         setFactoryCell_for_Tcn();
     }
-
 
     private void setFactoryCell_for_Tcn() {
         col_property_btype.setCellValueFactory(new PropertyValueFactory<Tcn, String>("lp"));

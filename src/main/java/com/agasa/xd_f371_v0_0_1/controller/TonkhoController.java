@@ -548,7 +548,7 @@ public class TonkhoController implements Initializable {
             mucgia.setAmount(40000);
             mucgia.setPrice(142857);
             mucgia.setItem_id(loaiXangDau.getId());
-            mucgia.setStatus("ACTIVE");
+            mucgia.setStatus("IN_STOCK");
             mucgiaService.createNew(mucgia);
             Mucgia mucgia1 = mucgiaService.findMucgiaByGia(loaiXangDau.getId(),DashboardController.findByTime.getId(), mucgia.getPrice());
 

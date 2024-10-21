@@ -585,7 +585,6 @@ public class XuatController extends CommonFactory implements Initializable {
                         }else{
                             soCaiDto.setLedger_id(0);
                         }
-
                         saveMucgia(soCaiDto);
                         savetk(soCaiDto);
                         savetkt(soCaiDto);
@@ -770,7 +769,7 @@ public class XuatController extends CommonFactory implements Initializable {
     }
     private void setDvxCombobox_tab_nv(){
         ObservableList<NguonNx> observableArrayList =
-                FXCollections.observableArrayList(nguonNXService.getAllByLoaiPhieu(loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_XUAT).getId()));
+                FXCollections.observableArrayList(nguonNXService.findNguonNXByName_NON(LoaiPhieu_cons.ROOT_NAME_NGUONNX));
         cbb_dvx_nv.setItems(observableArrayList);
         cbb_dvx_nv.setConverter(new StringConverter<NguonNx>() {
             @Override

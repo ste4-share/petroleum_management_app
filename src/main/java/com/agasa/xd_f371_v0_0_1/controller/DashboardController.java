@@ -3,9 +3,11 @@ package com.agasa.xd_f371_v0_0_1.controller;
 import com.agasa.xd_f371_v0_0_1.dto.LichsuXNK;
 import com.agasa.xd_f371_v0_0_1.dto.TTPhieuDto;
 import com.agasa.xd_f371_v0_0_1.dto.TonKho;
+import com.agasa.xd_f371_v0_0_1.entity.AssignType;
 import com.agasa.xd_f371_v0_0_1.entity.LoaiXangDau;
 import com.agasa.xd_f371_v0_0_1.entity.Quarter;
 import com.agasa.xd_f371_v0_0_1.entity.TonkhoTong;
+import com.agasa.xd_f371_v0_0_1.model.AssignTypeEnum;
 import com.agasa.xd_f371_v0_0_1.model.TTPhieuModel;
 import com.agasa.xd_f371_v0_0_1.service.*;
 import com.agasa.xd_f371_v0_0_1.service.impl.*;
@@ -55,6 +57,7 @@ public class DashboardController implements Initializable {
     public static Stage xuatStage;
     public static Stage ctStage;
     public static String so_clicked;
+    public static AssignType assignType;
     private static List<TTPhieuModel> ttp_ls = new ArrayList<>();
     public static List<TonkhoTong> prepare_addnew_inventory = new ArrayList<>();
     public static List<TonkhoTong> root_inventory = new ArrayList<>();
@@ -105,6 +108,7 @@ public class DashboardController implements Initializable {
     private QuarterService quarterService = new QuarterImp();
     private LoaiXdService loaiXdService = new LoaiXdImp();
     private TonkhoTongService tonkhoTongService = new TonkhoTongImp();
+    private MucgiaService mucgiaService = new MucgiaImp();
     public static Quarter findByTime;
 
     @FXML
@@ -117,6 +121,7 @@ public class DashboardController implements Initializable {
         ttp_ls = new ArrayList<>();
         lichsuXNKS = new ArrayList<>();
         root_inventory = tonkhoTongService.getAll();
+        assignType = mucgiaService.findByName(AssignTypeEnum.NVDX.getName());
         getDataToChart(root_inventory);
         getCurrentQuarter();
         getCurrentTiming();

@@ -365,9 +365,11 @@ public class NhapController extends CommonFactory implements Initializable {
     private void saveMucGia(LedgerDetails soCaiDto){
         Mucgia mucgia_existed = mucgiaService.findMucgiaByGia(soCaiDto.getXd().getId(), soCaiDto.getQuarter_id(), soCaiDto.getDon_gia());
         if (mucgia_existed==null){
+            System.out.println("create mucgia");
             createNewMucgia(soCaiDto, soCaiDto.getThuc_xuat());
-        }else{
-            int quantityPerPrice = mucgia_existed.getAmount() - soCaiDto.getThuc_xuat();
+        } else {
+            System.out.println("update mucgia");
+            int quantityPerPrice = mucgia_existed.getAmount() + soCaiDto.getThuc_xuat();
             updateMucgia(quantityPerPrice, mucgia_existed);
         }
     }

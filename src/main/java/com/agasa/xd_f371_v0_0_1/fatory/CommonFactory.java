@@ -110,8 +110,10 @@ public class CommonFactory {
         mucgia.setQuarter_id(ledgerDetails.getQuarter_id());
         mucgia.setItem_id(ledgerDetails.getXd().getId());
         mucgia.setStatus(MucGiaEnum.IN_STOCK.getStatus());
+        mucgia.setAssign_type_id(DashboardController.assignType.getId());
         mucgiaService.createNew(mucgia);
     }
+
     protected void updateMucgia(int quantity, Mucgia mucgia_existed){
         if (quantity ==0){
             mucgia_existed.setStatus(MucGiaEnum.OUT_STOCK.getStatus());
