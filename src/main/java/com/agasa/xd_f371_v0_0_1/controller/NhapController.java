@@ -1,8 +1,5 @@
 package com.agasa.xd_f371_v0_0_1.controller;
 
-import com.agasa.xd_f371_v0_0_1.dto.LichsuXNK;
-import com.agasa.xd_f371_v0_0_1.dto.QuantityByTructhuocDTO;
-import com.agasa.xd_f371_v0_0_1.dto.TitleDto;
 import com.agasa.xd_f371_v0_0_1.entity.LedgerDetails;
 import com.agasa.xd_f371_v0_0_1.dto.TonKho;
 import com.agasa.xd_f371_v0_0_1.entity.*;
@@ -10,7 +7,6 @@ import com.agasa.xd_f371_v0_0_1.fatory.CommonFactory;
 import com.agasa.xd_f371_v0_0_1.model.*;
 import com.agasa.xd_f371_v0_0_1.service.*;
 import com.agasa.xd_f371_v0_0_1.service.impl.*;
-import com.agasa.xd_f371_v0_0_1.util.Common;
 import com.agasa.xd_f371_v0_0_1.util.TextToNumber;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,20 +18,16 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.controlsfx.control.textfield.TextFields;
-import org.jfree.util.Log;
 
 import java.io.*;
 import java.net.URL;
-import java.text.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class NhapController extends CommonFactory implements Initializable {
@@ -46,7 +38,6 @@ public class NhapController extends CommonFactory implements Initializable {
     private static ValidateFiledBol validateFiledBol = new ValidateFiledBol(true, true,true, true,true, true,true, true,true, true,true, true,true, true,true,true,true);
     private static int click_index;
     private static NguonNx_tructhuoc nguonNxTructhuoc_selected = new NguonNx_tructhuoc();
-    Logger logger = Logger.getLogger(NhapController.class.getName());
 
     @FXML
     private TextField soTf, recvTf,tcNhap,lenhKHso,soXe,
@@ -340,7 +331,7 @@ public class NhapController extends CommonFactory implements Initializable {
 
     private void saveLichsunxk(LedgerDetails soCaiDto) {
         int quarter_id = DashboardController.findByTime.getId();
-        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia());
+        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia(), DashboardController.assignType.getId());
         TonKho tonKho =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
         int tonsau = tonKho.getSoluong()+ soCaiDto.getThuc_xuat();
         int tontruoc = tonKho.getSoluong();
@@ -349,7 +340,7 @@ public class NhapController extends CommonFactory implements Initializable {
 
     private void savetk(LedgerDetails soCaiDto) {
         int quarter_id = DashboardController.findByTime.getId();
-        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia());
+        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia(),DashboardController.assignType.getId());
         TonKho tonKho =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
         if (tonKho==null){
             createNewTonKho(soCaiDto, soCaiDto.getThuc_xuat());
@@ -363,12 +354,10 @@ public class NhapController extends CommonFactory implements Initializable {
     }
 
     private void saveMucGia(LedgerDetails soCaiDto){
-        Mucgia mucgia_existed = mucgiaService.findMucgiaByGia(soCaiDto.getXd().getId(), soCaiDto.getQuarter_id(), soCaiDto.getDon_gia());
+        Mucgia mucgia_existed = mucgiaService.findMucgiaByGia(soCaiDto.getXd().getId(), soCaiDto.getQuarter_id(), soCaiDto.getDon_gia(),DashboardController.assignType.getId());
         if (mucgia_existed==null){
-            System.out.println("create mucgia");
             createNewMucgia(soCaiDto, soCaiDto.getThuc_xuat());
         } else {
-            System.out.println("update mucgia");
             int quantityPerPrice = mucgia_existed.getAmount() + soCaiDto.getThuc_xuat();
             updateMucgia(quantityPerPrice, mucgia_existed);
         }

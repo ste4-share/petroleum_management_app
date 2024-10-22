@@ -138,7 +138,7 @@ public class CommonFactory {
         tonKho.setLoai_xd(ledgerDetails.getTen_xd().trim());
         tonKho.setMucgia(ledgerDetails.getDon_gia());
         tonKho.setSoluong(soluong);
-        Mucgia mucgia = mucgiaService.findMucgiaByGia(ledgerDetails.getLoaixd_id(),DashboardController.findByTime.getId(),ledgerDetails.getDon_gia());
+        Mucgia mucgia = mucgiaService.findMucgiaByGia(ledgerDetails.getLoaixd_id(),DashboardController.findByTime.getId(),ledgerDetails.getDon_gia(),DashboardController.assignType.getId());
         tonKho.setMucgia_id(mucgia.getId());
         tonKho.setLoaixd_id(ledgerDetails.getLoaixd_id());
         tonKho.setQuarter_id(DashboardController.findByTime.getId());

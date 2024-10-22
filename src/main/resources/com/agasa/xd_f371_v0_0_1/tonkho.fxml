@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox fx:id="nxt_menu_bar" prefHeight="894.0" prefWidth="1850.0" stylesheets="@css/tonkho.css" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.agasa.xd_f371_v0_0_1.controller.TonkhoController">
+<HBox fx:id="nxt_menu_bar" prefHeight="894.0" prefWidth="1850.0" stylesheets="@css/tonkho.css" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.agasa.xd_f371_v0_0_1.controller.TonkhoController">
    <children>
       <VBox>
          <children>

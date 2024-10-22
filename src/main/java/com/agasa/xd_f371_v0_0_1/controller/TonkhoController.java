@@ -72,7 +72,6 @@ public class TonkhoController implements Initializable {
     private TonkhoTongService tonkhoTongService = new TonkhoTongImp();
     private TonKhoService tonKhoService = new TonkhoImp();
     private LoaiXdService loaiXdService = new LoaiXdImp();
-    private LedgerDetailsService ledgerDetailsService = new LedgerDetailsImp();
     private TrucThuocService trucThuocService = new TrucThuocImp();
     private InvReportService invReportService = new InvReportImp();
     private InvReportDetailService invReportDetailService = new invReportDetailImp();
@@ -523,8 +522,8 @@ public class TonkhoController implements Initializable {
     }
 
     private void mockInventoryData(){
-        int tondk_nvdx_mock = 20000;
-        int tondk_sscd_mock = 20000;
+        int tondk_nvdx_mock = 40000;
+        int tondk_sscd_mock = 0;
         int tondk_sum_mock = tondk_sscd_mock+tondk_nvdx_mock;
         for (LoaiXangDau loaiXangDau : loaiXdService.getAll()) {
 
@@ -548,9 +547,10 @@ public class TonkhoController implements Initializable {
             mucgia.setAmount(40000);
             mucgia.setPrice(142857);
             mucgia.setItem_id(loaiXangDau.getId());
+            mucgia.setAssign_type_id(DashboardController.assignType.getId());
             mucgia.setStatus("IN_STOCK");
             mucgiaService.createNew(mucgia);
-            Mucgia mucgia1 = mucgiaService.findMucgiaByGia(loaiXangDau.getId(),DashboardController.findByTime.getId(), mucgia.getPrice());
+            Mucgia mucgia1 = mucgiaService.findMucgiaByGia(loaiXangDau.getId(),DashboardController.findByTime.getId(), mucgia.getPrice(),DashboardController.assignType.getId());
 
             //mock tonkho
             TonKho tonKho = new TonKho();

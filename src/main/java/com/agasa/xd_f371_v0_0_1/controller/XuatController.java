@@ -259,7 +259,7 @@ public class XuatController extends CommonFactory implements Initializable {
 
     private void savetk(LedgerDetails soCaiDto) {
         int quarter_id = DashboardController.findByTime.getId();
-        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia());
+        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia(), DashboardController.assignType.getId());
         TonKho tonKho =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
         if (tonKho==null){
             createNewTonKho(soCaiDto, soCaiDto.getThuc_xuat());
@@ -612,7 +612,7 @@ public class XuatController extends CommonFactory implements Initializable {
 
     private void saveLichsuxnk(LedgerDetails soCaiDto) {
         int quarter_id = DashboardController.findByTime.getId();
-        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia());
+        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia(),DashboardController.assignType.getId());
         TonKho tonKho =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
         int tonsau = tonKho.getSoluong() - soCaiDto.getThuc_xuat();
         int tontruoc = tonKho.getSoluong();
@@ -633,7 +633,7 @@ public class XuatController extends CommonFactory implements Initializable {
     }
 
     private void saveMucgia(LedgerDetails soCaiDto){
-        Mucgia mucgia_existed = mucgiaService.findMucgiaByGia(soCaiDto.getXd().getId(), soCaiDto.getQuarter_id(), soCaiDto.getDon_gia());
+        Mucgia mucgia_existed = mucgiaService.findMucgiaByGia(soCaiDto.getXd().getId(), soCaiDto.getQuarter_id(), soCaiDto.getDon_gia(),DashboardController.assignType.getId());
         if (mucgia_existed==null){
             createNewMucgia(soCaiDto, soCaiDto.getThuc_xuat()*(-1));
         }else{

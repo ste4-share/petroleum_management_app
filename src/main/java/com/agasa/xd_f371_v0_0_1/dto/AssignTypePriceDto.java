@@ -1,12 +1,22 @@
 package com.agasa.xd_f371_v0_0_1.dto;
 
 public class AssignTypePriceDto {
+    private int id;
     private String price;
     private String soluong;
 
-    public AssignTypePriceDto(String price, String soluong) {
+    public AssignTypePriceDto(int id, String price, String soluong) {
+        this.id = id;
         this.price = price;
         this.soluong = soluong;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getPrice() {

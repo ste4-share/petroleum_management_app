@@ -1,8 +1,10 @@
 package com.agasa.xd_f371_v0_0_1.service.impl;
 
 import com.agasa.xd_f371_v0_0_1.entity.LoaiXangDau;
+import com.agasa.xd_f371_v0_0_1.entity.PetroleumType;
 import com.agasa.xd_f371_v0_0_1.model.QDatabase;
 import com.agasa.xd_f371_v0_0_1.service.LoaiXdService;
+import org.codehaus.stax2.ri.typed.StringBase64Decoder;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -97,6 +99,23 @@ public class LoaiXdImp implements LoaiXdService {
             throw new RuntimeException(e);
         }
         return importDto;
+    }
+
+    @Override
+    public PetroleumType create(PetroleumType petroleumType) {
+        QDatabase.getConnectionDB();
+        String sql = "insert into petroleum_type(name, type, r_type) values(?,?,?)";
+        try {
+            PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
+            statement.setString(1, petroleumType.getName());
+            statement.setString(2, petroleumType.getType());
+            statement.setString(3, petroleumType.getR_type());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return petroleumType;
     }
 
     @Override
@@ -218,6 +237,64 @@ public class LoaiXdImp implements LoaiXdService {
                 loaiXangDau.setType(type);
                 loaiXangDau.setRtype(rType);
                 result.add(loaiXangDau);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<LoaiXangDau> findLoaiXdByChungloai(String chungloai1) {
+        QDatabase.getConnectionDB();
+        List<LoaiXangDau> result = new ArrayList<>();
+        String SQL_SELECT = "select * from loaixd2 where chungloai=?";
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setString(1, chungloai1);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String maxd = resultSet.getString("maxd");
+                String tenxd = resultSet.getString("tenxd");
+                String chungloai = resultSet.getString("chungloai");
+                Date createtime = resultSet.getDate("timestamp");
+                String status = resultSet.getString("status");
+                String type = resultSet.getString("type");
+                String rType = resultSet.getString("r_type");
+
+                LoaiXangDau loaiXangDau = new LoaiXangDau();
+                loaiXangDau.setId(id);
+                loaiXangDau.setChungloai(chungloai);
+                loaiXangDau.setCreatetime(createtime);
+                loaiXangDau.setTenxd(tenxd);
+                loaiXangDau.setMaxd(maxd);
+                loaiXangDau.setStatus(status);
+                loaiXangDau.setType(type);
+                loaiXangDau.setRtype(rType);
+                result.add(loaiXangDau);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<String> getAllType() {
+        QDatabase.getConnectionDB();
+        List<String> result = new ArrayList<>();
+        String SQL_SELECT = "SELECT chungloai FROM loaixd2 group by chungloai";
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                String chungloai = resultSet.getString("chungloai");
+                result.add(chungloai);
             }
         } catch (SQLException e) {
             e.printStackTrace();

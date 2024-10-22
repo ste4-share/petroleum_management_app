@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="quarter_form" prefHeight="464.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.agasa.xd_f371_v0_0_1.controller.QuyController">
+<AnchorPane fx:id="quarter_form" prefHeight="464.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.agasa.xd_f371_v0_0_1.controller.QuyController">
    <children>
       <Pane layoutX="12.0" layoutY="73.0" prefHeight="313.0" prefWidth="576.0">
          <children>

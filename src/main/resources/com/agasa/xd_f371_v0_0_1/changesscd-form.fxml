@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="456.0" prefWidth="653.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.agasa.xd_f371_v0_0_1.controller.ChangingController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="456.0" prefWidth="653.0" style="-fx-background-color: #ffffff;" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.agasa.xd_f371_v0_0_1.controller.ChangingController">
    <children>
       <AnchorPane prefHeight="46.0" prefWidth="653.0" style="-fx-background-color: #e74c3c;">
          <children>
@@ -50,7 +50,7 @@
                                     <Insets bottom="10.0" />
                                  </VBox.margin>
                               </Label>
-                              <TableView fx:id="nvdx_tb" prefHeight="184.0" prefWidth="220.0">
+                              <TableView fx:id="nvdx_tb" onMousePressed="#nvdx_press" prefHeight="184.0" prefWidth="220.0">
                                 <columns>
                                   <TableColumn fx:id="nvdx_price" prefWidth="75.0" text="Mức giá" />
                                   <TableColumn fx:id="nvdx_quantity" prefWidth="75.0" text="Số lượng" />
@@ -63,8 +63,8 @@
                         </VBox>
                         <VBox alignment="CENTER" layoutX="225.0" layoutY="10.0">
                            <children>
-                              <Button mnemonicParsing="false" onAction="#nvdxToSscdAction" text="&gt;&gt;|" />
-                              <Button layoutX="10.0" layoutY="84.0" mnemonicParsing="false" onAction="#sscdToNvdxAction" text="|&lt;&lt;">
+                              <Button fx:id="nvdx_sscd" mnemonicParsing="false" onAction="#nvdxToSscdAction" text="&gt;&gt;|" />
+                              <Button fx:id="sscd_nvdx" layoutX="10.0" layoutY="84.0" mnemonicParsing="false" onAction="#sscdToNvdxAction" text="|&lt;&lt;">
                                  <VBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="25.0" />
                                  </VBox.margin>
@@ -84,7 +84,7 @@
                                     <Insets bottom="10.0" />
                                  </VBox.margin>
                               </Label>
-                              <TableView fx:id="sscd_tb" prefHeight="186.0" prefWidth="238.0">
+                              <TableView fx:id="sscd_tb" onMousePressed="#sscd_press" prefHeight="186.0" prefWidth="238.0">
                                  <columns>
                                     <TableColumn fx:id="sscd_price" prefWidth="75.0" text="Mức giá" />
                                     <TableColumn fx:id="sscd_quantity" prefWidth="75.0" text="Số lượng" />

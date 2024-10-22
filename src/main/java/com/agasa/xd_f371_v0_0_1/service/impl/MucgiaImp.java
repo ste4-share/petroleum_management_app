@@ -56,16 +56,17 @@ public class MucgiaImp implements MucgiaService {
     }
 
     @Override
-    public Mucgia findMucgiaByGia(int id_xd, int id_quarter, int gia) {
+    public Mucgia findMucgiaByGia(int id_xd, int id_quarter, int gia, int assT) {
         QDatabase.getConnectionDB();
 
-        String SQL_SELECT = "Select * from mucgia where quarter_id=? and item_id=? and price=?";
+        String SQL_SELECT = "Select * from mucgia where quarter_id=? and item_id=? and price=? and asssign_type_id=?";
         // auto close connection and preparedStatement
         try {
             PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
             preparedStatement.setInt(1, id_quarter);
             preparedStatement.setInt(2, id_xd);
             preparedStatement.setInt(3, gia);
+            preparedStatement.setInt(4, assT);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -76,6 +77,7 @@ public class MucgiaImp implements MucgiaService {
                 int quarter_id = resultSet.getInt("quarter_id");
                 int item_id = resultSet.getInt("item_id");
                 String status = resultSet.getString("status");
+                int assId = resultSet.getInt("asssign_type_id");
 
                 Mucgia mucgia = new Mucgia();
                 mucgia.setId(id);
@@ -84,6 +86,7 @@ public class MucgiaImp implements MucgiaService {
                 mucgia.setAmount(amount);
                 mucgia.setQuarter_id(quarter_id);
                 mucgia.setItem_id(item_id);
+                mucgia.setAssign_type_id(assId);
                 return mucgia;
             }
 
@@ -118,6 +121,7 @@ public class MucgiaImp implements MucgiaService {
                 int quarter_id = resultSet.getInt("quarter_id");
                 int item_id = resultSet.getInt("item_id");
                 String status = resultSet.getString("status");
+                int assId = resultSet.getInt("asssign_type_id");
 
                 Mucgia mucgia = new Mucgia();
                 mucgia.setId(id);
@@ -126,6 +130,7 @@ public class MucgiaImp implements MucgiaService {
                 mucgia.setAmount(amount);
                 mucgia.setQuarter_id(quarter_id);
                 mucgia.setItem_id(item_id);
+                mucgia.setAssign_type_id(assId);
                 result.add(mucgia);
             }
 
@@ -141,7 +146,7 @@ public class MucgiaImp implements MucgiaService {
     @Override
     public Mucgia createNew(Mucgia mucgia) {
         QDatabase.getConnectionDB();
-        String sql = "insert into mucgia(price, amount, quarter_id, item_id, status) values(?,?,?,?,?)";
+        String sql = "insert into mucgia(price, amount, quarter_id, item_id, status,asssign_type_id) values(?,?,?,?,?,?)";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
             statement.setInt(1, mucgia.getPrice());
@@ -149,6 +154,7 @@ public class MucgiaImp implements MucgiaService {
             statement.setInt(3, mucgia.getQuarter_id());
             statement.setInt(4, mucgia.getItem_id());
             statement.setString(5, mucgia.getStatus());
+            statement.setInt(6, mucgia.getAssign_type_id());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -160,14 +166,14 @@ public class MucgiaImp implements MucgiaService {
     @Override
     public Mucgia updateMucGia(Mucgia mucgia) {
         QDatabase.getConnectionDB();
-        String sql = "update mucgia set amount=?, asssign_type_id=? where quarter_id=? and item_id=? and price=?";
+        String sql = "update mucgia set amount=? where quarter_id=? and item_id=? and price=? and asssign_type_id=?";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
             statement.setInt(1, mucgia.getAmount());
-            statement.setInt(2, mucgia.getAssign_type_id());
-            statement.setInt(3, mucgia.getQuarter_id());
-            statement.setInt(4, mucgia.getItem_id());
-            statement.setInt(5, mucgia.getPrice());
+            statement.setInt(2, mucgia.getQuarter_id());
+            statement.setInt(3, mucgia.getItem_id());
+            statement.setInt(4, mucgia.getPrice());
+            statement.setInt(5, mucgia.getAssign_type_id());
 
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -283,7 +289,7 @@ public class MucgiaImp implements MucgiaService {
             while (resultSet.next()) {
                 String quantity = String.valueOf(resultSet.getInt("amount"));
                 String price = String.valueOf(resultSet.getInt("price"));
-                result.add(new AssignTypePriceDto(price, quantity));
+                result.add(new AssignTypePriceDto(petroId,price, quantity));
             }
 
         } catch (SQLException e) {
