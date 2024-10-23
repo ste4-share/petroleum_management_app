@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox fx:id="nxt_menu_bar" prefHeight="894.0" prefWidth="1850.0" stylesheets="@css/tonkho.css" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.agasa.xd_f371_v0_0_1.controller.TonkhoController">
+<HBox fx:id="nxt_menu_bar" prefHeight="873.0" prefWidth="1377.0" stylesheets="@css/tonkho.css" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23" fx:controller="com.agasa.xd_f371_v0_0_1.controller.TonkhoController">
    <children>
       <VBox>
          <children>
@@ -180,7 +180,6 @@
                                     <TableView fx:id="tb_quater_inv" prefHeight="720.0" style="-fx-cursor: hand;" stylesheets="@css/tonkho.css">
                                        <columns>
                                           <TableColumn fx:id="col_stt_qt" prefWidth="75.0" text="STT" />
-                                          <TableColumn fx:id="col_ma_qt" prefWidth="78.0" text="Mã" />
                                           <TableColumn fx:id="col_tenxd_qt" prefWidth="174.0" text="Tên Xăng Dầu" />
                                           <TableColumn fx:id="col_chungloai_qt" prefWidth="119.0" text="Chủng loại" />
                                           <TableColumn prefWidth="435.0" text="Tồn đầu kỳ">
@@ -188,6 +187,13 @@
                                                 <TableColumn fx:id="col_nvdx_tdk" prefWidth="119.0" text="NV đột xuất" />
                                                 <TableColumn fx:id="col_sscd_tdk" prefWidth="119.0" text="SSCD" />
                                                 <TableColumn fx:id="col_sum_tdk" prefWidth="119.0" text="Cộng" />
+                                             </columns>
+                                          </TableColumn>
+                                          <TableColumn prefWidth="435.0" text="Tồn hiện tại">
+                                             <columns>
+                                                <TableColumn fx:id="col_nvdx_pre" prefWidth="119.0" text="NV đột xuất" />
+                                                <TableColumn fx:id="col_sscd_pre" prefWidth="119.0" text="SSCD" />
+                                                <TableColumn fx:id="col_sum_pre" prefWidth="119.0" text="Cộng" />
                                              </columns>
                                           </TableColumn>
                                           <TableColumn prefWidth="279.0" text="Tồn cuối kỳ">

@@ -1,6 +1,7 @@
 package com.agasa.xd_f371_v0_0_1.controller;
 
 import com.agasa.xd_f371_v0_0_1.dto.AssignTypePriceDto;
+import com.agasa.xd_f371_v0_0_1.dto.SpotDto;
 import com.agasa.xd_f371_v0_0_1.dto.TonKho;
 import com.agasa.xd_f371_v0_0_1.entity.Mucgia;
 import com.agasa.xd_f371_v0_0_1.entity.TonkhoTong;
@@ -39,7 +40,7 @@ public class ChangingController implements Initializable {
     public static String sscd ;
     public static String quantity ;
     public static String quantity_convert =null;
-    private static TonkhoTong tonkho_selected;
+    private static SpotDto tonkho_selected;
     private static List<AssignTypePriceDto> sscd_ls_buf;
     private static List<AssignTypePriceDto> nvdx_ls_buf;
 
@@ -147,7 +148,7 @@ public class ChangingController implements Initializable {
             int sl_conlai = Integer.parseInt(pre_convert.getSoluong()) -Integer.parseInt(quantity_convert);
             AssignTypePriceDto after_convert = after.stream().filter(x -> x.getPrice().equals(pre_convert.getPrice())).findAny().orElse(null);
             if (after_convert==null){
-                after.add(new AssignTypePriceDto(tonkho_selected.getId_xd(), pre_convert.getPrice(), quantity_convert));
+                after.add(new AssignTypePriceDto(tonkho_selected.getLxd_id(), pre_convert.getPrice(), quantity_convert));
                 for (int i = 0; i< pre.size(); i++){
                     if (pre.get(i).getPrice().equals(pre_convert.getPrice())) {
                         pre.get(i).setSoluong(String.valueOf(sl_conlai));
@@ -178,14 +179,14 @@ public class ChangingController implements Initializable {
 
     private void updateMucgia(List<AssignTypePriceDto> assignTypePriceDtoList,int ass_id){
         for(int i = 0;i < assignTypePriceDtoList.size(); i++){
-            Mucgia mucgia = mucgiaService.findMucgiaByGia(tonkho_selected.getId_xd(),DashboardController.findByTime.getId(),Integer.parseInt(assignTypePriceDtoList.get(i).getPrice()),ass_id);
+            Mucgia mucgia = mucgiaService.findMucgiaByGia(tonkho_selected.getLxd_id(),DashboardController.findByTime.getId(),Integer.parseInt(assignTypePriceDtoList.get(i).getPrice()),ass_id);
             if (mucgia==null){
                 Mucgia after_convert = new Mucgia();
                 after_convert.setAssign_type_id(ass_id);
                 after_convert.setPrice(Integer.parseInt(assignTypePriceDtoList.get(i).getPrice()));
                 after_convert.setAmount(Integer.parseInt(assignTypePriceDtoList.get(i).getSoluong()));
                 after_convert.setStatus(MucGiaEnum.IN_STOCK.getStatus());
-                after_convert.setItem_id(tonkho_selected.getId_xd());
+                after_convert.setItem_id(tonkho_selected.getLxd_id());
                 after_convert.setQuarter_id(DashboardController.findByTime.getId());
                 mucgiaService.createNew(after_convert);
             }else{
@@ -223,7 +224,7 @@ public class ChangingController implements Initializable {
     }
     private List<AssignTypePriceDto> setDataToTable(TableView<AssignTypePriceDto> tb, String assTypeName){
         int assId = mucgiaService.findByName(assTypeName).getId();
-        int petroId = tonkho_selected.getId_xd();
+        int petroId = tonkho_selected.getLxd_id();
         List<AssignTypePriceDto> list = mucgiaService.getPriceAndQuanTityByAssId(assId,petroId,DashboardController.findByTime.getId());
         tb.setItems(FXCollections.observableList(list));
         return list;

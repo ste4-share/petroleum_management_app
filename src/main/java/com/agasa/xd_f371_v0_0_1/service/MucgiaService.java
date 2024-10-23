@@ -1,6 +1,7 @@
 package com.agasa.xd_f371_v0_0_1.service;
 
 import com.agasa.xd_f371_v0_0_1.dto.AssignTypePriceDto;
+import com.agasa.xd_f371_v0_0_1.dto.SpotDto;
 import com.agasa.xd_f371_v0_0_1.entity.AssignType;
 import com.agasa.xd_f371_v0_0_1.entity.Mucgia;
 
@@ -16,4 +17,7 @@ public interface MucgiaService {
     List<AssignType> getAll();
     AssignType findByName(String name);
     List<AssignTypePriceDto> getPriceAndQuanTityByAssId(int ass_id, int petroId, int quarter_id);
+    List<Mucgia> getPriceAndQuanTityByAssId2(int ass_id, int petroId, int quarter_id);
+    List<SpotDto> getAllSpots(int quarter_id);
+    SpotDto findSpotByPetro(int quarter_id, int petroleum_id);
 }

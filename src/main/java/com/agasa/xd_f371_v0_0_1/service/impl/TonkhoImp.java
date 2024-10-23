@@ -1,6 +1,7 @@
 package com.agasa.xd_f371_v0_0_1.service.impl;
 
 import com.agasa.xd_f371_v0_0_1.dto.TonKho;
+import com.agasa.xd_f371_v0_0_1.entity.Inventory;
 import com.agasa.xd_f371_v0_0_1.model.QDatabase;
 import com.agasa.xd_f371_v0_0_1.service.TonKhoService;
 import com.fasterxml.jackson.core.json.async.NonBlockingJsonParser;
@@ -189,6 +190,180 @@ public class TonkhoImp implements TonKhoService {
                 obj.setLoaixd_id(loaixdId);
                 obj.setMucgia_id(mucgiaId);
                 return obj;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    @Override
+    public List<Inventory> getAllInventory(int quarter_id) {
+        QDatabase.getConnectionDB();
+        List<Inventory> result = new ArrayList<>();
+
+
+        String SQL_SELECT = "Select * from inventory where quarter_id=?";
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, quarter_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                int id = resultSet.getInt("id");
+                int petro_id = resultSet.getInt("petro_id");
+                int quarterId = resultSet.getInt("quarter_id");
+                int tdk_nvdx = resultSet.getInt("tdk_nvdx");
+                int tdk_sscd = resultSet.getInt("tdk_sscd");
+                int tcK_nvdx = resultSet.getInt("tcK_nvdx");
+                int tck_sscd = resultSet.getInt("tck_sscd");
+                int pre_nvdx = resultSet.getInt("pre_nvdx");
+                int pre_sscd = resultSet.getInt("pre_sscd");
+                int import_total = resultSet.getInt("import_total");
+                int export_total = resultSet.getInt("export_total");
+                int total = resultSet.getInt("total");
+                String status1 = resultSet.getString("status");
+                Inventory inventory = new Inventory(id,petro_id, quarterId, tdk_nvdx, tdk_sscd, tcK_nvdx, tck_sscd, total, status1,import_total, export_total,pre_nvdx,pre_sscd);
+                result.add(inventory);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<Inventory> getAllInventoryWithJoin(int quarter_id) {
+        QDatabase.getConnectionDB();
+        List<Inventory> result = new ArrayList<>();
+
+
+        String SQL_SELECT = "select * from inventory \n" +
+                "left join loaixd2 on inventory.petro_id=loaixd2.id\n" +
+                "where inventory.quarter_id=?";
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, quarter_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                int id = resultSet.getInt("id");
+                int petro_id = resultSet.getInt("petro_id");
+                int quarterId = resultSet.getInt("quarter_id");
+                int tdk_nvdx = resultSet.getInt("tdk_nvdx");
+                int tdk_sscd = resultSet.getInt("tdk_sscd");
+                int tcK_nvdx = resultSet.getInt("tcK_nvdx");
+                int tck_sscd = resultSet.getInt("tck_sscd");
+                int pre_nvdx = resultSet.getInt("pre_nvdx");
+                int pre_sscd = resultSet.getInt("pre_sscd");
+                int import_total = resultSet.getInt("import_total");
+                int export_total = resultSet.getInt("export_total");
+                int total = resultSet.getInt("total");
+                String status1 = resultSet.getString("status");
+
+                Inventory inventory = new Inventory(id,petro_id, quarterId, tdk_nvdx, tdk_sscd, tcK_nvdx, tck_sscd, total, status1  , import_total, export_total, pre_nvdx, pre_sscd);
+                result.add(inventory);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public Inventory createNew(Inventory tonKho) {
+        QDatabase.getConnectionDB();
+        String sql = "insert into inventory(tdk_sscd, tdk_nvdx,total,status,tck_sscd,quarter_id, tck_nvdx, petro_id, import_total, export_total,pre_nvdx, pre_sscd) values (?,?,?,?,?,?,?,?,?,?,?,?)";
+        try {
+            PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
+            statement.setInt(1, tonKho.getTdk_sscd());
+            statement.setInt(2, tonKho.getTdk_nvdx());
+            statement.setInt(3, tonKho.getTotal());
+            statement.setString(4, tonKho.getStatus());
+            statement.setInt(5, tonKho.getTck_sscd());
+            statement.setInt(6, tonKho.getQuarter_id());
+            statement.setInt(7, tonKho.getTcK_nvdx());
+            statement.setInt(8, tonKho.getPetro_id());
+            statement.setInt(9, tonKho.getImport_total());
+            statement.setInt(10, tonKho.getExport_total());
+            statement.setInt(11, tonKho.getPre_nvdx());
+            statement.setInt(12, tonKho.getPre_sscd());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return tonKho;
+    }
+
+    @Override
+    public Inventory updateNew(Inventory tonKho) {
+        QDatabase.getConnectionDB();
+        String sql = "update inventory set tdk_sscd=?, tdk_nvdx=?,total=?,status=?,tck_sscd=?, tck_nvdx=?, import_total=?, export_total=? where petro_id=? and quarter_id=?";
+        try {
+            PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
+            statement.setLong(1, tonKho.getTdk_sscd());
+            statement.setLong(2, tonKho.getTdk_nvdx());
+            statement.setLong(3, tonKho.getTotal());
+            statement.setString(4, tonKho.getStatus());
+            statement.setLong(5, tonKho.getTck_sscd());
+            statement.setLong(6, tonKho.getTcK_nvdx());
+            statement.setInt(7, tonKho.getImport_total());
+            statement.setInt(8, tonKho.getExport_total());
+            statement.setInt(9, tonKho.getPetro_id());
+            statement.setInt(10, tonKho.getQuarter_id());
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return tonKho;
+    }
+
+    @Override
+    public Inventory findByUniqueId(int petroleum_id, int quarter_id) {
+        QDatabase.getConnectionDB();
+        String SQL_SELECT = "Select * from inventory where petro_id=? and quarter_id=?";
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1,petroleum_id);
+            preparedStatement.setInt(2,quarter_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                int id = resultSet.getInt("id");
+                int petro_id = resultSet.getInt("petro_id");
+                int quarterId = resultSet.getInt("quarter_id");
+                int tdk_nvdx = resultSet.getInt("tdk_nvdx");
+                int tdk_sscd = resultSet.getInt("tdk_sscd");
+                int tcK_nvdx = resultSet.getInt("tcK_nvdx");
+                int tck_sscd = resultSet.getInt("tck_sscd");
+                int pre_nvdx = resultSet.getInt("pre_nvdx");
+                int pre_sscd = resultSet.getInt("pre_sscd");
+                int import_total = resultSet.getInt("import_total");
+                int export_total = resultSet.getInt("export_total");
+                int total = resultSet.getInt("total");
+                String status1 = resultSet.getString("status");
+                return new Inventory(id,petro_id, quarterId, tdk_nvdx, tdk_sscd, tcK_nvdx, tck_sscd, total, status1, import_total, export_total,pre_nvdx, pre_sscd);
             }
 
         } catch (SQLException e) {

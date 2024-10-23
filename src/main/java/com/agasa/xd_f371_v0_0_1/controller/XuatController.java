@@ -54,7 +54,7 @@ public class XuatController extends CommonFactory implements Initializable {
     private static int click_index;
     private boolean addedBySelection_lstb = false;
     private static List<LedgerDetails> ls_socai;
-    List<TonKho> tonKhos_pref = new ArrayList<>();
+    List<Inventory> tonKhos_pref = new ArrayList<>();
     private static NguonNx_nhiemvu nguonNxNhiemvu_selected_nv = new NguonNx_nhiemvu();
     private static PhuongTienNhiemVu phuongTienNhiemVu_selected = new PhuongTienNhiemVu();
     private static List<ChiTietNhiemVuDTO> chiTietNhiemVuDTO_list = new ArrayList<>();
@@ -95,7 +95,6 @@ public class XuatController extends CommonFactory implements Initializable {
     private LoaiXdService loaiXdService = new LoaiXdImp();
     private LedgerDetailsService ledgerDetailsService = new LedgerDetailsImp();
     private NguonNXService nguonNXService = new NguonNXImp();
-    private TonkhoTongService tonkhoTongService = new TonkhoTongImp();
     private MucgiaService mucgiaService = new MucgiaImp();
     private PhuongTienService phuongTienService = new PhuongTienImp();
     private NguonNx_tructhuocService nguonNxTructhuocService = new NguonNx_tructhuocImp();
@@ -228,8 +227,6 @@ public class XuatController extends CommonFactory implements Initializable {
                             soCaiDto.setLedger_id(0);
                         }
                         saveMucgia(soCaiDto);
-                        savetk(soCaiDto);
-                        savetkt(soCaiDto);
                         saveLichsuxnk(soCaiDto);
                         recognized_tcx();
                         soCaiDto.setTcn_id(pre_createNewTcn.getId());
@@ -255,21 +252,6 @@ public class XuatController extends CommonFactory implements Initializable {
         });
         cbb_dvn_xk.setOnAction(event -> {
         });
-    }
-
-    private void savetk(LedgerDetails soCaiDto) {
-        int quarter_id = DashboardController.findByTime.getId();
-        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia(), DashboardController.assignType.getId());
-        TonKho tonKho =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
-        if (tonKho==null){
-            createNewTonKho(soCaiDto, soCaiDto.getThuc_xuat());
-            TonKho tonKho1 =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
-            soCaiDto.setTonkho_id(tonKho1.getId());
-        }else{
-            int soluong = tonKho.getSoluong() - soCaiDto.getThuc_xuat();
-            updateTonKho(tonKho, soluong);
-            soCaiDto.setTonkho_id(tonKho.getId());
-        }
     }
 
     // tab khac
@@ -368,7 +350,7 @@ public class XuatController extends CommonFactory implements Initializable {
                 return mucgiaService.findMucGiaByID(mucgia_id_selected_mucgia_cbb.getId());
             }
         });
-        List<Mucgia> mucgials = mucgiaService.findMucgiaBy_xd_quarter_status(xd_id,DashboardController.findByTime.getId(), MucGiaEnum.IN_STOCK.getStatus());
+        List<Mucgia> mucgials = mucgiaService.getPriceAndQuanTityByAssId2(mucgiaService.findByName(AssignTypeEnum.NVDX.getName()).getId(),xd_id,DashboardController.findByTime.getId());
         cbb_dongia_k.setItems(FXCollections.observableArrayList(mucgials));
         cbb_dongia_k.getSelectionModel().selectFirst();
         setDongia_k_Label();
@@ -455,22 +437,24 @@ public class XuatController extends CommonFactory implements Initializable {
     }
     private void setDongia_k_Label() {
         try {
-            tonKhos_pref = tonKhoService.findByLoaiXD(cbb_tenxd_k.getSelectionModel().getSelectedItem().getId(), mucgia_id_selected_mucgia_cbb.getId());
-            if (!tonKhos_pref.isEmpty()){
-                lb_slt_k.setText("Số lượng tồn: "+ TextToNumber.textToNum(String.valueOf(tonKhos_pref.get(0).getSoluong())));
+            Inventory inventory = tonKhoService.findByUniqueId(cbb_tenxd_k.getSelectionModel().getSelectedItem().getId(),DashboardController.findByTime.getId());
+            Mucgia mucgia = mucgiaService.findMucGiaByID(cbb_dongia_k.getSelectionModel().getSelectedItem().getId());
+            if (inventory!=null){
+                lb_slt_k.setText("Số lượng tồn: "+ TextToNumber.textToNum(String.valueOf(mucgia.getAmount())));
             } else {
-                lb_slt_k.setText("Số lượng tồn: "+ "000");
+                lb_slt_k.setText("Số lượng tồn: "+ "0");
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
     }
     private void setDongia_nv_Label() {
-        tonKhos_pref = tonKhoService.findByLoaiXD(cbb_tenxd_nv.getSelectionModel().getSelectedItem().getId(), mucgia_id_selected_mucgia_cbb_nv.getId());
-        if (!tonKhos_pref.isEmpty()){
-            lb_slt_nv.setText("Số lượng tồn: "+ TextToNumber.textToNum(String.valueOf(tonKhos_pref.get(0).getSoluong())));
-        }else{
-            lb_slt_nv.setText("Số lượng tồn: "+ "000");
+        Inventory inventory = tonKhoService.findByUniqueId(cbb_tenxd_nv.getSelectionModel().getSelectedItem().getId(),DashboardController.findByTime.getId());
+        Mucgia mucgia = mucgiaService.findMucGiaByID(cbb_dongia_nv.getSelectionModel().getSelectedItem().getId());
+        if (inventory!=null){
+            lb_slt_nv.setText("Số lượng tồn: "+ TextToNumber.textToNum(String.valueOf(mucgia.getAmount())));
+        } else {
+            lb_slt_nv.setText("Số lượng tồn: "+ "0");
         }
     }
 
@@ -586,8 +570,6 @@ public class XuatController extends CommonFactory implements Initializable {
                             soCaiDto.setLedger_id(0);
                         }
                         saveMucgia(soCaiDto);
-                        savetk(soCaiDto);
-                        savetkt(soCaiDto);
                         saveLichsuxnk(soCaiDto);
                         ledgerDetailsService.create(soCaiDto);
                         updateInvReport(soCaiDto, nguonNxTructhuoc_selected_nv.getTructhuoc_id());
@@ -613,23 +595,9 @@ public class XuatController extends CommonFactory implements Initializable {
     private void saveLichsuxnk(LedgerDetails soCaiDto) {
         int quarter_id = DashboardController.findByTime.getId();
         Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia(),DashboardController.assignType.getId());
-        TonKho tonKho =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
-        int tonsau = tonKho.getSoluong() - soCaiDto.getThuc_xuat();
-        int tontruoc = tonKho.getSoluong();
+        int tonsau = mucgia.getAmount() - soCaiDto.getThuc_xuat();
+        int tontruoc = mucgia.getAmount();
         createNewTransaction(soCaiDto, tontruoc, tonsau);
-    }
-
-    private void savetkt(LedgerDetails soCaiDto) {
-        TonkhoTong tonkhoTong = tonkhoTongService.findByQuarterAndXdAll(soCaiDto.getQuarter_id(), soCaiDto.getXd().getId());
-        if (tonkhoTong!=null) {
-            int tck = tonkhoTong.getTck_nvdx()- soCaiDto.getThuc_xuat();
-            tonkhoTong.setTck_sum(tck + tonkhoTong.getTck_sscd());
-            tonkhoTong.setTck_nvdx(tck);
-            tonkhoTongService.update(tonkhoTong);
-            soCaiDto.setTonkhotong_id(tonkhoTong.getId());
-        }else{
-            throw new NullPointerException("tonkhotong is null");
-        }
     }
 
     private void saveMucgia(LedgerDetails soCaiDto){
@@ -821,7 +789,7 @@ public class XuatController extends CommonFactory implements Initializable {
                 return mucgiaService.findMucGiaByID(mucgia_id_selected_mucgia_cbb_nv.getId());
             }
         });
-        List<Mucgia> mucgials = mucgiaService.findMucgiaBy_xd_quarter_status(xd_id,DashboardController.findByTime.getId(), MucGiaEnum.IN_STOCK.getStatus());
+        List<Mucgia> mucgials = mucgiaService.getPriceAndQuanTityByAssId2(mucgiaService.findByName(AssignTypeEnum.NVDX.getName()).getId(),xd_id,DashboardController.findByTime.getId());
         cbb_dongia_nv.setItems(FXCollections.observableArrayList(mucgials));
         cbb_dongia_nv.getSelectionModel().selectFirst();
         setDongia_nv_Label();

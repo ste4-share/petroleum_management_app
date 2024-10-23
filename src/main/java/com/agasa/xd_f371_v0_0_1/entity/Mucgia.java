@@ -6,11 +6,20 @@ public class Mucgia {
     private int amount;
     private int quarter_id;
     private int item_id;
+    private int inventory_id;
     private int assign_type_id;
     private String status;
     private String timestamp;
 
     public Mucgia() {
+    }
+
+    public int getInventory_id() {
+        return inventory_id;
+    }
+
+    public void setInventory_id(int inventory_id) {
+        this.inventory_id = inventory_id;
     }
 
     public int getAssign_type_id() {

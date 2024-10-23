@@ -93,9 +93,9 @@ public class CommonFactory {
             for(int i = 0; i< invReports.size(); i++){
                 InvReport invReport = invReports.get(i);
                 TitleDto category = categoryService.getTitleById(invReport.getReport_header());
-                TonkhoTong tonkhoTong = tonkhoTongService.findById(ledgerDetails.getTonkhotong_id());
+                Inventory inventory = tonKhoService.findByUniqueId(ledgerDetails.getLoaixd_id(), ledgerDetails.getQuarter_id());
                 InvReportDetail invReportDetail = invReportDetailService.findByReportId(invReports.get(i).getId());
-                if (Common.getInvCatalogField(category, tonkhoTong,invReport, invReportDetail)){
+                if (Common.getInvCatalogField(category, inventory,invReport, invReportDetail)){
                     invReportService.updateReport(invReport);
                     invReportDetailService.updateNew(invReportDetail);
                 }
@@ -105,12 +105,14 @@ public class CommonFactory {
 
     protected void createNewMucgia(LedgerDetails ledgerDetails, int quantity){
         Mucgia mucgia = new Mucgia();
+        Inventory inventory = tonKhoService.findByUniqueId(ledgerDetails.getLoaixd_id(), ledgerDetails.getQuarter_id());
         mucgia.setPrice(ledgerDetails.getDon_gia());
         mucgia.setAmount(quantity);
         mucgia.setQuarter_id(ledgerDetails.getQuarter_id());
         mucgia.setItem_id(ledgerDetails.getXd().getId());
         mucgia.setStatus(MucGiaEnum.IN_STOCK.getStatus());
         mucgia.setAssign_type_id(DashboardController.assignType.getId());
+        mucgia.setInventory_id(inventory.getId());
         mucgiaService.createNew(mucgia);
     }
 
@@ -128,11 +130,6 @@ public class CommonFactory {
         mucgiaService.updateMucGia(mucgia_existed);
     }
 
-
-    protected void updateTonKho(TonKho tonKho, int soluong){
-        tonKho.setSoluong(soluong);
-        tonKhoService.update(tonKho);
-    }
     protected TonKho createNewTonKho(LedgerDetails ledgerDetails, int soluong){
         TonKho tonKho = new TonKho();
         tonKho.setLoai_xd(ledgerDetails.getTen_xd().trim());

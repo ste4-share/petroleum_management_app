@@ -6,3 +6,4 @@ delete from lichsuxnk;
 delete from inv_report_detail;
 delete from inv_report;
 delete from mucgia;
+delete from inventory;

@@ -1,7 +1,6 @@
 package com.agasa.xd_f371_v0_0_1.controller;
 
 import com.agasa.xd_f371_v0_0_1.entity.LedgerDetails;
-import com.agasa.xd_f371_v0_0_1.dto.TonKho;
 import com.agasa.xd_f371_v0_0_1.entity.*;
 import com.agasa.xd_f371_v0_0_1.fatory.CommonFactory;
 import com.agasa.xd_f371_v0_0_1.model.*;
@@ -302,8 +301,6 @@ public class NhapController extends CommonFactory implements Initializable {
                         }
                         // add new so_cai
                         saveMucGia(soCaiDto);
-                        savetk(soCaiDto);
-                        savetkt(soCaiDto);
                         saveLichsunxk(soCaiDto);
                         recognized_tcn();
                         soCaiDto.setTcn_id(pre_createNewTcn.getId());
@@ -332,25 +329,9 @@ public class NhapController extends CommonFactory implements Initializable {
     private void saveLichsunxk(LedgerDetails soCaiDto) {
         int quarter_id = DashboardController.findByTime.getId();
         Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia(), DashboardController.assignType.getId());
-        TonKho tonKho =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
-        int tonsau = tonKho.getSoluong()+ soCaiDto.getThuc_xuat();
-        int tontruoc = tonKho.getSoluong();
+        int tonsau = mucgia.getAmount()+ soCaiDto.getThuc_xuat();
+        int tontruoc = mucgia.getAmount();
         createNewTransaction(soCaiDto, tontruoc, tonsau);
-    }
-
-    private void savetk(LedgerDetails soCaiDto) {
-        int quarter_id = DashboardController.findByTime.getId();
-        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia(),DashboardController.assignType.getId());
-        TonKho tonKho =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
-        if (tonKho==null){
-            createNewTonKho(soCaiDto, soCaiDto.getThuc_xuat());
-            TonKho tonKho1 =tonKhoService.findBy3Id(quarter_id,soCaiDto.getLoaixd_id(), mucgia.getId());
-            soCaiDto.setTonkho_id(tonKho1.getId());
-        }else{
-            int soluong = tonKho.getSoluong() + soCaiDto.getThuc_xuat();
-            updateTonKho(tonKho, soluong);
-            soCaiDto.setTonkho_id(tonKho.getId());
-        }
     }
 
     private void saveMucGia(LedgerDetails soCaiDto){
@@ -361,20 +342,6 @@ public class NhapController extends CommonFactory implements Initializable {
             int quantityPerPrice = mucgia_existed.getAmount() + soCaiDto.getThuc_xuat();
             updateMucgia(quantityPerPrice, mucgia_existed);
         }
-    }
-
-    private void savetkt(LedgerDetails soCaiDto) {
-        TonkhoTong tonkhoTong = tonkhoTongService.findByQuarterAndXdAll(soCaiDto.getQuarter_id(), soCaiDto.getXd().getId());
-        if (tonkhoTong!=null) {
-            int tck = tonkhoTong.getTck_nvdx() + soCaiDto.getThuc_xuat();
-            tonkhoTong.setTck_sum(tck + tonkhoTong.getTck_sscd());
-            tonkhoTong.setTck_nvdx(tck);
-            tonkhoTongService.update(tonkhoTong);
-            soCaiDto.setTonkhotong_id(tonkhoTong.getId());
-        }else{
-            throw new NullPointerException("tonkhotong is null");
-        }
-
     }
 
     private void createNewLedger() {
@@ -699,10 +666,10 @@ public class NhapController extends CommonFactory implements Initializable {
 
     public void validate_nhietdo(KeyEvent keyEvent) {
         String text = tThucTe.getText();
-        if (!text.matches("[^0A-Za-z][0-9]{0,5}")){
+        if (!text.matches("[^0A-Za-z][0-9]{0,5}")) {
             tThucTe.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
             validateFiledBol.setNhietdo(false);
-        }else{
+        } else {
             tThucTe.setStyle(null);
             validateFiledBol.setNhietdo(true);
         }
@@ -747,9 +714,9 @@ public class NhapController extends CommonFactory implements Initializable {
     }
 
     private void setTonKhoLabel(){
-        TonkhoTong tonkhoTong = tonkhoTongService.findByQuarterAndXdAll(DashboardController.findByTime.getId(), cmb_tenxd.getSelectionModel().getSelectedItem().getId());
-        if (tonkhoTong!=null){
-            String sl_ton = TextToNumber.textToNum(String.valueOf(tonkhoTong.getTck_sum()));
+        Inventory inventory = tonKhoService.findByUniqueId(cmb_tenxd.getSelectionModel().getSelectedItem().getId(), DashboardController.findByTime.getId());
+        if (inventory!=null){
+            String sl_ton = TextToNumber.textToNum(String.valueOf(inventory.getPre_nvdx()));
             lb_tontheoxd.setText("Số lượng tồn: "+ sl_ton +" (Lit)");
         }else{
             lb_tontheoxd.setText("Số lượng tồn: "+ 0 +" (Lit)");

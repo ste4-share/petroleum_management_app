@@ -1,8 +1,10 @@
 package com.agasa.xd_f371_v0_0_1.controller;
 
+import com.agasa.xd_f371_v0_0_1.dto.SpotDto;
 import com.agasa.xd_f371_v0_0_1.dto.TitleDto;
 import com.agasa.xd_f371_v0_0_1.dto.TonKho;
 import com.agasa.xd_f371_v0_0_1.entity.*;
+import com.agasa.xd_f371_v0_0_1.model.AssignTypeEnum;
 import com.agasa.xd_f371_v0_0_1.model.ChungLoaiModel;
 import com.agasa.xd_f371_v0_0_1.model.ChungloaiMap;
 import com.agasa.xd_f371_v0_0_1.service.*;
@@ -44,32 +46,32 @@ public class TonkhoController implements Initializable {
 
     public static Stage quarter_stage;
     public static Stage ChangeSScd_stage;
-    private static List<TonkhoTong> tkt;
+    private static List<SpotDto> tkt;
     private static Quarter findByTime;
-    public static TonkhoTong pickTonKho = new TonkhoTong();
+    public static SpotDto pickTonKho = new SpotDto();
     private static Map<String, String> chungloaiXd = new HashMap<>();
-    private static  Map<String, Map<Integer, Integer>> map_coodinate_title = new HashMap<>();
-
     @FXML
-    public TableView<TonkhoTong> tb_tonkho, tb_quater_inv;
+    public TableView<SpotDto> tb_tonkho;
     @FXML
-    public TableColumn<TonkhoTong, String> col_stt_tk,col_maxd_tk,col_tenxd_tk,col_nvdx_tk,col_sscd_tk,col_sum_tk,
-            col_stt_qt, col_ma_qt, col_tenxd_qt, col_chungloai_qt, col_nvdx_tdk, col_sscd_tdk, col_sum_tdk,col_nvdx_tck,col_sscd_tck,col_sum_tck;
+    public TableView<Inventory> tb_quater_inv;
+    @FXML
+    public TableColumn<SpotDto, String> col_stt_tk,col_maxd_tk,col_tenxd_tk,col_nvdx_tk,col_sscd_tk,col_sum_tk;
+    @FXML
+    public TableColumn<Inventory, String> col_stt_qt,col_ma_qt, col_tenxd_qt, col_chungloai_qt,col_nvdx_tdk, col_sscd_tdk, col_sum_tdk,col_nvdx_tck,col_sscd_tck,col_sum_tck;
+    @FXML
+    private TableColumn<Inventory, String> col_nvdx_pre,col_sscd_pre,col_sum_pre;
     @FXML
     private TextField tf_search_inv_qt, search_inventory;
     @FXML
     private DatePicker start_date_qt, end_date_qt;
-
     @FXML
     private Button addNewQuarter_btn, createQuarterBtn, cancel_quaterbtn,printBcNxt;
-
     @FXML
     private ComboBox<Quarter> cbb_quarter;
     @FXML
     private Label lb_end_date,lb_start_date;
 
     private QuarterService quarterService = new QuarterImp();
-    private TonkhoTongService tonkhoTongService = new TonkhoTongImp();
     private TonKhoService tonKhoService = new TonkhoImp();
     private LoaiXdService loaiXdService = new LoaiXdImp();
     private TrucThuocService trucThuocService = new TrucThuocImp();
@@ -81,7 +83,7 @@ public class TonkhoController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         tkt = new ArrayList<>();
-        pickTonKho = new TonkhoTong();
+        pickTonKho = new SpotDto();
         findByTime = new Quarter();
         chungloaiXd = loaiXdService.getChungLoaiCount();
         findByTime = quarterService.findByDatetime(LocalDate.now());
@@ -139,39 +141,26 @@ public class TonkhoController implements Initializable {
         lb_start_date.setText(selected.getStart_date().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
         fillDataToTable(selected);
     }
-
     private void fillDataToTableTonkho(){
-        tkt = tonkhoTongService.findByQuarterAll(findByTime.getId());
-        List<String> search_arr = new ArrayList<>();
-        for(int i=0; i< tkt.size(); i++){
-            String tenxd_1 = loaiXdService.findLoaiXdByID_non(tkt.get(i).getId_xd()).getTenxd();
-            TonkhoTong tkt_item = tkt.get(i);
-            tkt_item.setTenxd(tenxd_1);
-            tkt_item.setStt(i+1);
-            tkt_item.setTck_nvdx_str(TextToNumber.textToNum(String.valueOf(tkt_item.getTck_nvdx()).equals("") ? "0" : String.valueOf(tkt_item.getTck_nvdx())));
-            tkt_item.setTck_sscd_str(TextToNumber.textToNum(String.valueOf(tkt_item.getTck_sscd()).equals("") ? "0" : String.valueOf(tkt_item.getTck_sscd())));
-            tkt_item.setTck_sum_str(TextToNumber.textToNum(String.valueOf(tkt_item.getTck_sum()).equals("") ? "0" : String.valueOf(tkt_item.getTck_sum())));
-            tkt_item.setTdk_sscd_str(TextToNumber.textToNum(String.valueOf(tkt_item.getTdk_sscd()).equals("") ? "0" : String.valueOf(tkt_item.getTdk_sscd())));
-            tkt_item.setTdk_nvdx_str(TextToNumber.textToNum(String.valueOf(tkt_item.getTdk_nvdx()).equals("") ? "0" : String.valueOf(tkt_item.getTdk_nvdx())));
-            tkt_item.setTdk_sum_str(TextToNumber.textToNum(String.valueOf(tkt_item.getTdk_sum()).equals("") ? "0" : String.valueOf(tkt_item.getTdk_sum())));
-            search_arr.add(tenxd_1);
+        tkt = mucgiaService.getAllSpots(findByTime.getId());
+        searching(tkt.stream().map(x->x.getTenxd()).toList());
+        for (SpotDto spotDto : tkt) {
+            spotDto.setNvdx_total(TextToNumber.textToNum(spotDto.getNvdx_total()));
+            spotDto.setSscd_total(TextToNumber.textToNum(spotDto.getSscd_total()));
+            spotDto.setTotal(TextToNumber.textToNum(spotDto.getTotal()));
         }
-
-        searching(search_arr);
-        ObservableList<TonkhoTong> observableList = FXCollections.observableArrayList(tkt);
+        ObservableList<SpotDto> observableList = FXCollections.observableArrayList(tkt);
         tb_tonkho.setItems(observableList);
     }
     private void setTonkhoTongToCol(){
-        col_stt_tk.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("stt"));
-        col_maxd_tk.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("id_xd"));
-        col_tenxd_tk.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("tenxd"));
-        col_nvdx_tk.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("tck_nvdx_str"));
-        col_sscd_tk.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("tck_sscd_str"));
-        col_sum_tk.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("tck_sum_str"));
+        col_stt_tk.setCellValueFactory(new PropertyValueFactory<SpotDto, String>("stt"));
+        col_maxd_tk.setCellValueFactory(new PropertyValueFactory<SpotDto, String>("maxd"));
+        col_tenxd_tk.setCellValueFactory(new PropertyValueFactory<SpotDto, String>("tenxd"));
+        col_nvdx_tk.setCellValueFactory(new PropertyValueFactory<SpotDto, String>("nvdx_total"));
+        col_sscd_tk.setCellValueFactory(new PropertyValueFactory<SpotDto, String>("sscd_total"));
+        col_sum_tk.setCellValueFactory(new PropertyValueFactory<SpotDto, String>("total"));
     }
-
     private boolean addedBySelection = false;
-
     private void searching(List<String> search_arr){
         TextFields.bindAutoCompletion(search_inventory,t -> {
             return search_arr.stream().filter(elem
@@ -192,8 +181,8 @@ public class TonkhoController implements Initializable {
 
         search_inventory.textProperty().addListener(e -> {
             if (addedBySelection) {
-                List<TonkhoTong> tkt_buf = tkt.stream().filter(tonkhoTong -> tonkhoTong.getTenxd().equals(search_inventory.getText())).toList();
-                ObservableList<TonkhoTong> observableList = FXCollections.observableArrayList(tkt_buf);
+                List<SpotDto> tkt_buf = tkt.stream().filter(tonkhoTong -> tonkhoTong.getTenxd().equals(search_inventory.getText())).toList();
+                ObservableList<SpotDto> observableList = FXCollections.observableArrayList(tkt_buf);
                 tb_tonkho.setItems(observableList);
                 addedBySelection = false;
             }
@@ -201,34 +190,48 @@ public class TonkhoController implements Initializable {
     }
 
     private void fillDataToTable(Quarter selected){
-        List<TonkhoTong> tkt_2 = tonkhoTongService.findByQuarterAll(selected.getId());
-        for(int i =0; i< tkt_2.size(); i++){
-            TonkhoTong tkt_item = tkt_2.get(i);
-            tkt_item.setTenxd(loaiXdService.findLoaiXdByID_non(tkt_2.get(i).getId_xd()).getTenxd());
-            tkt_item.setChungloai(loaiXdService.findLoaiXdByID_non(tkt_2.get(i).getId_xd()).getChungloai());
-            tkt_item.setStt(i+1);
-            tkt_item.setTck_nvdx_str(TextToNumber.textToNum(String.valueOf(tkt_item.getTck_nvdx()).equals("") ? "0" : String.valueOf(tkt_item.getTck_nvdx())));
-            tkt_item.setTck_sscd_str(TextToNumber.textToNum(String.valueOf(tkt_item.getTck_sscd()).equals("") ? "0" : String.valueOf(tkt_item.getTck_sscd())));
-            tkt_item.setTck_sum_str(TextToNumber.textToNum(String.valueOf(tkt_item.getTck_sum()).equals("") ? "0" : String.valueOf(tkt_item.getTck_sum())));
-            tkt_item.setTdk_sscd_str(TextToNumber.textToNum(String.valueOf(tkt_item.getTdk_sscd()).equals("") ? "0" : String.valueOf(tkt_item.getTdk_sscd())));
-            tkt_item.setTdk_nvdx_str(TextToNumber.textToNum(String.valueOf(tkt_item.getTdk_nvdx()).equals("") ? "0" : String.valueOf(tkt_item.getTdk_nvdx())));
-            tkt_item.setTdk_sum_str(TextToNumber.textToNum(String.valueOf(tkt_item.getTdk_sum()).equals("") ? "0" : String.valueOf(tkt_item.getTdk_sum())));
+        List<Inventory> inventories = tonKhoService.getAllInventory(DashboardController.findByTime.getId());
+        for(int i =0; i< inventories.size(); i++){
+            Inventory inventory = inventories.get(i);
+            LoaiXangDau loaiXangDau = loaiXdService.findLoaiXdByID_non(inventory.getPetro_id());
+
+
+            inventory.setPetroleumName(loaiXangDau.getTenxd());
+            inventory.setChungloai(loaiXangDau.getChungloai());
+            inventory.setStt(i+1);
+
+            inventory.setTcK_nvdx_str(TextToNumber.textToNum(String.valueOf(inventory.getTcK_nvdx()).equals("") ? "0" : String.valueOf(inventory.getTcK_nvdx())));
+            inventory.setTck_sscd_str(TextToNumber.textToNum(String.valueOf(inventory.getTck_sscd()).equals("") ? "0" : String.valueOf(inventory.getTck_sscd())));
+            int sum_tck = inventory.getTcK_nvdx() + inventory.getTck_sscd();
+            inventory.setTck_sum_str(TextToNumber.textToNum(String.valueOf(sum_tck).equals("") ? "0" : String.valueOf(sum_tck)));
+
+            inventory.setTdk_sscd_str(TextToNumber.textToNum(String.valueOf(inventory.getTdk_sscd()).equals("") ? "0" : String.valueOf(inventory.getTdk_sscd())));
+            inventory.setTdk_nvdx_str(TextToNumber.textToNum(String.valueOf(inventory.getTdk_nvdx()).equals("") ? "0" : String.valueOf(inventory.getTdk_nvdx())));
+            int sum_tdk = inventory.getTdk_sscd() + inventory.getTdk_nvdx();
+            inventory.setTdk_sum_str(TextToNumber.textToNum(String.valueOf(sum_tdk).equals("") ? "0" : String.valueOf(sum_tdk)));
+
+            inventory.setPre_nvdx_str(TextToNumber.textToNum(String.valueOf(inventory.getPre_nvdx()).equals("") ? "0" : String.valueOf(inventory.getPre_nvdx())));
+            inventory.setPre_sscd_str(TextToNumber.textToNum(String.valueOf(inventory.getPre_sscd()).equals("") ? "0" : String.valueOf(inventory.getPre_sscd())));
+            int sum_pre = inventory.getPre_sscd() + inventory.getPre_nvdx();
+            inventory.setPre_sum_str(TextToNumber.textToNum(String.valueOf(sum_pre).equals("") ? "0" : String.valueOf(sum_pre)));
         };
-        ObservableList<TonkhoTong> observableList = FXCollections.observableArrayList(tkt_2);
+        ObservableList<Inventory> observableList = FXCollections.observableArrayList(inventories);
         tb_quater_inv.setItems(observableList);
     }
 
     private void setTonkhoTongToCol2(){
-        col_stt_qt.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("stt"));
-        col_ma_qt.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("id_xd"));
-        col_tenxd_qt.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("tenxd"));
-        col_chungloai_qt.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("chungloai"));
-        col_nvdx_tdk.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("tdk_nvdx_str"));
-        col_sscd_tdk.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("tdk_sscd_str"));
-        col_sum_tdk.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("tdk_sum_str"));
-        col_nvdx_tck.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("tck_nvdx_str"));
-        col_sscd_tck.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("tck_sscd_str"));
-        col_sum_tck.setCellValueFactory(new PropertyValueFactory<TonkhoTong, String>("tck_sum_str"));
+        col_stt_qt.setCellValueFactory(new PropertyValueFactory<Inventory, String>("stt"));
+        col_tenxd_qt.setCellValueFactory(new PropertyValueFactory<Inventory, String>("petroleumName"));
+        col_chungloai_qt.setCellValueFactory(new PropertyValueFactory<Inventory, String>("chungloai"));
+        col_nvdx_tdk.setCellValueFactory(new PropertyValueFactory<Inventory, String>("tdk_nvdx_str"));
+        col_sscd_tdk.setCellValueFactory(new PropertyValueFactory<Inventory, String>("tdk_sscd_str"));
+        col_sum_tdk.setCellValueFactory(new PropertyValueFactory<Inventory, String>("tdk_sum_str"));
+        col_nvdx_tck.setCellValueFactory(new PropertyValueFactory<Inventory, String>("tcK_nvdx_str"));
+        col_sscd_tck.setCellValueFactory(new PropertyValueFactory<Inventory, String>("tck_sscd_str"));
+        col_sum_tck.setCellValueFactory(new PropertyValueFactory<Inventory, String>("tck_sum_str"));
+        col_nvdx_pre.setCellValueFactory(new PropertyValueFactory<Inventory, String>("pre_nvdx_str"));
+        col_sscd_pre.setCellValueFactory(new PropertyValueFactory<Inventory, String>("pre_sscd_str"));
+        col_sum_pre.setCellValueFactory(new PropertyValueFactory<Inventory, String>("pre_sum_str"));
     }
 
     @FXML
@@ -522,47 +525,52 @@ public class TonkhoController implements Initializable {
     }
 
     private void mockInventoryData(){
-        int tondk_nvdx_mock = 40000;
-        int tondk_sscd_mock = 0;
+        int tondk_nvdx_mock = 20000;
+        int tondk_sscd_mock = 20000;
         int tondk_sum_mock = tondk_sscd_mock+tondk_nvdx_mock;
         for (LoaiXangDau loaiXangDau : loaiXdService.getAll()) {
 
-            // mock tonkhotong
-            TonkhoTong tonkhoTong = new TonkhoTong();
-            tonkhoTong.setId_quarter(DashboardController.findByTime.getId());
-            tonkhoTong.setId_xd(loaiXangDau.getId());
-            tonkhoTong.setAmount(0);
+            Inventory inventory = new Inventory();
+            inventory.setPetro_id(loaiXangDau.getId());
+            inventory.setQuarter_id(DashboardController.findByTime.getId());
+            inventory.setTotal(tondk_sum_mock);
+            inventory.setTdk_nvdx(tondk_nvdx_mock);
+            inventory.setTdk_sscd(tondk_sscd_mock);
+            inventory.setPre_nvdx(tondk_nvdx_mock);
+            inventory.setPre_sscd(tondk_sscd_mock);
+            inventory.setTcK_nvdx(0);
+            inventory.setTck_sscd(0);
+            inventory.setImport_total(0);
+            inventory.setExport_total(0);
 
-            tonkhoTong.setTdk_nvdx(tondk_nvdx_mock);
-            tonkhoTong.setTdk_sscd(tondk_sscd_mock);
-            tonkhoTong.setTdk_sum(tondk_sum_mock);
+            inventory.setTdk_sscd(tondk_sscd_mock);
+            inventory.setStatus("RECORDING");
+            tonKhoService.createNew(inventory);
 
-            tonkhoTong.setTck_nvdx(tondk_nvdx_mock);
-            tonkhoTong.setTck_sscd(tondk_sscd_mock);
-            tonkhoTong.setTck_sum(tondk_sum_mock);
-
+            Inventory inventory1 = tonKhoService.findByUniqueId(loaiXangDau.getId(), DashboardController.findByTime.getId());
             //mock mucgia
             Mucgia mucgia = new Mucgia();
             mucgia.setQuarter_id(DashboardController.findByTime.getId());
-            mucgia.setAmount(40000);
+            mucgia.setAmount(tondk_nvdx_mock);
             mucgia.setPrice(142857);
             mucgia.setItem_id(loaiXangDau.getId());
-            mucgia.setAssign_type_id(DashboardController.assignType.getId());
+            mucgia.setAssign_type_id(mucgiaService.findByName(AssignTypeEnum.NVDX.getName()).getId());
             mucgia.setStatus("IN_STOCK");
+            mucgia.setInventory_id(inventory1.getId());
             mucgiaService.createNew(mucgia);
-            Mucgia mucgia1 = mucgiaService.findMucgiaByGia(loaiXangDau.getId(),DashboardController.findByTime.getId(), mucgia.getPrice(),DashboardController.assignType.getId());
+            Mucgia mucgia2 = new Mucgia();
+            mucgia2.setQuarter_id(DashboardController.findByTime.getId());
+            mucgia2.setAmount(tondk_nvdx_mock);
+            mucgia2.setPrice(142857);
+            mucgia2.setItem_id(loaiXangDau.getId());
+            mucgia2.setAssign_type_id(mucgiaService.findByName(AssignTypeEnum.SSCD.getName()).getId());
+            mucgia2.setStatus("IN_STOCK");
+            mucgia2.setInventory_id(inventory1.getId());
+            mucgiaService.createNew(mucgia2);
 
-            //mock tonkho
-            TonKho tonKho = new TonKho();
-            tonKho.setLoaixd_id(loaiXangDau.getId());
-            tonKho.setMucgia_id(mucgia1.getId());
-            tonKho.setSoluong(40000);
-            tonKho.setMucgia(142857);
-            tonKho.setLoai_xd(loaiXangDau.getTenxd());
-            tonKhoService.create(tonKho);
-            tonkhoTongService.create(tonkhoTong);
         }
         fillDataToTableTonkho();
+        initMap();
     }
 
     @FXML
@@ -576,14 +584,14 @@ public class TonkhoController implements Initializable {
         try {
             int quarter_id = DashboardController.findByTime.getId();
             for (int i =0; i< loaiXangDauList.size(); i++){
-                TonkhoTong tonkhoTong = tonkhoTongService.findByQuarterAndXdAll(quarter_id, loaiXangDauList.get(i).getId());
+                Inventory inventory = tonKhoService.findByUniqueId(loaiXangDauList.get(i).getId(), quarter_id);
                 for (int j=0; j< categories.size(); j++){
                     Category catelos = categories.get(j);
                     InvReport invReport = new InvReport();
                     InvReportDetail invReportDetail = new InvReportDetail();
                     TitleDto titleDto = new TitleDto(catelos.getHeader_lv1(), catelos.getHeader_lv2(),catelos.getHeader_lv3());
 
-                    Common.getInvCatalogField(titleDto, tonkhoTong, invReport, invReportDetail);
+                    Common.getInvCatalogField(titleDto, inventory, invReport, invReportDetail);
                     invReport.setReport_header(categories.get(j).getId());
                     invReport.setPetroleum_id(loaiXangDauList.get(i).getId());
                     invReport.setQuarter_id(DashboardController.findByTime.getId());
