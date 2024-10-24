@@ -56,16 +56,7 @@ public class NhapController extends CommonFactory implements Initializable {
     @FXML
     private ComboBox<LoaiXangDau> cmb_tenxd;
 
-    private TonKhoService tonKhoService = new TonkhoImp();
-    private LoaiXdService loaiXdService = new LoaiXdImp();
-    private LedgerDetailsService ledgerDetailsService = new LedgerDetailsImp();
-    private NguonNXService nguonNXService = new NguonNXImp();
-    private TonkhoTongService tonkhoTongService = new TonkhoTongImp();
-    private MucgiaService mucgiaService = new MucgiaImp();
-    private TcnService tcnService = new TcnImp();
-    private NguonNx_tructhuocService nguonNxTructhuocService = new NguonNx_tructhuocImp();
-    private LedgerService ledgerService = new LedgerImp();
-    private LoaiPhieuService loaiPhieuService = new LoaiPhieuImp();
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -233,7 +224,6 @@ public class NhapController extends CommonFactory implements Initializable {
         return ledgerDetails;
     }
 
-
     private void fillDataToTextField(LedgerDetails ledgerDetails){
         cmb_tenxd.getSelectionModel().select(ledgerDetails.getXd());
         donGiaTf.setText(String.valueOf(ledgerDetails.getDon_gia()));
@@ -333,14 +323,15 @@ public class NhapController extends CommonFactory implements Initializable {
         createNewTransaction(soCaiDto, tontruoc, tonsau);
     }
 
-    private void saveMucGia(LedgerDetails soCaiDto){
-        Mucgia mucgia_existed = mucgiaService.findMucgiaByGia(soCaiDto.getXd().getId(), soCaiDto.getQuarter_id(), soCaiDto.getDon_gia(),DashboardController.assignType.getId());
+    private void saveMucGia(LedgerDetails ledgerDetails){
+        Mucgia mucgia_existed = mucgiaService.findMucgiaByGia(ledgerDetails.getXd().getId(), ledgerDetails.getQuarter_id(), ledgerDetails.getDon_gia(),DashboardController.assignType.getId());
         if (mucgia_existed==null){
-            createNewMucgia(soCaiDto, soCaiDto.getThuc_xuat());
+            createNewMucgia(ledgerDetails, ledgerDetails.getThuc_xuat());
         } else {
-            int quantityPerPrice = mucgia_existed.getAmount() + soCaiDto.getThuc_xuat();
+            int quantityPerPrice = mucgia_existed.getAmount() + ledgerDetails.getThuc_xuat();
             updateMucgia(quantityPerPrice, mucgia_existed);
         }
+        ledgerDetails.setTonkho_id(tonKhoService.findByUniqueId(ledgerDetails.getLoaixd_id(), ledgerDetails.getQuarter_id()).getId());
     }
 
     private void createNewLedger() {

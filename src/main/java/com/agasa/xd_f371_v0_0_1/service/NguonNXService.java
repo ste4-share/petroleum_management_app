@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface NguonNXService {
     List<NguonNx> getAll();
+    List<NguonNx> getAllAndNguonnx();
     List<NguonNx> getAllUnless(String ten_1);
     List<NguonNx> getAllByLoaiPhieu(int loai_phieu);
     NguonNx create(NguonNx nguonNx);

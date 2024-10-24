@@ -4,23 +4,14 @@ public class NguonNx_tructhuoc {
     private int id;
     private int nguonnx_id;
     private int tructhuoc_id;
-    private int loaiphieu_id;
 
     public NguonNx_tructhuoc() {
     }
 
-    public NguonNx_tructhuoc(int nguonnx_id, int tructhuoc_id, int loaiphieu_id) {
+    public NguonNx_tructhuoc(int id, int nguonnx_id, int tructhuoc_id) {
+        this.id = id;
         this.nguonnx_id = nguonnx_id;
         this.tructhuoc_id = tructhuoc_id;
-        this.loaiphieu_id = loaiphieu_id;
-    }
-
-    public int getLoaiphieu_id() {
-        return loaiphieu_id;
-    }
-
-    public void setLoaiphieu_id(int loaiphieu_id) {
-        this.loaiphieu_id = loaiphieu_id;
     }
 
     public int getId() {

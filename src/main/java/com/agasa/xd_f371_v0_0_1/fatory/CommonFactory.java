@@ -4,17 +4,13 @@ import com.agasa.xd_f371_v0_0_1.controller.DashboardController;
 import com.agasa.xd_f371_v0_0_1.dto.LichsuXNK;
 import com.agasa.xd_f371_v0_0_1.dto.QuantityByTructhuocDTO;
 import com.agasa.xd_f371_v0_0_1.dto.TitleDto;
-import com.agasa.xd_f371_v0_0_1.dto.TonKho;
 import com.agasa.xd_f371_v0_0_1.entity.*;
 import com.agasa.xd_f371_v0_0_1.model.ChungloaiMap;
-import com.agasa.xd_f371_v0_0_1.model.LoaiPhieu_cons;
 import com.agasa.xd_f371_v0_0_1.model.MucGiaEnum;
 import com.agasa.xd_f371_v0_0_1.service.*;
 import com.agasa.xd_f371_v0_0_1.service.impl.*;
 import com.agasa.xd_f371_v0_0_1.util.Common;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class CommonFactory {
@@ -25,20 +21,24 @@ public class CommonFactory {
     protected InvReportDetailService invReportDetailService = new invReportDetailImp();
     protected InvReportService invReportService = new InvReportImp();
     protected LoaiXdService loaiXdService = new LoaiXdImp();
-    protected TonkhoTongService tonkhoTongService = new TonkhoTongImp();
     protected TonKhoService tonKhoService = new TonkhoImp();
     protected MucgiaService mucgiaService = new MucgiaImp();
     protected LichsuNXKService lichsuNXKService = new LichsuNXKImp();
     protected static LoaiPhieu lp_id_pre = new LoaiPhieu();
     protected static List<Tcn> ls_tcn = new ArrayList<>();
     protected static Tcn pre_createNewTcn = new Tcn();
+    protected NguonNXService nguonNXService = new NguonNXImp();
+    protected TcnService tcnService = new TcnImp();
+    protected NguonNx_tructhuocService nguonNxTructhuocService = new NguonNx_tructhuocImp();
+    protected LedgerService ledgerService = new LedgerImp();
+    protected NhiemVuService nhiemVuService = new NhiemVuImp();
+    protected PhuongTienService phuongTienService = new PhuongTienImp();
 
     protected void updateInvReport(LedgerDetails ledgerDetails, int tt_id){
-        LoaiPhieu lp= loaiPhieuService.findLoaiPhieuByType(ledgerDetails.getLoai_phieu());
+        LoaiPhieu lp = loaiPhieuService.findLoaiPhieuByType(ledgerDetails.getLoai_phieu());
         InvReport invReport = new InvReport();
-
         invReport.setPetroleum_id(ledgerDetails.getLoaixd_id());
-        invReport.setInventory_id(ledgerDetails.getTonkhotong_id());
+        invReport.setInventory_id(ledgerDetails.getTonkho_id());
         QuantityByTructhuocDTO quantityByTructhuocDTO = ledgerDetailsService.selectQuantityByTT(lp.getType(),ledgerDetails.getLoaixd_id(), tt_id);
         if (quantityByTructhuocDTO!=null){
             invReport.setQuantity(quantityByTructhuocDTO.getSoluong());
@@ -47,7 +47,6 @@ public class CommonFactory {
         TructhuocLoaiphieu tructhuocLoaiphieu = tructhuocLoaiphieuService.findByTTLPId(tt_id, lp.getId());
         if (tructhuocLoaiphieu!=null) {
             Category category = categoryService.getTitleByttLpId(tructhuocLoaiphieu.getId());
-            System.out.println("cate: " + category.getId());
             if (category!=null){
                 InvReport report = invReportService.findByPetroleum(ledgerDetails.getLoaixd_id(), DashboardController.findByTime.getId(), category.getId());
                 invReport.setReport_header(category.getId());
@@ -106,6 +105,9 @@ public class CommonFactory {
     protected void createNewMucgia(LedgerDetails ledgerDetails, int quantity){
         Mucgia mucgia = new Mucgia();
         Inventory inventory = tonKhoService.findByUniqueId(ledgerDetails.getLoaixd_id(), ledgerDetails.getQuarter_id());
+        if (inventory==null){
+            inventory = createInventory(ledgerDetails);
+        }
         mucgia.setPrice(ledgerDetails.getDon_gia());
         mucgia.setAmount(quantity);
         mucgia.setQuarter_id(ledgerDetails.getQuarter_id());
@@ -113,7 +115,23 @@ public class CommonFactory {
         mucgia.setStatus(MucGiaEnum.IN_STOCK.getStatus());
         mucgia.setAssign_type_id(DashboardController.assignType.getId());
         mucgia.setInventory_id(inventory.getId());
+        ledgerDetails.setTonkho_id(inventory.getId());
         mucgiaService.createNew(mucgia);
+    }
+
+    private Inventory createInventory(LedgerDetails ledgerDetails){
+        Inventory inventory = new Inventory();
+        inventory.setQuarter_id(ledgerDetails.getQuarter_id());
+        inventory.setPetro_id(ledgerDetails.getLoaixd_id());
+        inventory.setPetroleumName(ledgerDetails.getTen_xd());
+        inventory.setTdk_sscd(0);
+        inventory.setTdk_nvdx(0);
+        inventory.setPre_sscd(0);
+        inventory.setPre_nvdx(ledgerDetails.getThuc_xuat());
+        inventory.setTck_sscd(0);
+        inventory.setTcK_nvdx(ledgerDetails.getThuc_xuat());
+        tonKhoService.createNew(inventory);
+        return tonKhoService.findByUniqueId(ledgerDetails.getLoaixd_id(), ledgerDetails.getQuarter_id());
     }
 
     protected void updateMucgia(int quantity, Mucgia mucgia_existed){
@@ -127,6 +145,7 @@ public class CommonFactory {
             mucgia_existed.setStatus(MucGiaEnum.IN_STOCK.getStatus());
             mucgia_existed.setAmount(quantity);
         }
+
         mucgiaService.updateMucGia(mucgia_existed);
     }
 

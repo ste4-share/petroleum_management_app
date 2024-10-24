@@ -440,7 +440,6 @@ public class LedgerDetailsImp implements LedgerDetailsService {
         QDatabase.getConnectionDB();
 
         String SQL_SELECT = "SELECT ten_xd, loai_phieu,tructhuoc.name as ttname, sum(thuc_xuat) as ttsum FROM public.ledger_details left join nguonnx_tructhuoc on ledger_details.nguonnx_tructhuoc =nguonnx_tructhuoc.id  left join tructhuoc on tructhuoc.id = nguonnx_tructhuoc.tructhuoc_id where loaixd_id=? and loai_phieu=? and tructhuoc.id=? group by ten_xd, loai_phieu,tructhuoc.name;";
-
         // auto close connection and preparedStatement
         try {
             PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);

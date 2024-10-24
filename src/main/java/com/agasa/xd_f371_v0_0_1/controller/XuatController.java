@@ -6,7 +6,6 @@ import com.agasa.xd_f371_v0_0_1.fatory.CommonFactory;
 import com.agasa.xd_f371_v0_0_1.model.*;
 import com.agasa.xd_f371_v0_0_1.service.*;
 import com.agasa.xd_f371_v0_0_1.service.impl.*;
-import com.agasa.xd_f371_v0_0_1.util.Common;
 import com.agasa.xd_f371_v0_0_1.util.TextToNumber;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,12 +17,10 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.util.StringConverter;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -32,29 +29,18 @@ import java.util.stream.Collectors;
 public class XuatController extends CommonFactory implements Initializable {
 
     private static int stt = 0;
-    private static final String DEFAUL_NGUONNX = "f Bộ";
-    private static final int ROOT_NGUONNX_ID = 54;
-    private static final String LOAI_TRUCTHUOC = "tt_xm";
     private static int nguonnx_id_selected = 0;
-    private static int tcx_id_selected_tab_k = 0;
     private static int nguonnx_id_selected_dvvc_cbb = 0;
     private static int pt_id_selected_by_cbb = 0;
     private static Mucgia mucgia_id_selected_mucgia_cbb = new Mucgia();
     private static Mucgia mucgia_id_selected_mucgia_cbb_nv = new Mucgia();
-    private static List<Tcn> tcx_ls_buf = new ArrayList<>();
     private static NguonNx_tructhuoc nguonNxTructhuoc_selected = new NguonNx_tructhuoc();
     private static NguonNx_tructhuoc nguonNxTructhuoc_selected_nv = new NguonNx_tructhuoc();
-    private static List<NhiemVu> nhiemvu_ls_buf = new ArrayList<>();
-    private static List<PhuongTien> phuongtien_ls_buf = new ArrayList<>();
     private static PhuongTien phuongTien_buf = new PhuongTien();
-    private static int phuongtien_id_selected_by_cbb = 0;
-    private static int tructhuoc_id_selected_by_cbb = 0;
-    private static Tcn pre_createNewTcn_tab_k = new Tcn();
     private static NguonNxTcn nguonNxTcn_selected_tab_k = new NguonNxTcn();
     private static int click_index;
     private boolean addedBySelection_lstb = false;
     private static List<LedgerDetails> ls_socai;
-    List<Inventory> tonKhos_pref = new ArrayList<>();
     private static NguonNx_nhiemvu nguonNxNhiemvu_selected_nv = new NguonNx_nhiemvu();
     private static PhuongTienNhiemVu phuongTienNhiemVu_selected = new PhuongTienNhiemVu();
     private static List<ChiTietNhiemVuDTO> chiTietNhiemVuDTO_list = new ArrayList<>();
@@ -90,24 +76,9 @@ public class XuatController extends CommonFactory implements Initializable {
     private TableColumn<LedgerDetails, String> col_stt_nv, col_tenxd_nv, col_dongia_nv,col_phaixuat_nv,col_nhietdo_nv,
             col_tytrong_nv,col_vcf_nv, col_thucxuat_nv, col_thanh_tien_nv;
 
-    private TonKhoService tonKhoService = new TonkhoImp();
-    private NhiemVuService nhiemVuService = new NhiemVuImp();
-    private LoaiXdService loaiXdService = new LoaiXdImp();
-    private LedgerDetailsService ledgerDetailsService = new LedgerDetailsImp();
-    private NguonNXService nguonNXService = new NguonNXImp();
-    private MucgiaService mucgiaService = new MucgiaImp();
-    private PhuongTienService phuongTienService = new PhuongTienImp();
-    private NguonNx_tructhuocService nguonNxTructhuocService = new NguonNx_tructhuocImp();
-    private TcnService tcnService = new TcnImp();
-    private LedgerService ledgerService = new LedgerImp();
-    private LoaiPhieuService loaiPhieuService = new LoaiPhieuImp();
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ls_socai = new ArrayList<>();
-        tcx_ls_buf = tcnService.getAll();
-        phuongtien_ls_buf = phuongTienService.getAll();
-        nhiemvu_ls_buf = nhiemVuService.getAll();
         chiTietNhiemVuDTO_list = nhiemVuService.getNvAndCtnv();
         lp_id_pre = loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_XUAT);
         ls_tcn = tcnService.getAllByBillTypeId(lp_id_pre.getId());
@@ -330,7 +301,7 @@ public class XuatController extends CommonFactory implements Initializable {
             }
         });
         ObservableList<NguonNx> observableArrayList =
-                FXCollections.observableArrayList(nguonNXService.getAllByLoaiPhieu(loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_XUAT).getId()));
+                FXCollections.observableArrayList(nguonNXService.getAll());
         cbb_dvn_xk.setItems(observableArrayList);
         cbb_dvn_xk.getSelectionModel().selectFirst();
     }
