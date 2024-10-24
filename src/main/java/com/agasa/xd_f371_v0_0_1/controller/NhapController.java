@@ -300,8 +300,8 @@ public class NhapController extends CommonFactory implements Initializable {
                             soCaiDto.setLedger_id(0);
                         }
                         // add new so_cai
-                        saveMucGia(soCaiDto);
                         saveLichsunxk(soCaiDto);
+                        saveMucGia(soCaiDto);
                         recognized_tcn();
                         soCaiDto.setTcn_id(pre_createNewTcn.getId());
                         ledgerDetailsService.create(soCaiDto);
@@ -327,10 +327,9 @@ public class NhapController extends CommonFactory implements Initializable {
     }
 
     private void saveLichsunxk(LedgerDetails soCaiDto) {
-        int quarter_id = DashboardController.findByTime.getId();
-        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia(), DashboardController.assignType.getId());
-        int tonsau = mucgia.getAmount()+ soCaiDto.getThuc_xuat();
-        int tontruoc = mucgia.getAmount();
+        Inventory inventory = tonKhoService.findByUniqueId(soCaiDto.getLoaixd_id(), DashboardController.findByTime.getId());
+        int tonsau = inventory.getPre_nvdx()+ soCaiDto.getThuc_xuat();
+        int tontruoc = inventory.getPre_nvdx();
         createNewTransaction(soCaiDto, tontruoc, tonsau);
     }
 

@@ -117,36 +117,17 @@ public class CommonFactory {
     }
 
     protected void updateMucgia(int quantity, Mucgia mucgia_existed){
-        if (quantity ==0){
+        if (quantity == 0){
             mucgia_existed.setStatus(MucGiaEnum.OUT_STOCK.getStatus());
             mucgia_existed.setAmount(quantity);
         } else if (quantity<0) {
             mucgia_existed.setStatus(MucGiaEnum.SUPER_OUT_STOCK.getStatus());
             mucgia_existed.setAmount(quantity);
-        }else {
+        } else {
             mucgia_existed.setStatus(MucGiaEnum.IN_STOCK.getStatus());
             mucgia_existed.setAmount(quantity);
         }
         mucgiaService.updateMucGia(mucgia_existed);
-    }
-
-    protected TonKho createNewTonKho(LedgerDetails ledgerDetails, int soluong){
-        TonKho tonKho = new TonKho();
-        tonKho.setLoai_xd(ledgerDetails.getTen_xd().trim());
-        tonKho.setMucgia(ledgerDetails.getDon_gia());
-        tonKho.setSoluong(soluong);
-        Mucgia mucgia = mucgiaService.findMucgiaByGia(ledgerDetails.getLoaixd_id(),DashboardController.findByTime.getId(),ledgerDetails.getDon_gia(),DashboardController.assignType.getId());
-        tonKho.setMucgia_id(mucgia.getId());
-        tonKho.setLoaixd_id(ledgerDetails.getLoaixd_id());
-        tonKho.setQuarter_id(DashboardController.findByTime.getId());
-        // get current day
-        String pattern = "MM/dd/yyyy HH:mm:ss";
-        DateFormat df = new SimpleDateFormat(pattern);
-        Date today = Calendar.getInstance().getTime();
-        String todayAsString = df.format(today);
-        tonKho.setCreatetime(todayAsString);
-        tonKho.setStatus("CREATED");
-        return tonKhoService.create(tonKho);
     }
 
     protected void createNewTransaction(LedgerDetails ledgerDetails, int tontruoc, int tonsau){

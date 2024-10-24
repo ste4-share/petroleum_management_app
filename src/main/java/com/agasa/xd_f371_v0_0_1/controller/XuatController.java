@@ -226,12 +226,11 @@ public class XuatController extends CommonFactory implements Initializable {
                         }else{
                             soCaiDto.setLedger_id(0);
                         }
-                        saveMucgia(soCaiDto);
                         saveLichsuxnk(soCaiDto);
+                        saveMucgia(soCaiDto);
                         recognized_tcx();
                         soCaiDto.setTcn_id(pre_createNewTcn.getId());
                         ledgerDetailsService.create(soCaiDto);
-
                         updateInvReport(soCaiDto, nguonNxTructhuoc_selected.getTructhuoc_id());
                     });
                     ls_socai = new ArrayList<>();
@@ -347,7 +346,7 @@ public class XuatController extends CommonFactory implements Initializable {
 
             @Override
             public Mucgia fromString(String string) {
-                return mucgiaService.findMucGiaByID(mucgia_id_selected_mucgia_cbb.getId());
+                return mucgiaService.findMucGiaByID(mucgia_id_selected_mucgia_cbb.getId(), MucGiaEnum.IN_STOCK.getStatus());
             }
         });
         List<Mucgia> mucgials = mucgiaService.getPriceAndQuanTityByAssId2(mucgiaService.findByName(AssignTypeEnum.NVDX.getName()).getId(),xd_id,DashboardController.findByTime.getId());
@@ -437,9 +436,8 @@ public class XuatController extends CommonFactory implements Initializable {
     }
     private void setDongia_k_Label() {
         try {
-            Inventory inventory = tonKhoService.findByUniqueId(cbb_tenxd_k.getSelectionModel().getSelectedItem().getId(),DashboardController.findByTime.getId());
-            Mucgia mucgia = mucgiaService.findMucGiaByID(cbb_dongia_k.getSelectionModel().getSelectedItem().getId());
-            if (inventory!=null){
+            Mucgia mucgia = mucgiaService.findMucGiaByID(cbb_dongia_k.getSelectionModel().getSelectedItem().getId(), MucGiaEnum.IN_STOCK.getStatus());
+            if (mucgia!=null){
                 lb_slt_k.setText("Số lượng tồn: "+ TextToNumber.textToNum(String.valueOf(mucgia.getAmount())));
             } else {
                 lb_slt_k.setText("Số lượng tồn: "+ "0");
@@ -449,18 +447,18 @@ public class XuatController extends CommonFactory implements Initializable {
         }
     }
     private void setDongia_nv_Label() {
-        Inventory inventory = tonKhoService.findByUniqueId(cbb_tenxd_nv.getSelectionModel().getSelectedItem().getId(),DashboardController.findByTime.getId());
-        Mucgia mucgia = mucgiaService.findMucGiaByID(cbb_dongia_nv.getSelectionModel().getSelectedItem().getId());
-        if (inventory!=null){
-            lb_slt_nv.setText("Số lượng tồn: "+ TextToNumber.textToNum(String.valueOf(mucgia.getAmount())));
-        } else {
-            lb_slt_nv.setText("Số lượng tồn: "+ "0");
+        try {
+            Mucgia mucgia = mucgiaService.findMucGiaByID(cbb_dongia_nv.getSelectionModel().getSelectedItem().getId(),MucGiaEnum.IN_STOCK.getStatus());
+            if (mucgia!=null){
+                lb_slt_nv.setText("Số lượng tồn: "+ TextToNumber.textToNum(String.valueOf(mucgia.getAmount())));
+            } else {
+                lb_slt_nv.setText("Số lượng tồn: "+ "0");
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
         }
     }
 
-///////////////////////////////////////////
-    ///////////////
-    //////////
     private void tabNhiemVu_assignment(){
         ls_socai = new ArrayList<>();
         setTenXDToCombobox_tab_nv();
@@ -569,8 +567,8 @@ public class XuatController extends CommonFactory implements Initializable {
                         }else{
                             soCaiDto.setLedger_id(0);
                         }
-                        saveMucgia(soCaiDto);
                         saveLichsuxnk(soCaiDto);
+                        saveMucgia(soCaiDto);
                         ledgerDetailsService.create(soCaiDto);
                         updateInvReport(soCaiDto, nguonNxTructhuoc_selected_nv.getTructhuoc_id());
                     });
@@ -593,10 +591,9 @@ public class XuatController extends CommonFactory implements Initializable {
     }
 
     private void saveLichsuxnk(LedgerDetails soCaiDto) {
-        int quarter_id = DashboardController.findByTime.getId();
-        Mucgia mucgia = mucgiaService.findMucgiaByGia(soCaiDto.getLoaixd_id(), quarter_id, soCaiDto.getDon_gia(),DashboardController.assignType.getId());
-        int tonsau = mucgia.getAmount() - soCaiDto.getThuc_xuat();
-        int tontruoc = mucgia.getAmount();
+        Inventory inventory = tonKhoService.findByUniqueId(soCaiDto.getLoaixd_id(), DashboardController.findByTime.getId());
+        int tonsau = inventory.getPre_nvdx() - soCaiDto.getThuc_xuat();
+        int tontruoc = inventory.getPre_nvdx();
         createNewTransaction(soCaiDto, tontruoc, tonsau);
     }
 
@@ -733,7 +730,6 @@ public class XuatController extends CommonFactory implements Initializable {
         cbb_tenxd_nv.getItems().addAll(loaiXdService.getAll());
         cbb_tenxd_nv.getSelectionModel().selectFirst();
         setDongiaCombobox_tab_nv(cbb_tenxd_nv.getSelectionModel().getSelectedItem().getId());
-//        setDongiaLabel();
     }
     private void setDvxCombobox_tab_nv(){
         ObservableList<NguonNx> observableArrayList =
@@ -786,7 +782,7 @@ public class XuatController extends CommonFactory implements Initializable {
 
             @Override
             public Mucgia fromString(String string) {
-                return mucgiaService.findMucGiaByID(mucgia_id_selected_mucgia_cbb_nv.getId());
+                return mucgiaService.findMucGiaByID(mucgia_id_selected_mucgia_cbb_nv.getId(), MucGiaEnum.IN_STOCK.getStatus());
             }
         });
         List<Mucgia> mucgials = mucgiaService.getPriceAndQuanTityByAssId2(mucgiaService.findByName(AssignTypeEnum.NVDX.getName()).getId(),xd_id,DashboardController.findByTime.getId());
