@@ -8,7 +8,6 @@ import java.util.List;
 public interface NguonNx_tructhuocService {
     List<TrucThuoc> findAllTrucThuocByNGuonNxID(int nguonnx_id);
     NguonNx_tructhuoc findNguonnx_tructhuocByNnx_lp(int nguonnx_id, int loaiPhieu);
-    List<Integer> findAllBillType(int nguonnx_id);
     NguonNx_tructhuoc createNew(NguonNx_tructhuoc nguonNxTructhuoc);
     NguonNx_tructhuoc update(NguonNx_tructhuoc nguonNxTructhuoc);
     int delete(NguonNx_tructhuoc nguonNxTructhuoc);

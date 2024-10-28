@@ -570,7 +570,6 @@ public class TonkhoController implements Initializable {
 
         }
         fillDataToTableTonkho();
-        initMap();
     }
 
     @FXML
@@ -587,27 +586,21 @@ public class TonkhoController implements Initializable {
                 Inventory inventory = tonKhoService.findByUniqueId(loaiXangDauList.get(i).getId(), quarter_id);
                 for (int j=0; j< categories.size(); j++){
                     Category catelos = categories.get(j);
-                    InvReport invReport = new InvReport();
                     InvReportDetail invReportDetail = new InvReportDetail();
-                    TitleDto titleDto = new TitleDto(catelos.getHeader_lv1(), catelos.getHeader_lv2(),catelos.getHeader_lv3());
-
-                    Common.getInvCatalogField(titleDto, inventory, invReport, invReportDetail);
-                    invReport.setReport_header(categories.get(j).getId());
-                    invReport.setPetroleum_id(loaiXangDauList.get(i).getId());
-                    invReport.setQuarter_id(DashboardController.findByTime.getId());
-                    invReportService.create(invReport);
-                    InvReport invReport1 = invReportService.findByPetroleum(invReport.getPetroleum_id(), invReport.getQuarter_id(), invReport.getReport_header());
+                    Common.getInvCatalogField(catelos, inventory, invReportDetail);
 
                     //inventory detail
                     invReportDetail.setLoaixd(loaiXangDauList.get(i).getTenxd());
-                    invReportDetail.setTitle_lv1(titleDto.getLv1());
-                    invReportDetail.setTitle_lv2(titleDto.getLv2());
-                    invReportDetail.setTitle_lv3(titleDto.getLv3());
+                    invReportDetail.setTitle_lv1(catelos.getHeader_lv1());
+                    invReportDetail.setTitle_lv2(catelos.getHeader_lv2());
+                    invReportDetail.setTitle_lv3(catelos.getHeader_lv3());
                     Map<String, String> titleMap = ChungloaiMap.getMapChungloai();
                     invReportDetail.setTitle_lxd_lv1(titleMap.get(loaiXangDauList.get(i).getChungloai()));
                     invReportDetail.setTitle_lxd_lv2(titleMap.get(loaiXangDauList.get(i).getType()));
                     invReportDetail.setTitle_lxd_lv3(titleMap.get(loaiXangDauList.get(i).getRtype()));
-                    invReportDetail.setInv_report_id(invReport1.getId());
+                    invReportDetail.setXd_id(loaiXangDauList.get(i).getId());
+                    invReportDetail.setQuarter_id(quarter_id);
+                    invReportDetail.setTitle_id(catelos.getId());
                     invReportDetailService.createNew(invReportDetail);
                 }
             }

@@ -1,6 +1,10 @@
 package com.agasa.xd_f371_v0_0_1.model;
 
 public enum ChungLoaiModel {
+    SSCD_a("SSCD"),
+    NVDX_a("NVDX"),
+    TDK_a("TDK"),
+    TCK_a("TCK"),
     NL_XANG_OTO("NL-XANG-OTO"),
     XANG("XANG"),
     DIEZEL("DIEZEL-XANG-OTO"),

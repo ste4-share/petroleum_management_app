@@ -5,6 +5,7 @@ import com.agasa.xd_f371_v0_0_1.dto.LichsuXNK;
 import com.agasa.xd_f371_v0_0_1.dto.QuantityByTructhuocDTO;
 import com.agasa.xd_f371_v0_0_1.dto.TitleDto;
 import com.agasa.xd_f371_v0_0_1.entity.*;
+import com.agasa.xd_f371_v0_0_1.model.ChungLoaiModel;
 import com.agasa.xd_f371_v0_0_1.model.ChungloaiMap;
 import com.agasa.xd_f371_v0_0_1.model.MucGiaEnum;
 import com.agasa.xd_f371_v0_0_1.service.*;
@@ -33,35 +34,9 @@ public class CommonFactory {
     protected LedgerService ledgerService = new LedgerImp();
     protected NhiemVuService nhiemVuService = new NhiemVuImp();
     protected PhuongTienService phuongTienService = new PhuongTienImp();
+    protected TrucThuocService trucThuocService = new TrucThuocImp();
 
-    protected void updateInvReport(LedgerDetails ledgerDetails, int tt_id){
-        LoaiPhieu lp = loaiPhieuService.findLoaiPhieuByType(ledgerDetails.getLoai_phieu());
-        InvReport invReport = new InvReport();
-        invReport.setPetroleum_id(ledgerDetails.getLoaixd_id());
-        invReport.setInventory_id(ledgerDetails.getTonkho_id());
-        QuantityByTructhuocDTO quantityByTructhuocDTO = ledgerDetailsService.selectQuantityByTT(lp.getType(),ledgerDetails.getLoaixd_id(), tt_id);
-        if (quantityByTructhuocDTO!=null){
-            invReport.setQuantity(quantityByTructhuocDTO.getSoluong());
-        }
-        invReport.setPrice_id(ledgerDetails.getTonkho_id());
-        TructhuocLoaiphieu tructhuocLoaiphieu = tructhuocLoaiphieuService.findByTTLPId(tt_id, lp.getId());
-        if (tructhuocLoaiphieu!=null) {
-            Category category = categoryService.getTitleByttLpId(tructhuocLoaiphieu.getId());
-            if (category!=null){
-                InvReport report = invReportService.findByPetroleum(ledgerDetails.getLoaixd_id(), DashboardController.findByTime.getId(), category.getId());
-                invReport.setReport_header(category.getId());
-                updateInvReportDetail(ledgerDetails, category, report, tt_id);
-                updateAllRowInv(ledgerDetails);
-            }else{
-                throw new RuntimeException("category is null");
-            }
-        }else {
-            throw new RuntimeException("tructhuocloaiphieu is null");
-        }
-        invReportService.updateReport(invReport);
-    }
-
-    protected void updateInvReportDetail(LedgerDetails ledgerDetails, Category category, InvReport report, int tt_id){
+    protected void updateInvReportDetail(LedgerDetails ledgerDetails, Category category, InvReport report){
         InvReportDetail invReportDetail = new InvReportDetail();
         LoaiXangDau loaiXangDau = loaiXdService.findLoaiXdByID_non(ledgerDetails.getLoaixd_id());
         if (loaiXangDau!=null) {
@@ -73,11 +48,10 @@ public class CommonFactory {
             invReportDetail.setTitle_lv1(category.getHeader_lv1());
             invReportDetail.setTitle_lv2(category.getHeader_lv2());
             invReportDetail.setTitle_lv3(category.getHeader_lv3());
-            invReportDetail.setInv_report_id(report.getId());
-            QuantityByTructhuocDTO quantityByTructhuocDTO = ledgerDetailsService.selectQuantityByTT(ledgerDetails.getLoai_phieu(), ledgerDetails.getLoaixd_id(),tt_id);
+            QuantityByTructhuocDTO quantityByTructhuocDTO = ledgerDetailsService.selectQuantityByTT(ledgerDetails.getLoai_phieu(), ledgerDetails.getLoaixd_id());
             if (quantityByTructhuocDTO!=null) {
                 invReportDetail.setSoluong(quantityByTructhuocDTO.getSoluong());
-            }else {
+            } else {
                 throw new RuntimeException("quantityByTructhuocDTO null");
             }
             invReportDetailService.updateNew(invReportDetail);
@@ -87,18 +61,15 @@ public class CommonFactory {
     }
 
     protected void updateAllRowInv(LedgerDetails ledgerDetails){
-        List<InvReport> invReports = invReportService.getAllByPetroleumId(ledgerDetails.getLoaixd_id());
-        if (!invReports.isEmpty()){
-            for(int i = 0; i< invReports.size(); i++){
-                InvReport invReport = invReports.get(i);
-                TitleDto category = categoryService.getTitleById(invReport.getReport_header());
-                Inventory inventory = tonKhoService.findByUniqueId(ledgerDetails.getLoaixd_id(), ledgerDetails.getQuarter_id());
-                InvReportDetail invReportDetail = invReportDetailService.findByReportId(invReports.get(i).getId());
-                if (Common.getInvCatalogField(category, inventory,invReport, invReportDetail)){
-                    invReportService.updateReport(invReport);
-                    invReportDetailService.updateNew(invReportDetail);
-                }
-            }
+        Inventory inventory = tonKhoService.findByUniqueId(ledgerDetails.getLoaixd_id(), ledgerDetails.getQuarter_id());
+        Category category = categoryService.getTitleByttLpId(ledgerDetails.getTructhuoc_id(), ledgerDetails.getLoai_phieu());
+        InvReportDetail invReportDetail = invReportDetailService.findByIds(ledgerDetails.getLoaixd_id(), ledgerDetails.getQuarter_id(), category.getId());
+        if (Common.getInvCatalogField(category, inventory, invReportDetail)){
+            invReportDetailService.updateNew(invReportDetail);
+        }
+        if (ledgerDetails.getLoai_phieu().equals("NHAP")){
+            LedgerDetails ledgerDetails1 = ledgerDetailsService.selectQuantityByTT()
+            invReportDetail.setSoluong(get);
         }
     }
 

@@ -36,7 +36,7 @@ public class NhapController extends CommonFactory implements Initializable {
     private static int lxd_id_combobox_selected =0;
     private static ValidateFiledBol validateFiledBol = new ValidateFiledBol(true, true,true, true,true, true,true, true,true, true,true, true,true, true,true,true,true);
     private static int click_index;
-    private static NguonNx_tructhuoc nguonNxTructhuoc_selected = new NguonNx_tructhuoc();
+//    private static NguonNx_tructhuoc nguonNxTructhuoc_selected = new NguonNx_tructhuoc();
 
     @FXML
     private TextField soTf, recvTf,tcNhap,lenhKHso,soXe,
@@ -55,6 +55,7 @@ public class NhapController extends CommonFactory implements Initializable {
     private ComboBox<NguonNx> cmb_dvvc, cmb_dvn;
     @FXML
     private ComboBox<LoaiXangDau> cmb_tenxd;
+
 
 
     @Override
@@ -219,8 +220,10 @@ public class NhapController extends CommonFactory implements Initializable {
         ledgerDetails.setDvn_obj(cmb_dvn.getSelectionModel().getSelectedItem());
         ledgerDetails.setDenngay(denngay.getValue().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
         ledgerDetails.setQuarter_id(DashboardController.findByTime.getId());
-        ledgerDetails.setNguonnx_tructhuoc(nguonNxTructhuoc_selected.getId());
+//        ledgerDetails.setNguonnx_tructhuoc(nguonNxTructhuoc_selected.getId());
         ledgerDetails.setLoaixd_id(cmb_tenxd.getSelectionModel().getSelectedItem().getId());
+        ledgerDetails.setImport_unit_id(cmb_dvn.getSelectionModel().getSelectedItem().getId());
+        ledgerDetails.setExport_unit_id(cmb_dvvc.getSelectionModel().getSelectedItem().getId());
         return ledgerDetails;
     }
 
@@ -246,19 +249,9 @@ public class NhapController extends CommonFactory implements Initializable {
         tbThanhTien.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("thanh_tien"));
     }
 
-    private void identify_nguonnx_tructhuoc(){
-        NguonNx_tructhuoc nguonNxTructhuoc = nguonNxTructhuocService.findNguonnx_tructhuocByNnx_lp(cmb_dvvc.getSelectionModel().getSelectedItem().getId(), loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_NHAP).getId());
-        if (nguonNxTructhuoc != null){
-            nguonNxTructhuoc_selected = nguonNxTructhuoc;
-        } else {
-            throw new RuntimeException("Nguon_nx - truc thuoc didn't create");
-        }
-    }
-
     @FXML
     private void btnInsert(ActionEvent event){
         if (validField()){
-            identify_nguonnx_tructhuoc();
             LedgerDetails ledgerDetails = getDataFromField();
             stt = stt+1;
             ledgerDetails.setStt(stt);
@@ -290,12 +283,13 @@ public class NhapController extends CommonFactory implements Initializable {
                             soCaiDto.setLedger_id(0);
                         }
                         // add new so_cai
+                        TrucThuoc trucThuoc = trucThuocService.findByNguonnx(soCaiDto.getExport_unit_id(), 2);
+                        soCaiDto.setTructhuoc_id(trucThuoc.getId());
                         saveLichsunxk(soCaiDto);
                         saveMucGia(soCaiDto);
                         recognized_tcn();
                         soCaiDto.setTcn_id(pre_createNewTcn.getId());
                         ledgerDetailsService.create(soCaiDto);
-                        updateInvReport(soCaiDto, nguonNxTructhuoc_selected.getTructhuoc_id());
                     });
                 } catch (Exception e) {
                     Alert error= new Alert(Alert.AlertType.ERROR);

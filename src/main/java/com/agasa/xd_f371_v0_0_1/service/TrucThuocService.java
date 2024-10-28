@@ -12,6 +12,7 @@ public interface TrucThuocService {
     TrucThuoc udpate_n(TrucThuoc trucThuoc);
     TrucThuoc delById(TrucThuoc trucThuoc);
     TrucThuoc findById(int id);
+    TrucThuoc findByNguonnx(int nguonnxId, int titleId);
     List<TrucThuoc> findByName(String name);
     List<TrucThuoc> findByType(String name);
     List<TructhuocLoaiphieuDTO> getAllTTLP();

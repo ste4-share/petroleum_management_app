@@ -1,7 +1,8 @@
 package com.agasa.xd_f371_v0_0_1.service.impl;
 
-import com.agasa.xd_f371_v0_0_1.dto.UnitsDto;
+import com.agasa.xd_f371_v0_0_1.entity.GroupTitle;
 import com.agasa.xd_f371_v0_0_1.entity.NguonNx;
+import com.agasa.xd_f371_v0_0_1.entity.NguonnxTitle;
 import com.agasa.xd_f371_v0_0_1.model.QDatabase;
 import com.agasa.xd_f371_v0_0_1.service.NguonNXService;
 
@@ -178,6 +179,81 @@ public class NguonNXImp implements NguonNXService {
             throw new RuntimeException(e);
         }
         return result;
+    }
+
+    @Override
+    public List<GroupTitle> getAllGroup() {
+        QDatabase.getConnectionDB();
+        List<GroupTitle> result = new ArrayList<>();
+
+
+        String SQL_SELECT = "SELECT * FROM group_title";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                int id = resultSet.getInt("id");
+                String groupName = resultSet.getString("group_name");
+                String groupCode = resultSet.getString("group_code");
+                result.add(new GroupTitle(id, groupName, groupCode));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<NguonnxTitle> getAllNnxTitles(int groupId) {
+        QDatabase.getConnectionDB();
+        List<NguonnxTitle> result = new ArrayList<>();
+        String SQL_SELECT = "SELECT * FROM nguonnx_title where group_id=?";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, groupId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                int id = resultSet.getInt("id");
+                int nguonnxId = resultSet.getInt("nguonnx_id");
+                int titleId = resultSet.getInt("title_id");
+                int groupId1 = resultSet.getInt("group_id");
+
+                result.add(new NguonnxTitle(id, nguonnxId, titleId, groupId1));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public int createNew(NguonnxTitle nguonnxTitle) {
+        QDatabase.getConnectionDB();
+        String sql = "insert into nguonnx_title(nguonnx_id, title_id, group_id) values(?,?,?)";
+        try {
+            PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
+            statement.setInt(1, nguonnxTitle.getNguonnx_id());
+            statement.setInt(2, nguonnxTitle.getTitle_id());
+            statement.setInt(3, nguonnxTitle.getGroup_id());
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

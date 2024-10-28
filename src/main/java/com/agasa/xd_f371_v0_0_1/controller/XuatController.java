@@ -197,12 +197,13 @@ public class XuatController extends CommonFactory implements Initializable {
                         }else{
                             soCaiDto.setLedger_id(0);
                         }
+                        TrucThuoc trucThuoc = trucThuocService.findByNguonnx(soCaiDto.getImport_unit_id(), 2);
+                        soCaiDto.setTructhuoc_id(trucThuoc.getId());
                         saveLichsuxnk(soCaiDto);
                         saveMucgia(soCaiDto);
                         recognized_tcx();
                         soCaiDto.setTcn_id(pre_createNewTcn.getId());
                         ledgerDetailsService.create(soCaiDto);
-                        updateInvReport(soCaiDto, nguonNxTructhuoc_selected.getTructhuoc_id());
                     });
                     ls_socai = new ArrayList<>();
                     DashboardController.xuatStage.close();
@@ -400,6 +401,8 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setNguonnx_tructhuoc(nguonNxTructhuoc_selected.getId());
             ledgerDetails.setDvvc_obj(cbb_dvx_k.getSelectionModel().getSelectedItem());
             ledgerDetails.setLoaixd_id(cbb_tenxd_k.getSelectionModel().getSelectedItem().getId());
+            ledgerDetails.setExport_unit_id(cbb_dvx_k.getSelectionModel().getSelectedItem().getId());
+            ledgerDetails.setImport_unit_id(cbb_dvn_xk.getSelectionModel().getSelectedItem().getId());
         } catch (NullPointerException e) {
             throw new NullPointerException(e.getMessage());
         }
@@ -538,10 +541,11 @@ public class XuatController extends CommonFactory implements Initializable {
                         }else{
                             soCaiDto.setLedger_id(0);
                         }
+                        TrucThuoc trucThuoc = trucThuocService.findByNguonnx(soCaiDto.getImport_unit_id(), 2);
+                        soCaiDto.setTructhuoc_id(trucThuoc.getId());
                         saveLichsuxnk(soCaiDto);
                         saveMucgia(soCaiDto);
                         ledgerDetailsService.create(soCaiDto);
-                        updateInvReport(soCaiDto, nguonNxTructhuoc_selected_nv.getTructhuoc_id());
                     });
                     ls_socai = new ArrayList<>();
                     DashboardController.xuatStage.close();
@@ -796,20 +800,11 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setPhuongtien_id(pt_id_selected_by_cbb);
             ledgerDetails.setDvvc_obj(cbb_dvx_nv.getSelectionModel().getSelectedItem());
             ledgerDetails.setLoaixd_id(cbb_tenxd_nv.getSelectionModel().getSelectedItem().getId());
+            ledgerDetails.setExport_unit_id(cbb_dvx_nv.getSelectionModel().getSelectedItem().getId());
         } catch (NullPointerException e) {
             throw new NullPointerException(e.getMessage());
         }
         return ledgerDetails;
-    }
-
-
-
-
-
-
-    private void setnguonNx_Tcn(int tcn_id, int nguonnx_id){
-        nguonNxTcn_selected_tab_k.setTcn_id(tcn_id);
-        nguonNxTcn_selected_tab_k.setNguonnx_id(nguonnx_id);
     }
 
     private void identify_nguonnx_tructhuoc(){

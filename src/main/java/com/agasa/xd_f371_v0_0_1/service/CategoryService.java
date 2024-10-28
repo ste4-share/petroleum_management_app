@@ -12,5 +12,5 @@ public interface CategoryService {
     int update(Category category);
     int delete(int category_id);
     TitleDto getTitleById(int catalog);
-    Category getTitleByttLpId(int tt_lpId);
+    Category getTitleByttLpId(int tructhuocId, String type);
 }

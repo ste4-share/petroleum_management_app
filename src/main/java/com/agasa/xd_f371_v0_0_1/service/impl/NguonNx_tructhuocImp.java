@@ -75,31 +75,6 @@ public class NguonNx_tructhuocImp implements NguonNx_tructhuocService {
     }
 
     @Override
-    public List<Integer> findAllBillType(int nguonnx_id) {
-        QDatabase.getConnectionDB();
-        List<Integer> list = new ArrayList<>();
-        String SQL_SELECT = "SELECT loaiphieu_id FROM public.nguonnx_tructhuoc where nguonnx_id=? group by loaiphieu_id";
-        // auto close connection and preparedStatement
-        try {
-            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
-            preparedStatement.setInt(1, nguonnx_id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                int loaiphieuId = resultSet.getInt("loaiphieu_id");
-                list.add(loaiphieuId);
-                return list;
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-        return list;
-    }
-
-    @Override
     public NguonNx_tructhuoc createNew(NguonNx_tructhuoc nguonNxTructhuoc) {
         QDatabase.getConnectionDB();
         String sql = "insert into nguonnx_tructhuoc(nguonnx_id, tructhuoc_id) values(?,?)";

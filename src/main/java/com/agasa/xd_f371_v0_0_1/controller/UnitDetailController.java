@@ -54,29 +54,9 @@ public class UnitDetailController implements Initializable {
     private void initSelectedValue() {
         NguonNx nguonNx = DonviController.selectedUnit;
         unit_name_lb.setText(nguonNx.getTen());
-        setValueForBillTypeChkb(nguonNx);
         setAffilateList(nguonNx);
     }
 
-    private void setValueForBillTypeChkb(NguonNx nguonNx){
-        List<Integer> lp_ids = nguonNxTructhuocService.findAllBillType(nguonNx.getId());
-        int size = lp_ids.size();
-        if (size==1){
-            if (lp_ids.get(0).equals(1)){
-                n_chkb.setSelected(true);
-                x_chkb.setSelected(false);
-                all_chkb.setSelected(false);
-            } else if (lp_ids.get(0).equals(2)){
-                n_chkb.setSelected(false);
-                x_chkb.setSelected(true);
-                all_chkb.setSelected(false);
-            }
-        } else if (size==2) {
-            n_chkb.setSelected(false);
-            x_chkb.setSelected(false);
-            all_chkb.setSelected(true);
-        }
-    }
 
     private void setAffilateList(NguonNx nguonNx){
         affList = nguonNxTructhuocService.findAllTrucThuocByNGuonNxID(nguonNx.getId());

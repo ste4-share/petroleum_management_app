@@ -31,13 +31,17 @@ public class CategoryImp implements CategoryService {
                 String headerLv1 = resultSet.getString("header_lv1");
                 String headerLv2 = resultSet.getString("header_lv2");
                 String headerLv3 = resultSet.getString("header_lv3");
-                int tructhuoc_id = resultSet.getInt("tructhuoc_lp_id");
+                String typeTitle = resultSet.getString("type_title");
+                int tructhuoc_id = resultSet.getInt("tructhuoc_id");
+                String code = resultSet.getString("code");
                 Category category = new Category();
                 category.setId(id);
                 category.setHeader_lv1(headerLv1);
                 category.setHeader_lv2(headerLv2);
                 category.setHeader_lv3(headerLv3);
+                category.setType_title(typeTitle);
                 category.setTructhuoc_id(tructhuoc_id);
+                category.setCode(code);
                 result.add(category);
             }
 
@@ -52,7 +56,7 @@ public class CategoryImp implements CategoryService {
 
     @Override
     public int create(Category category) {
-        String SQL_SELECT = "insert into category(header_lv1,header_lv2,header_lv3,tructhuoc_lp_id) values(?,?,?,?)";
+        String SQL_SELECT = "insert into category(header_lv1,header_lv2,header_lv3,type_title, tructhuoc_id,code) values(?,?,?,?,?,?)";
 
         // auto close connection and preparedStatement
         try {
@@ -60,7 +64,9 @@ public class CategoryImp implements CategoryService {
             preparedStatement.setString(1, category.getHeader_lv1());
             preparedStatement.setString(2, category.getHeader_lv2());
             preparedStatement.setString(3, category.getHeader_lv3());
-            preparedStatement.setInt(4, category.getTructhuoc_id());
+            preparedStatement.setString(4, category.getType_title());
+            preparedStatement.setInt(5, category.getTructhuoc_id());
+            preparedStatement.setString(6, category.getCode());
             return preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
@@ -73,7 +79,7 @@ public class CategoryImp implements CategoryService {
 
     @Override
     public int update(Category category) {
-        String SQL_SELECT = "update category set header_lv1=?,header_lv2=?,header_lv3=?,tructhuoc_lp_id=? where id=?";
+        String SQL_SELECT = "update category set header_lv1=?,header_lv2=?,header_lv3=?,type_title=?,tructhuoc_id=? where id=?";
 
         // auto close connection and preparedStatement
         try {
@@ -82,7 +88,7 @@ public class CategoryImp implements CategoryService {
             preparedStatement.setString(2, category.getHeader_lv2());
             preparedStatement.setString(3, category.getHeader_lv3());
             preparedStatement.setInt(4, category.getTructhuoc_id());
-            preparedStatement.setInt(5, category.getId());
+            preparedStatement.setInt(5,category.getId());
             return preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
@@ -129,16 +135,17 @@ public class CategoryImp implements CategoryService {
     }
 
     @Override
-    public Category getTitleByttLpId(int tt_lpId) {
+    public Category getTitleByttLpId(int tructhuoc_id, String type) {
         QDatabase.getConnectionDB();
 
 
-        String SQL_SELECT = "Select * from category where tructhuoc_lp_id=?";
+        String SQL_SELECT = "Select * from category where tructhuoc_id=? and type_title=?";
 
         // auto close connection and preparedStatement
         try {
             PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
-            preparedStatement.setInt(1, tt_lpId);
+            preparedStatement.setInt(1, tructhuoc_id);
+            preparedStatement.setString(2, type);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
@@ -147,8 +154,10 @@ public class CategoryImp implements CategoryService {
                 String headerLv1 = resultSet.getString("header_lv1");
                 String headerLv2 = resultSet.getString("header_lv2");
                 String headerLv3 = resultSet.getString("header_lv3");
-                int tructhuoc_id = resultSet.getInt("tructhuoc_lp_id");
-                return new Category(id,headerLv1,headerLv2,headerLv3,tructhuoc_id);
+                String typeTitle = resultSet.getString("type_title");
+                int tructhuocId = resultSet.getInt("tructhuoc_id");
+                String code = resultSet.getString("code");
+                return new Category(id,headerLv1,headerLv2,headerLv3,typeTitle,tructhuocId, code);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

@@ -50,8 +50,35 @@ public class LedgerDetails {
     private int tonkhotong_id;
     private int tonkho_id;
     private int ledger_id;
+    private int import_unit_id;
+    private int export_unit_id;
+    private int tructhuoc_id;
 
     public LedgerDetails() {
+    }
+
+    public int getTructhuoc_id() {
+        return tructhuoc_id;
+    }
+
+    public void setTructhuoc_id(int tructhuoc_id) {
+        this.tructhuoc_id = tructhuoc_id;
+    }
+
+    public int getImport_unit_id() {
+        return import_unit_id;
+    }
+
+    public void setImport_unit_id(int import_unit_id) {
+        this.import_unit_id = import_unit_id;
+    }
+
+    public int getExport_unit_id() {
+        return export_unit_id;
+    }
+
+    public void setExport_unit_id(int export_unit_id) {
+        this.export_unit_id = export_unit_id;
     }
 
     public int getTcn_id() {

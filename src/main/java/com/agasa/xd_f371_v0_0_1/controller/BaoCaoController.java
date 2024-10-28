@@ -1,18 +1,22 @@
 package com.agasa.xd_f371_v0_0_1.controller;
 
 import com.agasa.xd_f371_v0_0_1.dto.TructhuocLoaiphieuDTO;
-import com.agasa.xd_f371_v0_0_1.entity.Category;
-import com.agasa.xd_f371_v0_0_1.entity.Tcn;
+import com.agasa.xd_f371_v0_0_1.entity.*;
 import com.agasa.xd_f371_v0_0_1.service.CategoryService;
+import com.agasa.xd_f371_v0_0_1.service.NguonNXService;
+import com.agasa.xd_f371_v0_0_1.service.NguonNx_tructhuocService;
 import com.agasa.xd_f371_v0_0_1.service.TrucThuocService;
 import com.agasa.xd_f371_v0_0_1.service.impl.CategoryImp;
+import com.agasa.xd_f371_v0_0_1.service.impl.NguonNXImp;
 import com.agasa.xd_f371_v0_0_1.service.impl.TrucThuocImp;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 
 import java.net.URL;
@@ -21,52 +25,80 @@ import java.util.ResourceBundle;
 public class BaoCaoController implements Initializable {
 
     @FXML
-    private ComboBox<String> loaiphieu_cbb;
+    private TableView<NguonNx> nguonnx_tb;
     @FXML
-    private TableView<Category> category_tb;
+    private TableView<TrucThuoc> tructhuoc_tb;
     @FXML
-    private TableColumn<Category, String> col_categ_id, col_categ_title,col_categ_lv2,col_categ_lv3;
+    private TableView<GroupTitle> group_tb;
     @FXML
-    private TableView<TructhuocLoaiphieuDTO> tb_tructhuocloaiphieu;
+    private TableView<NguonnxTitle> group_title_tb;
+
+
     @FXML
-    private TableColumn<TructhuocLoaiphieuDTO, String> col_ttlp_id, col_ttlp_ttid,col_ttlp_lpid,col_ttlp_type,col_ttlp_name;
+    private TableColumn<NguonNx, String> col_nnx_id, col_nnx_ten;
+    @FXML
+    private TableColumn<TrucThuoc, String> col_tt_id, col_tt_name,col_tt_type;
+    @FXML
+    private TableColumn<GroupTitle, String> col_gr_id, col_gr_name;
+    @FXML
+    private TableColumn<NguonnxTitle, String> col_group_id, col_group_ttid,col_group_nguonnxId,col_group_tructhuocId;
 
     private TrucThuocService trucThuocService = new TrucThuocImp();
-    private CategoryService categoryService = new CategoryImp();
+    private NguonNXService nguonNXService = new NguonNXImp();
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        fillDataToTbCategory();
-        fillDataToTbttLp();
+        fillDataToTbTructhuoc();
+        fillDataToTbNguonnx();
+        fillDataToTbGroup();
     }
 
-    private void fillDataToTbCategory(){
-        category_tb.setItems(FXCollections.observableList(categoryService.getAll()));
-        setFactoryCell_for_Category();
+    private void fillDataToTbNguonxTitle(int group_id) {
+        group_title_tb.setItems(FXCollections.observableList(nguonNXService.getAllNnxTitles(group_id)));
+        col_group_id.setCellValueFactory(new PropertyValueFactory<NguonnxTitle, String>("id"));
+        col_group_nguonnxId.setCellValueFactory(new PropertyValueFactory<NguonnxTitle, String>("nguonnx_id"));
+        col_group_tructhuocId.setCellValueFactory(new PropertyValueFactory<NguonnxTitle, String>("title_id"));
+        col_group_ttid.setCellValueFactory(new PropertyValueFactory<NguonnxTitle, String>("group_id"));
     }
 
-    private void setFactoryCell_for_Category() {
-        col_categ_id.setCellValueFactory(new PropertyValueFactory<Category, String>("id"));
-        col_categ_title.setCellValueFactory(new PropertyValueFactory<Category, String>("header_lv1"));
-        col_categ_lv2.setCellValueFactory(new PropertyValueFactory<Category, String>("header_lv2"));
-        col_categ_lv3.setCellValueFactory(new PropertyValueFactory<Category, String>("header_lv3"));
+    private void fillDataToTbGroup() {
+        group_tb.setItems(FXCollections.observableList(nguonNXService.getAllGroup()));
+        col_gr_id.setCellValueFactory(new PropertyValueFactory<GroupTitle, String>("id"));
+        col_gr_name.setCellValueFactory(new PropertyValueFactory<GroupTitle, String>("groupName"));
     }
 
-    private void fillDataToTbttLp(){
-        tb_tructhuocloaiphieu.setItems(FXCollections.observableList(trucThuocService.getAllTTLP()));
-        setFactoryCell_for_ttlp();
+    private void fillDataToTbTructhuoc() {
+        tructhuoc_tb.setItems(FXCollections.observableList(trucThuocService.getAll()));
+        col_tt_id.setCellValueFactory(new PropertyValueFactory<TrucThuoc, String>("id"));
+        col_tt_name.setCellValueFactory(new PropertyValueFactory<TrucThuoc, String>("name"));
+        col_tt_type.setCellValueFactory(new PropertyValueFactory<TrucThuoc, String>("type"));
     }
 
-    private void setFactoryCell_for_ttlp() {
-        col_ttlp_id.setCellValueFactory(new PropertyValueFactory<TructhuocLoaiphieuDTO, String>("id"));
-        col_ttlp_lpid.setCellValueFactory(new PropertyValueFactory<TructhuocLoaiphieuDTO, String>("loaiphieu_id"));
-        col_ttlp_ttid.setCellValueFactory(new PropertyValueFactory<TructhuocLoaiphieuDTO, String>("tructhuoc_id"));
-        col_ttlp_type.setCellValueFactory(new PropertyValueFactory<TructhuocLoaiphieuDTO, String>("type"));
-        col_ttlp_name.setCellValueFactory(new PropertyValueFactory<TructhuocLoaiphieuDTO, String>("name"));
+    private void fillDataToTbNguonnx() {
+        nguonnx_tb.setItems(FXCollections.observableList(nguonNXService.getAll()));
+        col_nnx_id.setCellValueFactory(new PropertyValueFactory<NguonNx, String>("id"));
+        col_nnx_ten.setCellValueFactory(new PropertyValueFactory<NguonNx, String>("ten"));
     }
 
-    @FXML
-    public void lp_onselected(ActionEvent actionEvent) {
+    public void nguonnx_selected(MouseEvent mouseEvent) {
+    }
 
+    public void tructhuoc_selected(MouseEvent mouseEvent) {
+    }
+
+    public void groupTtSeleected(MouseEvent mouseEvent) {
+        fillDataToTbNguonxTitle(group_tb.getSelectionModel().getSelectedItem().getId());
+    }
+
+    public void addNewGroupTitle(ActionEvent actionEvent) {
+        NguonNx nguonnx_id = nguonnx_tb.getSelectionModel().getSelectedItem();
+        GroupTitle group_id = group_tb.getSelectionModel().getSelectedItem();
+        TrucThuoc tructhuoc_id = tructhuoc_tb.getSelectionModel().getSelectedItem();
+        if (nguonnx_id!=null && group_id!=null && tructhuoc_id!=null){
+            int success = nguonNXService.createNew(new NguonnxTitle(nguonnx_id.getId(), tructhuoc_id.getId(), group_id.getId()));
+            System.out.println("succees: " + success);
+            fillDataToTbNguonxTitle(group_id.getId());
+        }
     }
 }

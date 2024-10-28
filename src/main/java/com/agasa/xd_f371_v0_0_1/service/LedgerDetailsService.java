@@ -16,5 +16,6 @@ public interface LedgerDetailsService {
     List<TTPhieuDto> getTTPhieu_ByLoaiPhieu(String loaiPhieu);
     List<LedgerDetails> getChiTietSoCai(String so);
     List<XdTrucThuocDto> findTrucThuocByNameXd(String loaiphieu, String tenxd);
-    QuantityByTructhuocDTO selectQuantityByTT(String loaiphieu, int xd_id, int tructhuoc_id);
+    QuantityByTructhuocDTO selectQuantityByTT(String loaiphieu, int xd_id);
+    QuantityByTructhuocDTO selectQuantityNguonnx(int nguonnx_id);
 }
