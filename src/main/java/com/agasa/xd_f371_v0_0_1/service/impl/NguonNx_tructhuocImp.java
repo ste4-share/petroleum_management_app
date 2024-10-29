@@ -51,7 +51,6 @@ public class NguonNx_tructhuocImp implements NguonNx_tructhuocService {
         try {
             PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
             preparedStatement.setInt(1, nguonnx_id);
-            preparedStatement.setInt(2, loaiPhieu);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {

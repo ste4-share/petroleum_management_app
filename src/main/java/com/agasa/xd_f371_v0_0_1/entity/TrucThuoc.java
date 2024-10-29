@@ -1,5 +1,6 @@
 package com.agasa.xd_f371_v0_0_1.entity;
 
+
 public class TrucThuoc {
     private int id;
     private String name;

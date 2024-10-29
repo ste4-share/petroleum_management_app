@@ -4,6 +4,7 @@ import com.agasa.xd_f371_v0_0_1.dto.TructhuocLoaiphieuDTO;
 import com.agasa.xd_f371_v0_0_1.entity.TrucThuoc;
 import com.agasa.xd_f371_v0_0_1.model.QDatabase;
 import com.agasa.xd_f371_v0_0_1.service.TrucThuocService;
+import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class TrucThuocImp implements TrucThuocService {
     @Override
     public List<TrucThuoc> getAll() {

@@ -4,9 +4,10 @@ import com.agasa.xd_f371_v0_0_1.entity.LedgerDetails;
 import com.agasa.xd_f371_v0_0_1.entity.*;
 import com.agasa.xd_f371_v0_0_1.fatory.CommonFactory;
 import com.agasa.xd_f371_v0_0_1.model.*;
-import com.agasa.xd_f371_v0_0_1.service.*;
-import com.agasa.xd_f371_v0_0_1.service.impl.*;
+import com.agasa.xd_f371_v0_0_1.service.TrucThuocService;
+import com.agasa.xd_f371_v0_0_1.service.impl.TrucThuocImp;
 import com.agasa.xd_f371_v0_0_1.util.TextToNumber;
+import jakarta.transaction.Transactional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -36,7 +37,6 @@ public class NhapController extends CommonFactory implements Initializable {
     private static int lxd_id_combobox_selected =0;
     private static ValidateFiledBol validateFiledBol = new ValidateFiledBol(true, true,true, true,true, true,true, true,true, true,true, true,true, true,true,true,true);
     private static int click_index;
-//    private static NguonNx_tructhuoc nguonNxTructhuoc_selected = new NguonNx_tructhuoc();
 
     @FXML
     private TextField soTf, recvTf,tcNhap,lenhKHso,soXe,
@@ -55,7 +55,6 @@ public class NhapController extends CommonFactory implements Initializable {
     private ComboBox<NguonNx> cmb_dvvc, cmb_dvn;
     @FXML
     private ComboBox<LoaiXangDau> cmb_tenxd;
-
 
 
     @Override
@@ -264,7 +263,7 @@ public class NhapController extends CommonFactory implements Initializable {
     }
 
     @FXML
-    public void btnImport(ActionEvent actionEvent) {
+    private void btnImport(ActionEvent actionEvent) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("NHẬP");
         alert.setHeaderText("Tạo phiếu nhập.");
@@ -290,6 +289,7 @@ public class NhapController extends CommonFactory implements Initializable {
                         recognized_tcn();
                         soCaiDto.setTcn_id(pre_createNewTcn.getId());
                         ledgerDetailsService.create(soCaiDto);
+                        updateAllRowInv(soCaiDto);
                     });
                 } catch (Exception e) {
                     Alert error= new Alert(Alert.AlertType.ERROR);

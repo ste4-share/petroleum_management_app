@@ -1,5 +1,6 @@
 package com.agasa.xd_f371_v0_0_1.service;
 
+import com.agasa.xd_f371_v0_0_1.dto.QuantityByTTDTO;
 import com.agasa.xd_f371_v0_0_1.dto.QuantityByTructhuocDTO;
 import com.agasa.xd_f371_v0_0_1.entity.LedgerDetails;
 import com.agasa.xd_f371_v0_0_1.dto.TTPhieuDto;
@@ -17,5 +18,6 @@ public interface LedgerDetailsService {
     List<LedgerDetails> getChiTietSoCai(String so);
     List<XdTrucThuocDto> findTrucThuocByNameXd(String loaiphieu, String tenxd);
     QuantityByTructhuocDTO selectQuantityByTT(String loaiphieu, int xd_id);
-    QuantityByTructhuocDTO selectQuantityNguonnx(int nguonnx_id);
+    QuantityByTTDTO selectQuantityNguonnx(int groupid, String loaiphieu, int tructhuoc_id,int xdid);
+    QuantityByTTDTO selectQuantityNguonnxImport(int group_id, String loaiphieu, int tructhuoc_id, int loaixdId);
 }

@@ -41,7 +41,6 @@ public class XuatController extends CommonFactory implements Initializable {
     private static int click_index;
     private boolean addedBySelection_lstb = false;
     private static List<LedgerDetails> ls_socai;
-    private static NguonNx_nhiemvu nguonNxNhiemvu_selected_nv = new NguonNx_nhiemvu();
     private static PhuongTienNhiemVu phuongTienNhiemVu_selected = new PhuongTienNhiemVu();
     private static List<ChiTietNhiemVuDTO> chiTietNhiemVuDTO_list = new ArrayList<>();
     private static ChiTietNhiemVuDTO nhiemVu_selected=  new ChiTietNhiemVuDTO();
@@ -124,7 +123,6 @@ public class XuatController extends CommonFactory implements Initializable {
             }
         });
         addBtn_k.setOnAction(actionEvent -> {
-            identify_nguonnx_tructhuoc();
             LedgerDetails ledgerDetails = getDataFromField_tab_k();
             stt = ls_socai.size();
             stt = stt+1;
@@ -204,6 +202,7 @@ public class XuatController extends CommonFactory implements Initializable {
                         recognized_tcx();
                         soCaiDto.setTcn_id(pre_createNewTcn.getId());
                         ledgerDetailsService.create(soCaiDto);
+                        updateAllRowInv(soCaiDto);
                     });
                     ls_socai = new ArrayList<>();
                     DashboardController.xuatStage.close();
@@ -398,7 +397,6 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setDenngay(denngay_dp_k.getValue()==null ? "" : denngay_dp_k.getValue().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
             ledgerDetails.setXd(cbb_tenxd_k.getSelectionModel().getSelectedItem());
             ledgerDetails.setQuarter_id(DashboardController.findByTime.getId());
-            ledgerDetails.setNguonnx_tructhuoc(nguonNxTructhuoc_selected.getId());
             ledgerDetails.setDvvc_obj(cbb_dvx_k.getSelectionModel().getSelectedItem());
             ledgerDetails.setLoaixd_id(cbb_tenxd_k.getSelectionModel().getSelectedItem().getId());
             ledgerDetails.setExport_unit_id(cbb_dvx_k.getSelectionModel().getSelectedItem().getId());
@@ -465,8 +463,6 @@ public class XuatController extends CommonFactory implements Initializable {
             }
         });
         addBtn_nv.setOnAction(actionEvent -> {
-            setNGuonNx_tructhuoc_nv();
-            setNguonnx_Nhiemvu_nv();
             setPhuongtienNhiemVu();
             LedgerDetails ledgerDetails = getDataFromField_tab_nhiemvu();
             stt = ls_socai.size();
@@ -546,6 +542,7 @@ public class XuatController extends CommonFactory implements Initializable {
                         saveLichsuxnk(soCaiDto);
                         saveMucgia(soCaiDto);
                         ledgerDetailsService.create(soCaiDto);
+                        updateAllRowInv(soCaiDto);
                     });
                     ls_socai = new ArrayList<>();
                     DashboardController.xuatStage.close();
@@ -671,20 +668,6 @@ public class XuatController extends CommonFactory implements Initializable {
         return new String[]{text.trim(), null};
     }
 
-    private void setNguonnx_Nhiemvu_nv() {
-        nguonNxNhiemvu_selected_nv.setNguonnx_id(nguonNxTructhuoc_selected_nv.getNguonnx_id());
-        nguonNxNhiemvu_selected_nv.setNvu_id(nhiemVu_selected.getId());
-    }
-    private void setNGuonNx_tructhuoc_nv() {
-        int nguonnx_from_vh = cbb_dvn_nv.getSelectionModel().getSelectedItem().getNguonnx_id();
-        int loaiphieu = loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_XUAT).getId();
-        NguonNx_tructhuoc nguonNxTructhuocs = nguonNxTructhuocService.findNguonnx_tructhuocByNnx_lp(nguonnx_from_vh, loaiphieu);
-        if (nguonNxTructhuocs!=null){
-            nguonNxTructhuoc_selected_nv = nguonNxTructhuocs;
-        }else {
-            throw new RuntimeException("Nguonnxtructhuoc is null");
-        }
-    }
     private void setPhuongtienNhiemVu(){
         phuongTien_buf = cbb_dvn_nv.getSelectionModel().getSelectedItem();
         phuongTienNhiemVu_selected.setPhuongtien_id(phuongTien_buf.getId());
@@ -794,8 +777,6 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setDenngay(denngay_dp_nv.getValue()==null ? "" : denngay_dp_nv.getValue().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
             ledgerDetails.setXd(cbb_tenxd_nv.getSelectionModel().getSelectedItem());
             ledgerDetails.setQuarter_id(DashboardController.findByTime.getId());
-            ledgerDetails.setNguonnx_tructhuoc(nguonNxTructhuoc_selected_nv.getId());
-            ledgerDetails.setNguonnx_nvu_id(nguonNxNhiemvu_selected_nv.getId());
             ledgerDetails.setPhuongtien_nvu_id(phuongTienNhiemVu_selected.getId());
             ledgerDetails.setPhuongtien_id(pt_id_selected_by_cbb);
             ledgerDetails.setDvvc_obj(cbb_dvx_nv.getSelectionModel().getSelectedItem());
@@ -807,16 +788,6 @@ public class XuatController extends CommonFactory implements Initializable {
         return ledgerDetails;
     }
 
-    private void identify_nguonnx_tructhuoc(){
-        int id_dvn_xk =  cbb_dvn_xk.getSelectionModel().getSelectedItem().getId();
-        int lp_id = loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_XUAT).getId();
-        NguonNx_tructhuoc nguonNxTructhuoc = nguonNxTructhuocService.findNguonnx_tructhuocByNnx_lp(id_dvn_xk, lp_id);
-        if (nguonNxTructhuoc!=null){
-            nguonNxTructhuoc_selected = nguonNxTructhuoc;
-        }else {
-            throw new RuntimeException("NguonnxTrucThuoc is null--");
-        }
-    }
 
     @FXML
     public void setActionDongia_tab_k(ActionEvent actionEvent) {

@@ -41,11 +41,9 @@ public class LedgerDetails {
     private int nhiemvu_id;
     private int nvu_tcn_id;
     private int nvu_tructhuoc;
-    private int nguonnx_tructhuoc;
     private int tcn_id;
     private int phuongtien_id;
     private int phuongtien_nvu_id;
-    private int nguonnx_nvu_id;
     private int quarter_id;
     private int tonkhotong_id;
     private int tonkho_id;
@@ -129,14 +127,6 @@ public class LedgerDetails {
         this.phuongtien_nvu_id = phuongtien_nvu_id;
     }
 
-    public int getNguonnx_nvu_id() {
-        return nguonnx_nvu_id;
-    }
-
-    public void setNguonnx_nvu_id(int nguonnx_nvu_id) {
-        this.nguonnx_nvu_id = nguonnx_nvu_id;
-    }
-
     public int getPhuongtien_id() {
         return phuongtien_id;
     }
@@ -159,14 +149,6 @@ public class LedgerDetails {
 
     public void setNvu_tructhuoc(int nvu_tructhuoc) {
         this.nvu_tructhuoc = nvu_tructhuoc;
-    }
-
-    public int getNguonnx_tructhuoc() {
-        return nguonnx_tructhuoc;
-    }
-
-    public void setNguonnx_tructhuoc(int nguonnx_tructhuoc) {
-        this.nguonnx_tructhuoc = nguonnx_tructhuoc;
     }
 
     public int getNhiemvu_id() {

@@ -110,6 +110,23 @@ public class invReportDetailImp implements InvReportDetailService {
     }
 
     @Override
+    public int update(InvReportDetail invReportDetail) {
+        String SQL_SELECT = "update inv_report_detail set soluong=? where id=?";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, invReportDetail.getSoluong());
+            preparedStatement.setInt(2, invReportDetail.getId());
+            return preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public InvReportDetail findByIds(int xd_id, int quarter_id, int titleId) {
         QDatabase.getConnectionDB();
         String SQL_SELECT = "Select * from inv_report_detail where xd_id=? and quarter_id=? and title_id=?";

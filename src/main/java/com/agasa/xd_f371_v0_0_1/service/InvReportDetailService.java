@@ -9,5 +9,6 @@ public interface InvReportDetailService {
     List<InvReportDetail> getAll();
     int createNew(InvReportDetail invReportDetail);
     int updateNew(InvReportDetail invReportDetail);
+    int update(InvReportDetail invReportDetail);
     InvReportDetail findByIds(int xd_id, int quarter_id, int titleId);
 }

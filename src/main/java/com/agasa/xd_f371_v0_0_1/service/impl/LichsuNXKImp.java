@@ -45,11 +45,11 @@ public class LichsuNXKImp implements LichsuNXKService {
                 obj.setSoluong(soluong);
                 result.add(obj);
             }
-
         } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            throw new RuntimeException(e);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return result;
     }
@@ -70,9 +70,9 @@ public class LichsuNXKImp implements LichsuNXKService {
             statement.setString(7, lichsuXNK.getMucgia());
 
             statement.executeUpdate();
-            System.out.println("Record Lich su xnk created.");
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return lichsuXNK;
     }

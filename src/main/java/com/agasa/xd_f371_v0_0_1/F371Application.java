@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.awt.im.InputContext;
 import java.io.IOException;
