@@ -1,5 +1,10 @@
 package com.agasa.xd_f371_v0_0_1.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class NguonnxTitle {
     private int id;
     private int nguonnx_id;
@@ -22,35 +27,4 @@ public class NguonnxTitle {
         this.group_id = group_id;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getNguonnx_id() {
-        return nguonnx_id;
-    }
-
-    public void setNguonnx_id(int nguonnx_id) {
-        this.nguonnx_id = nguonnx_id;
-    }
-
-    public int getTitle_id() {
-        return title_id;
-    }
-
-    public void setTitle_id(int title_id) {
-        this.title_id = title_id;
-    }
-
-    public int getGroup_id() {
-        return group_id;
-    }
-
-    public void setGroup_id(int group_id) {
-        this.group_id = group_id;
-    }
 }

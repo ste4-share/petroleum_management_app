@@ -78,6 +78,31 @@ public class CategoryImp implements CategoryService {
     }
 
     @Override
+    public String checkByTructhuocId(int tructhuocId) {
+        QDatabase.getConnectionDB();
+        List<Category> result = new ArrayList<>();
+        String SQL_SELECT = "select string_agg(code, ', ') from category where tructhuoc_id=?";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, tructhuocId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                return resultSet.getString("string_agg");
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    @Override
     public int update(Category category) {
         String SQL_SELECT = "update category set header_lv1=?,header_lv2=?,header_lv3=?,type_title=?,tructhuoc_id=? where id=?";
 
@@ -89,6 +114,26 @@ public class CategoryImp implements CategoryService {
             preparedStatement.setString(3, category.getHeader_lv3());
             preparedStatement.setInt(4, category.getTructhuoc_id());
             preparedStatement.setInt(5,category.getId());
+            return preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public int updateType(Category category) {
+        String SQL_SELECT = "update category set type_title=?, code=? where tructhuoc_id=?";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setString(1, category.getType_title());
+            preparedStatement.setString(2, category.getCode());
+            preparedStatement.setInt(3,category.getTructhuoc_id());
             return preparedStatement.executeUpdate();
 
         } catch (SQLException e) {

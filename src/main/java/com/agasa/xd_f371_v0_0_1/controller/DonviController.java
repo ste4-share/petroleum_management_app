@@ -32,7 +32,7 @@ public class DonviController implements Initializable {
     @FXML
     private TableView<Tcn> tb_property;
     @FXML
-        private TableColumn<NguonNx, String> col_name_unit,col_create_time;
+        private TableColumn<NguonNx, String> col_name_unit,col_create_time,col_affilated,col_loaiphieu;
     @FXML
     private TableColumn<Tcn, String> col_property_name,col_property_btype  ,col_property_status;
 
@@ -51,7 +51,7 @@ public class DonviController implements Initializable {
     }
 
     private void fillDataForTable_nguonnx(){
-        tb_unit.setItems(FXCollections.observableList(nguonNXService.getAll()));
+        tb_unit.setItems(FXCollections.observableList(nguonNXService.getAllAndNguonnx()));
         setFactoryCell_for_Nguonnx();
     }
 
@@ -66,9 +66,11 @@ public class DonviController implements Initializable {
         col_property_status.setCellValueFactory(new PropertyValueFactory<Tcn, String>("status"));
     }
 
-    private void setFactoryCell_for_Nguonnx(){
+    private void setFactoryCell_for_Nguonnx() {
         col_name_unit.setCellValueFactory(new PropertyValueFactory<NguonNx, String>("ten"));
         col_create_time.setCellValueFactory(new PropertyValueFactory<NguonNx, String>("createtime"));
+        col_affilated.setCellValueFactory(new PropertyValueFactory<NguonNx, String>("tructhuoc"));
+        col_loaiphieu.setCellValueFactory(new PropertyValueFactory<NguonNx, String>("loaiphieu"));
     }
 
     private void showUnitsDetailScreen() throws IOException {

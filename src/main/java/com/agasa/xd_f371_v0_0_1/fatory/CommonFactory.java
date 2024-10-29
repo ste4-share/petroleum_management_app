@@ -8,6 +8,7 @@ import com.agasa.xd_f371_v0_0_1.model.MucGiaEnum;
 import com.agasa.xd_f371_v0_0_1.service.*;
 import com.agasa.xd_f371_v0_0_1.service.impl.*;
 import com.agasa.xd_f371_v0_0_1.util.Common;
+import javafx.scene.control.Alert;
 
 import java.util.*;
 
@@ -33,19 +34,25 @@ public class CommonFactory {
     protected void updateAllRowInv(LedgerDetails ledgerDetails){
         Inventory inventory = tonKhoService.findByUniqueId(ledgerDetails.getLoaixd_id(), ledgerDetails.getQuarter_id());
         Category category = categoryService.getTitleByttLpId(ledgerDetails.getTructhuoc_id(), ledgerDetails.getLoai_phieu());
-        InvReportDetail invReportDetail = invReportDetailService.findByIds(ledgerDetails.getLoaixd_id(), ledgerDetails.getQuarter_id(), category.getId());
-        if (Common.getInvCatalogField(category, inventory, invReportDetail)){
-            invReportDetailService.update(invReportDetail);
-        }else {
-            if (ledgerDetails.getLoai_phieu().equals("NHAP")){
-                QuantityByTTDTO quantity = ledgerDetailsService.selectQuantityNguonnx(2,ledgerDetails.getLoai_phieu(),category.getTructhuoc_id(),ledgerDetails.getLoaixd_id());
-                invReportDetail.setSoluong(quantity.getSum());
+        if (category!=null){
+            InvReportDetail invReportDetail = invReportDetailService.findByIds(ledgerDetails.getLoaixd_id(), ledgerDetails.getQuarter_id(), category.getId());
+            if (Common.getInvCatalogField(category, inventory, invReportDetail)){
                 invReportDetailService.update(invReportDetail);
-            }else{
-                QuantityByTTDTO quantity = ledgerDetailsService.selectQuantityNguonnxImport(2,ledgerDetails.getLoai_phieu(),category.getTructhuoc_id(),ledgerDetails.getLoaixd_id());
-                invReportDetail.setSoluong(quantity.getSum());
-                invReportDetailService.update(invReportDetail);
+            }else {
+                if (ledgerDetails.getLoai_phieu().equals("NHAP")){
+                    QuantityByTTDTO quantity = ledgerDetailsService.selectQuantityNguonnx(2,ledgerDetails.getLoai_phieu(),category.getTructhuoc_id(),ledgerDetails.getLoaixd_id());
+                    invReportDetail.setSoluong(quantity.getSum());
+                    invReportDetailService.update(invReportDetail);
+                }else{
+                    QuantityByTTDTO quantity = ledgerDetailsService.selectQuantityNguonnxImport(2,ledgerDetails.getLoai_phieu(),category.getTructhuoc_id(),ledgerDetails.getLoaixd_id());
+                    invReportDetail.setSoluong(quantity.getSum());
+                    invReportDetailService.update(invReportDetail);
+                }
             }
+        }else{
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setContentText("Đơn vị không có nguồn trực thuộc.");
+            alert.showAndWait();
         }
     }
 
