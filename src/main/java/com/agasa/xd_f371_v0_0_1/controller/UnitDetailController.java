@@ -22,6 +22,7 @@ import javafx.util.StringConverter;
 
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class UnitDetailController implements Initializable {
@@ -33,7 +34,7 @@ public class UnitDetailController implements Initializable {
     @FXML
     TextField unit_name_tf;
     @FXML
-    CheckBox n_chkb,x_chkb,all_chkb;
+    RadioButton n_radio,x_radio,all_radio;
     @FXML
     ComboBox<TrucThuoc> tructhuoc_cbb;
 
@@ -41,7 +42,7 @@ public class UnitDetailController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         unit_name_tf.setText(DonviController.selectedUnit.getTen());
-        setcheckboxLoaiphieu();
+        setRadiobutton();
         setTructhuocCombobox();
     }
 
@@ -63,20 +64,15 @@ public class UnitDetailController implements Initializable {
         });
         tructhuoc_cbb.getSelectionModel().select(trucThuocService.findById(DonviController.selectedUnit.getTructhuoc_id()));
     }
-    private void setcheckboxLoaiphieu() {
+    private void setRadiobutton() {
         String lp = DonviController.selectedUnit.getLoaiphieu();
         if(lp.contains("NHAP") && lp.contains("XUAT")){
-            setCheckBox(true, false, false);
+            all_radio.setSelected(true);
         } else if(lp.contains("NHAP")){
-            setCheckBox(false, true, false);
+            n_radio.setSelected(true);
         } else if(lp.contains("XUAT")){
-            setCheckBox(false, false, true);
+            x_radio.setSelected(true);
         }
-    }
-    private void setCheckBox(boolean all, boolean n, boolean x){
-        all_chkb.setSelected(all);
-        n_chkb.setSelected(n);
-        x_chkb.setSelected(x);
     }
 
     @FXML
@@ -86,28 +82,55 @@ public class UnitDetailController implements Initializable {
 
     @FXML
     public void saveUnit(ActionEvent actionEvent) {
-        String lp = DonviController.selectedUnit.getLoaiphieu();
-        String lp_db = categoryService.checkByTructhuocId(DonviController.selectedUnit.getTructhuoc_id());
-
-        categoryService.checkByTructhuocId()
-        nguonNXService.createNew(nguonnxTitle)
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("LƯU");
+        alert.setHeaderText("Lưu thay đổi");
+        alert.setContentText("Xác nhận Lưu thay đổi?");
+        if (alert.showAndWait().get() == ButtonType.OK){
+            updateNguonnxTitle();
+            isChangeBillType();
+        }
+        DonviController.unit_stage.close();
     }
 
-    private boolean isChangeBillType(){
-        String lp = DonviController.selectedUnit.getLoaiphieu();
-        if (all_chkb.isSelected()){
-            if(lp.contains("NHAP") && lp.contains("XUAT")){
-                return true;
+    private void updateNguonnxTitle(){
+        NguonnxTitle nguonnxTitle = new NguonnxTitle();
+        nguonnxTitle.setTitle_id(tructhuoc_cbb.getSelectionModel().getSelectedItem().getId());
+        nguonnxTitle.setGroup_id(2);
+        nguonnxTitle.setNguonnx_id(DonviController.selectedUnit.getId());
+        nguonNXService.updateNguonnxTitle(nguonnxTitle);
+    }
+
+    private void setNEwCategoryChangeCode(Category category, String header3, String code){
+        category.setHeader_lv3(header3);
+        category.setCode(code);
+        category.setType_title(code);
+        categoryService.updateAndDoNotConflic(category);
+    }
+
+    private void isChangeBillType(){
+        if (all_radio.isSelected()){
+            List<Category> category_X = categoryService.getCategoryByTructhuocId(DonviController.selectedUnit.getTructhuoc_id());
+            if (categoryService.deleteBytructhuocId(DonviController.selectedUnit.getTructhuoc_id()) > 0){
+                setNEwCategoryChangeCode(category_X.get(0), "Nhập", "NHAP");
+                setNEwCategoryChangeCode(category_X.get(0), "Xuất", "XUAT");
+            }else{
+                throw new RuntimeException("category_by_tructhuoc is null");
             }
-        }else if (n_chkb.isSelected()){
-            if(lp.contains("NHAP")){
-                return true;
+        }else if (n_radio.isSelected()){
+            List<Category> category_X = categoryService.getCategoryByTructhuocId(DonviController.selectedUnit.getTructhuoc_id());
+            if (categoryService.deleteBytructhuocId(DonviController.selectedUnit.getTructhuoc_id()) > 0){
+                setNEwCategoryChangeCode(category_X.get(0), "Nhập", "NHAP");
+            }else{
+                throw new RuntimeException("category_by_tructhuoc is null");
             }
-        }else if (x_chkb.isSelected()){
-            if(lp.contains("XUAT")){
-                return true;
+        }else if (x_radio.isSelected()){
+            List<Category> category_X = categoryService.getCategoryByTructhuocId(DonviController.selectedUnit.getTructhuoc_id());
+            if (categoryService.deleteBytructhuocId(DonviController.selectedUnit.getTructhuoc_id()) > 0){
+                setNEwCategoryChangeCode(category_X.get(0), "Xuất", "XUAT");
+            }else{
+                throw new RuntimeException("category_by_tructhuoc is null");
             }
         }
-        return false;
     }
 }

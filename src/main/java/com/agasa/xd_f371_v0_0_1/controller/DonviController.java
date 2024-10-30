@@ -83,6 +83,8 @@ public class DonviController implements Initializable {
         unit_stage.initModality(Modality.APPLICATION_MODAL);
         unit_stage.setTitle("Chi tiết");
         unit_stage.showAndWait();
+        fillDataForTable_nguonnx();
+        tb_unit.refresh();
     }
 
     @FXML
@@ -95,7 +97,18 @@ public class DonviController implements Initializable {
     }
 
     @FXML
-    public void addUnitAction(ActionEvent actionEvent) {
+    public void addUnitAction(ActionEvent actionEvent) throws IOException{
+        selectedUnit = tb_unit.getSelectionModel().getSelectedItem();
+        Parent root = FXMLLoader.load(getClass().getResource("../add_unit.fxml"));
+        Scene scene = new Scene(root);
+        unit_stage = new Stage();
+        unit_stage.setScene(scene);
+        unit_stage.initStyle(StageStyle.DECORATED);
+        unit_stage.initModality(Modality.APPLICATION_MODAL);
+        unit_stage.setTitle("Thêm mới");
+        unit_stage.showAndWait();
+        fillDataForTable_nguonnx();
+        tb_unit.refresh();
     }
 
     @FXML

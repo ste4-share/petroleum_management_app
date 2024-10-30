@@ -119,43 +119,6 @@ public class NguonNXImp implements NguonNXService {
     }
 
     @Override
-    public List<NguonNx> getAllByLoaiPhieu(int loai_phieu) {
-        QDatabase.getConnectionDB();
-        List<NguonNx> result = new ArrayList<>();
-
-
-        String SQL_SELECT = "select nguon_nx.* from nguonnx_tructhuoc \n" +
-                "join nguon_nx on nguonnx_tructhuoc.nguonnx_id=nguon_nx.id\n" +
-                "join loai_phieu on nguonnx_tructhuoc.loaiphieu_id=loai_phieu.id \n" +
-                "where loai_phieu.id=?;";
-
-        // auto close connection and preparedStatement
-        try {
-            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
-            preparedStatement.setInt(1,loai_phieu);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-
-                int id = resultSet.getInt("id");
-                String ten = resultSet.getString("ten");
-                String createtime = resultSet.getString("createtime");
-                NguonNx obj = new NguonNx();
-                obj.setId(id);
-                obj.setCreatetime(createtime);
-                obj.setTen(ten);
-                result.add(obj);
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            throw new RuntimeException();
-        }
-        return result;
-    }
-
-    @Override
     public NguonNx findNguonNXByName_NON(String name) {
         QDatabase.getConnectionDB();
         NguonNx result = new NguonNx();
@@ -218,6 +181,33 @@ public class NguonNXImp implements NguonNXService {
     }
 
     @Override
+    public GroupTitle findGroupById(int grid) {
+        QDatabase.getConnectionDB();
+        String SQL_SELECT = "SELECT * FROM group_title where id=?";
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, grid);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                int id = resultSet.getInt("id");
+                String groupName = resultSet.getString("group_name");
+                String groupCode = resultSet.getString("group_code");
+                return new GroupTitle(id, groupName, groupCode);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    @Override
     public List<NguonnxTitle> getAllNnxTitles(int groupId) {
         QDatabase.getConnectionDB();
         List<NguonnxTitle> result = new ArrayList<>();
@@ -265,7 +255,7 @@ public class NguonNXImp implements NguonNXService {
     @Override
     public int updateNguonnxTitle(NguonnxTitle nguonnxTitle) {
         QDatabase.getConnectionDB();
-        String sql = "begin transaction;update nguonnx_title set title_id=? where nguonnx_id=?, group_id=?;commit;";
+        String sql = "begin transaction;update nguonnx_title set title_id=? where nguonnx_id=? and group_id=?;commit;";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
             statement.setInt(1, nguonnxTitle.getTitle_id());
@@ -279,9 +269,8 @@ public class NguonNXImp implements NguonNXService {
 
     @Override
     public NguonNx create(NguonNx nguonNx) {
-
         QDatabase.getConnectionDB();
-        String sql = "insert into nguon_nx(ten) values(?)";
+        String sql = "begin transaction;insert into nguon_nx(ten) values(?);commit;";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
             statement.setString(1, nguonNx.getTen());

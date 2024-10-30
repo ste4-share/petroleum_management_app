@@ -55,8 +55,60 @@ public class CategoryImp implements CategoryService {
     }
 
     @Override
+    public List<String> getAllTypeTitle() {
+        QDatabase.getConnectionDB();
+        List<String> result = new ArrayList<>();
+
+
+        String SQL_SELECT = "select type_title from category group by type_title";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                result.add(resultSet.getString("type_title"));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<String> getAllCode() {
+        QDatabase.getConnectionDB();
+        List<String> result = new ArrayList<>();
+
+
+        String SQL_SELECT = "select code from category group by code";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                result.add(resultSet.getString("code"));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
     public int create(Category category) {
-        String SQL_SELECT = "insert into category(header_lv1,header_lv2,header_lv3,type_title, tructhuoc_id,code) values(?,?,?,?,?,?)";
+        String SQL_SELECT = "begin transaction;insert into category(header_lv1,header_lv2,header_lv3,type_title, tructhuoc_id,code) values(?,?,?,?,?,?);commit;";
 
         // auto close connection and preparedStatement
         try {
@@ -78,20 +130,20 @@ public class CategoryImp implements CategoryService {
     }
 
     @Override
-    public String checkByTructhuocId(int tructhuocId) {
-        QDatabase.getConnectionDB();
-        List<Category> result = new ArrayList<>();
-        String SQL_SELECT = "select string_agg(code, ', ') from category where tructhuoc_id=?";
+    public int updateAndDoNotConflic(Category category) {
+        String SQL_SELECT = "insert into category(header_lv1, header_lv2,header_lv3,type_title,tructhuoc_id,code) \n" +
+                "values(?,?,?,?,?,?) on conflict do nothing;";
 
         // auto close connection and preparedStatement
         try {
             PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
-            preparedStatement.setInt(1, tructhuocId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                return resultSet.getString("string_agg");
-            }
+            preparedStatement.setString(1, category.getHeader_lv1());
+            preparedStatement.setString(2, category.getHeader_lv2());
+            preparedStatement.setString(3, category.getHeader_lv3());
+            preparedStatement.setString(4, category.getType_title());
+            preparedStatement.setInt(5, category.getTructhuoc_id());
+            preparedStatement.setString(6, category.getCode());
+            return preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -99,7 +151,6 @@ public class CategoryImp implements CategoryService {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        return null;
     }
 
     @Override
@@ -211,5 +262,55 @@ public class CategoryImp implements CategoryService {
             throw new RuntimeException(e);
         }
         return null;
+    }
+
+    @Override
+    public List<Category> getCategoryByTructhuocId(int tructhuocId) {
+        QDatabase.getConnectionDB();
+        List<Category> list = new ArrayList<>();
+
+        String SQL_SELECT = "Select * from category where tructhuoc_id=?";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, tructhuocId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                String headerLv1 = resultSet.getString("header_lv1");
+                String headerLv2 = resultSet.getString("header_lv2");
+                String headerLv3 = resultSet.getString("header_lv3");
+                String typeTitle = resultSet.getString("type_title");
+                int tructhuoc_id = resultSet.getInt("tructhuoc_id");
+                String code = resultSet.getString("code");
+                list.add(new Category(headerLv1,headerLv2,headerLv3,typeTitle,tructhuoc_id, code));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return list;
+    }
+
+    @Override
+    public int deleteBytructhuocId(int tructhuocId) {
+        String SQL_SELECT = "delete from category where tructhuoc_id=?";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, tructhuocId);
+            return preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 }

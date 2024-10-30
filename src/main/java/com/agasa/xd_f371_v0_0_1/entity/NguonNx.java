@@ -17,6 +17,10 @@ public class NguonNx {
     public NguonNx() {
     }
 
+    public NguonNx(String ten) {
+        this.ten = ten;
+    }
+
     public NguonNx(int id, String ten, String tructhuoc, String loaiphieu, String createtime) {
         this.id = id;
         this.ten = ten;
