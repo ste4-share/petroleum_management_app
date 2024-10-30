@@ -127,6 +127,36 @@ public class invReportDetailImp implements InvReportDetailService {
     }
 
     @Override
+    public int updateTitleId(int pre_id, int current_id) {
+        String SQL_SELECT = "update inv_report_detail set title_id=? where title_id=?";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, current_id);
+            preparedStatement.setInt(2, pre_id);
+            return preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public int deleteAll() {
+        String SQL_SELECT = "begin transaction;delete from inv_report_detail;commit;";
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            return preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public InvReportDetail findByIds(int xd_id, int quarter_id, int titleId) {
         QDatabase.getConnectionDB();
         String SQL_SELECT = "Select * from inv_report_detail where xd_id=? and quarter_id=? and title_id=?";
@@ -140,7 +170,6 @@ public class invReportDetailImp implements InvReportDetailService {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-
                 int id = resultSet.getInt("id");
                 String loaixd = resultSet.getString("loaixd");
                 int soluong = resultSet.getInt("soluong");

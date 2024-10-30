@@ -11,6 +11,7 @@ public interface NguonNXService {
     List<NguonNx> getAllAndNguonnx();
     List<NguonNx> getAllUnless(String ten_1);
     NguonNx create(NguonNx nguonNx);
+    int delete(NguonNx nguonNx, int groupId);
     NguonNx update(NguonNx nguonNx);
     NguonNx findById(int id);
     NguonNx findNguonNXByName_NON(String name);

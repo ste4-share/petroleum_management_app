@@ -1,14 +1,18 @@
 package com.agasa.xd_f371_v0_0_1.controller;
 
 import com.agasa.xd_f371_v0_0_1.entity.Category;
+import com.agasa.xd_f371_v0_0_1.entity.InvReportDetail;
 import com.agasa.xd_f371_v0_0_1.entity.NguonnxTitle;
 import com.agasa.xd_f371_v0_0_1.entity.TrucThuoc;
+import com.agasa.xd_f371_v0_0_1.model.MockDataMap;
 import com.agasa.xd_f371_v0_0_1.service.CategoryService;
+import com.agasa.xd_f371_v0_0_1.service.InvReportDetailService;
 import com.agasa.xd_f371_v0_0_1.service.NguonNXService;
 import com.agasa.xd_f371_v0_0_1.service.TrucThuocService;
 import com.agasa.xd_f371_v0_0_1.service.impl.CategoryImp;
 import com.agasa.xd_f371_v0_0_1.service.impl.NguonNXImp;
 import com.agasa.xd_f371_v0_0_1.service.impl.TrucThuocImp;
+import com.agasa.xd_f371_v0_0_1.service.impl.invReportDetailImp;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -31,6 +35,7 @@ public class UnitDetailController implements Initializable {
     private TrucThuocService trucThuocService = new TrucThuocImp();
     private NguonNXService nguonNXService = new NguonNXImp();
     private CategoryService categoryService = new CategoryImp();
+    private InvReportDetailService invReportDetailService = new invReportDetailImp();
     @FXML
     TextField unit_name_tf;
     @FXML
@@ -89,6 +94,7 @@ public class UnitDetailController implements Initializable {
         if (alert.showAndWait().get() == ButtonType.OK){
             updateNguonnxTitle();
             isChangeBillType();
+            MockDataMap.initInventoryMap();
         }
         DonviController.unit_stage.close();
     }

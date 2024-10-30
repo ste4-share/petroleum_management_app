@@ -1,7 +1,10 @@
 package com.agasa.xd_f371_v0_0_1.util;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
+
+import java.util.Optional;
 
 public class DialogMessage {
     public static void message(String title, String content, String header, Alert.AlertType alertType){
@@ -11,5 +14,16 @@ public class DialogMessage {
         a.setContentText("content");
         a.setHeaderText("header");
         a.showAndWait();
+    }
+
+    public static ButtonType callAlert(){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation Dialog");
+        alert.setHeaderText("Warning !");
+        alert.setContentText("Are you sure you want to perform this action ?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        //Button.Ok
+        return result.get();
     }
 }

@@ -49,7 +49,7 @@
                                     </HBox>
                                  </children>
                               </VBox>
-                              <TableView fx:id="tb_unit" onMouseClicked="#unit_clicked" prefHeight="697.0" prefWidth="1226.0">
+                              <TableView fx:id="tb_unit" onMouseReleased="#unit_clicked" prefHeight="697.0" prefWidth="1226.0">
                                  <columns>
                                     <TableColumn fx:id="col_name_unit" prefWidth="75.0" text="Tên đơn vị" />
                                     <TableColumn fx:id="col_affilated" prefWidth="75.0" text="Trực thuộc" />

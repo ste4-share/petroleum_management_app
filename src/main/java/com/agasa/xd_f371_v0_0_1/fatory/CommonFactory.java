@@ -4,6 +4,7 @@ import com.agasa.xd_f371_v0_0_1.controller.DashboardController;
 import com.agasa.xd_f371_v0_0_1.dto.LichsuXNK;
 import com.agasa.xd_f371_v0_0_1.dto.QuantityByTTDTO;
 import com.agasa.xd_f371_v0_0_1.entity.*;
+import com.agasa.xd_f371_v0_0_1.model.ChungLoaiModel;
 import com.agasa.xd_f371_v0_0_1.model.MucGiaEnum;
 import com.agasa.xd_f371_v0_0_1.service.*;
 import com.agasa.xd_f371_v0_0_1.service.impl.*;
@@ -34,16 +35,18 @@ public class CommonFactory {
     protected void updateAllRowInv(LedgerDetails ledgerDetails){
         Inventory inventory = tonKhoService.findByUniqueId(ledgerDetails.getLoaixd_id(), ledgerDetails.getQuarter_id());
         Category category = categoryService.getTitleByttLpId(ledgerDetails.getTructhuoc_id(), ledgerDetails.getLoai_phieu());
+        updateTck_forReport(ChungLoaiModel.NVDX_a.getNameChungloai(),ChungLoaiModel.TCK_a.getNameChungloai(), ledgerDetails, inventory.getTcK_nvdx());
+        updateTck_forReport(ChungLoaiModel.SSCD_a.getNameChungloai(),ChungLoaiModel.TCK_a.getNameChungloai(), ledgerDetails, inventory.getTck_sscd());
         if (category!=null){
             InvReportDetail invReportDetail = invReportDetailService.findByIds(ledgerDetails.getLoaixd_id(), ledgerDetails.getQuarter_id(), category.getId());
             if (Common.getInvCatalogField(category, inventory, invReportDetail)){
                 invReportDetailService.update(invReportDetail);
-            }else {
+            } else {
                 if (ledgerDetails.getLoai_phieu().equals("NHAP")){
                     QuantityByTTDTO quantity = ledgerDetailsService.selectQuantityNguonnx(2,ledgerDetails.getLoai_phieu(),category.getTructhuoc_id(),ledgerDetails.getLoaixd_id());
                     invReportDetail.setSoluong(quantity.getSum());
                     invReportDetailService.update(invReportDetail);
-                }else{
+                } else {
                     QuantityByTTDTO quantity = ledgerDetailsService.selectQuantityNguonnxImport(2,ledgerDetails.getLoai_phieu(),category.getTructhuoc_id(),ledgerDetails.getLoaixd_id());
                     invReportDetail.setSoluong(quantity.getSum());
                     invReportDetailService.update(invReportDetail);
@@ -54,6 +57,14 @@ public class CommonFactory {
             alert.setContentText("Đơn vị không có nguồn trực thuộc.");
             alert.showAndWait();
         }
+    }
+
+    private void updateTck_forReport(String code, String type, LedgerDetails ledgerDetails, int soluong){
+        //set tck sscd
+        Category category = categoryService.findByCode(code,type);
+        InvReportDetail invReportDetail1 = invReportDetailService.findByIds(ledgerDetails.getLoaixd_id(), ledgerDetails.getQuarter_id(), category.getId());
+        invReportDetail1.setSoluong(soluong);
+        invReportDetailService.update(invReportDetail1);
     }
 
     protected void createNewMucgia(LedgerDetails ledgerDetails, int quantity){

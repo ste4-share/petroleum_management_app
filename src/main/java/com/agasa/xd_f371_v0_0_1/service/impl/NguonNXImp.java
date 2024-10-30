@@ -282,6 +282,21 @@ public class NguonNXImp implements NguonNXService {
     }
 
     @Override
+    public int delete(NguonNx nguonNx, int groupId) {
+        QDatabase.getConnectionDB();
+        String sql = "begin transaction;delete from nguonnx_title where nguonnx_id=? and group_id=?;delete from nguon_nx where id=?;commit;";
+        try {
+            PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
+            statement.setInt(1, nguonNx.getId());
+            statement.setInt(2, groupId);
+            statement.setInt(3, nguonNx.getId());
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public NguonNx update(NguonNx nguonNx) {
         return null;
     }

@@ -107,6 +107,73 @@ public class CategoryImp implements CategoryService {
     }
 
     @Override
+    public List<String> getAll_Header1() {
+        QDatabase.getConnectionDB();
+        List<String> result = new ArrayList<>();
+        String SQL_SELECT = "select header_lv1 from category group by header_lv1";
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                result.add(resultSet.getString("header_lv1"));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<String> getAll_Header2() {
+        QDatabase.getConnectionDB();
+        List<String> result = new ArrayList<>();
+        String SQL_SELECT = "select header_lv2 from category group by header_lv2";
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                result.add(resultSet.getString("header_lv2"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<String> getAll_Header3() {
+        QDatabase.getConnectionDB();
+        List<String> result = new ArrayList<>();
+        String SQL_SELECT = "select header_lv3 from category group by header_lv3";
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                result.add(resultSet.getString("header_lv3"));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
     public int create(Category category) {
         String SQL_SELECT = "begin transaction;insert into category(header_lv1,header_lv2,header_lv3,type_title, tructhuoc_id,code) values(?,?,?,?,?,?);commit;";
 
@@ -254,6 +321,35 @@ public class CategoryImp implements CategoryService {
                 int tructhuocId = resultSet.getInt("tructhuoc_id");
                 String code = resultSet.getString("code");
                 return new Category(id,headerLv1,headerLv2,headerLv3,typeTitle,tructhuocId, code);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    @Override
+    public Category findByCode(String code, String type) {
+        QDatabase.getConnectionDB();
+        String SQL_SELECT = "Select * from category where code=? and type_title=?";
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setString(1, code);
+            preparedStatement.setString(2, type);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String headerLv1 = resultSet.getString("header_lv1");
+                String headerLv2 = resultSet.getString("header_lv2");
+                String headerLv3 = resultSet.getString("header_lv3");
+                String typeTitle = resultSet.getString("type_title");
+                int tructhuocId = resultSet.getInt("tructhuoc_id");
+                String code2 = resultSet.getString("code");
+                return new Category(id,headerLv1,headerLv2,headerLv3,typeTitle,tructhuocId, code2);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

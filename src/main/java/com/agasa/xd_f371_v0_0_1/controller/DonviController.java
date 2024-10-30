@@ -5,6 +5,8 @@ import com.agasa.xd_f371_v0_0_1.dto.UnitsDto;
 import com.agasa.xd_f371_v0_0_1.entity.*;
 import com.agasa.xd_f371_v0_0_1.service.*;
 import com.agasa.xd_f371_v0_0_1.service.impl.*;
+import com.agasa.xd_f371_v0_0_1.util.DialogMessage;
+import com.jfoenix.controls.JFXButton;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -27,6 +29,7 @@ public class DonviController implements Initializable {
 
     public static Stage unit_stage;
     public static NguonNx selectedUnit;
+    private int index =0;
     @FXML
     private TableView<NguonNx> tb_unit;
     @FXML
@@ -37,9 +40,6 @@ public class DonviController implements Initializable {
     private TableColumn<Tcn, String> col_property_name,col_property_btype  ,col_property_status;
 
     private NguonNXService nguonNXService = new NguonNXImp();
-    private TrucThuocService trucThuocService = new TrucThuocImp();
-    private NguonNx_tructhuocService nguonNxTructhuocService = new NguonNx_tructhuocImp();
-    private LoaiPhieuService loaiPhieuService = new LoaiPhieuImp();
     private TcnService tcnService = new TcnImp();
 
 
@@ -91,10 +91,6 @@ public class DonviController implements Initializable {
     public void searchButtonUnit(ActionEvent actionEvent) {
     }
 
-    @FXML
-    public void unit_clicked(MouseEvent mouseEvent) throws IOException {
-        showUnitsDetailScreen();
-    }
 
     @FXML
     public void addUnitAction(ActionEvent actionEvent) throws IOException{
@@ -117,6 +113,14 @@ public class DonviController implements Initializable {
 
     @FXML
     public void deleteUnitAction(ActionEvent actionEvent) {
+        NguonNx nguonNx = tb_unit.getSelectionModel().getSelectedItem();
+        if (nguonNx!=null){
+            if (DialogMessage.callAlert()== ButtonType.OK){
+                nguonNXService.delete(nguonNx, 2);
+                fillDataForTable_nguonnx();
+                tb_unit.refresh();
+            }
+        }
     }
 
     @FXML
@@ -133,5 +137,16 @@ public class DonviController implements Initializable {
 
     @FXML
     public void delPropertyAction(ActionEvent actionEvent) {
+    }
+
+    @FXML
+    public void unit_clicked(MouseEvent mouseEvent) throws IOException {
+        index+=1;
+        if (index==2){
+            index=0;
+            showUnitsDetailScreen();
+            fillDataForTable_nguonnx();
+            tb_unit.refresh();
+        }
     }
 }

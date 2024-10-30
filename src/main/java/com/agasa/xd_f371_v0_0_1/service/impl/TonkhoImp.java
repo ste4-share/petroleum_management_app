@@ -355,7 +355,7 @@ public class TonkhoImp implements TonKhoService {
                 int quarterId = resultSet.getInt("quarter_id");
                 int tdk_nvdx = resultSet.getInt("tdk_nvdx");
                 int tdk_sscd = resultSet.getInt("tdk_sscd");
-                int tcK_nvdx = resultSet.getInt("tcK_nvdx");
+                int tcK_nvdx = resultSet.getInt("tck_nvdx");
                 int tck_sscd = resultSet.getInt("tck_sscd");
                 int pre_nvdx = resultSet.getInt("pre_nvdx");
                 int pre_sscd = resultSet.getInt("pre_sscd");

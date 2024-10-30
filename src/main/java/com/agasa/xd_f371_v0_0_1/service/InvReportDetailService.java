@@ -10,5 +10,7 @@ public interface InvReportDetailService {
     int createNew(InvReportDetail invReportDetail);
     int updateNew(InvReportDetail invReportDetail);
     int update(InvReportDetail invReportDetail);
+    int updateTitleId(int pre_id, int current_id);
+    int deleteAll();
     InvReportDetail findByIds(int xd_id, int quarter_id, int titleId);
 }

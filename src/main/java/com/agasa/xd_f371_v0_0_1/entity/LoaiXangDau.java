@@ -1,7 +1,11 @@
 package com.agasa.xd_f371_v0_0_1.entity;
 
-import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.Date;
+@Getter
+@Setter
 public class LoaiXangDau {
     private int id;
     private String maxd;
@@ -15,67 +19,4 @@ public class LoaiXangDau {
     public LoaiXangDau() {
     }
 
-    public String getRtype() {
-        return Rtype;
-    }
-
-    public void setRtype(String rtype) {
-        Rtype = rtype;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getMaxd() {
-        return maxd;
-    }
-
-    public void setMaxd(String maxd) {
-        this.maxd = maxd;
-    }
-
-    public String getTenxd() {
-        return tenxd;
-    }
-
-    public void setTenxd(String tenxd) {
-        this.tenxd = tenxd;
-    }
-
-    public String getChungloai() {
-        return chungloai;
-    }
-
-    public void setChungloai(String chungloai) {
-        this.chungloai = chungloai;
-    }
-
-    public Date getCreatetime() {
-        return createtime;
-    }
-
-    public void setCreatetime(Date createtime) {
-        this.createtime = createtime;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 }
