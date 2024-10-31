@@ -15,6 +15,7 @@ public class PhuongTien {
     private int dm_xm;
     private int quantity;
     private int nguonnx_id;
+    private int loaiphuongtien_id;
     private String status;
 
     public PhuongTien() {

@@ -34,10 +34,7 @@ public class XuatController extends CommonFactory implements Initializable {
     private static int pt_id_selected_by_cbb = 0;
     private static Mucgia mucgia_id_selected_mucgia_cbb = new Mucgia();
     private static Mucgia mucgia_id_selected_mucgia_cbb_nv = new Mucgia();
-    private static NguonNx_tructhuoc nguonNxTructhuoc_selected = new NguonNx_tructhuoc();
-    private static NguonNx_tructhuoc nguonNxTructhuoc_selected_nv = new NguonNx_tructhuoc();
     private static PhuongTien phuongTien_buf = new PhuongTien();
-    private static NguonNxTcn nguonNxTcn_selected_tab_k = new NguonNxTcn();
     private static int click_index;
     private boolean addedBySelection_lstb = false;
     private static List<LedgerDetails> ls_socai;
@@ -47,8 +44,8 @@ public class XuatController extends CommonFactory implements Initializable {
 
     @FXML
     private TextField so_tf_k,nguoinhan_tf_k,tcx_tf_k,lenhso_tf_k,soxe_tf_k,phaixuat_tf_k,nhietdothucte_tf_k,vcf_tf_k,tytrong_tf_k,thucxuat_tf_k,
-            so_tf_nv,nguoinhan_tf_nv,tcx_tf_nhiemvu,lenhso_tf_nv,soxe_tf_nv,sokm_tf_nv,sogio_tf_nv,
-            sophut_tf_nv,phaixuat_tf_nv,nhietdothucte_tf_nv,vcf_tf_nv,tytrong_tf_nv,thucxuat_tf_nv;
+            so_tf_nv,nguoinhan_tf_nv,tcx_tf_nhiemvu,lenhso_tf_nv,soxe_tf_nv,sokm_tf_nv,sogio_md_tf_nv,
+            sophut_md_tf_nv,sogio_tk_tf_nv,sophut_tk_tf_nv,phaixuat_tf_nv,nhietdothucte_tf_nv,vcf_tf_nv,tytrong_tf_nv,thucxuat_tf_nv;
     @FXML
     private CheckBox maybay_chkbox,xe_chkbox,may_chkbox;
     @FXML
@@ -771,9 +768,11 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setDvvc(cbb_dvx_nv.getSelectionModel().getSelectedItem().getTen());
             ledgerDetails.setDvi(cbb_dvn_nv.getValue().getName());
             ledgerDetails.setNhiemvu_id(nhiemVu_selected.getId());
-            ledgerDetails.setSo_gio(Integer.parseInt(sogio_tf_nv.getText()=="" ? "0" : sogio_tf_nv.getText()));
-            ledgerDetails.setSo_phut(Integer.parseInt(sophut_tf_nv.getText()=="" ? "0" : sophut_tf_nv.getText()));
-            ledgerDetails.setSo_km(Integer.parseInt(sokm_tf_nv.getText()=="" ? "0" : sokm_tf_nv.getText()));
+            ledgerDetails.setSo_gio(Integer.parseInt(sogio_md_tf_nv.getText().isEmpty() ? "0" : sogio_md_tf_nv.getText()));
+            ledgerDetails.setSo_phut(Integer.parseInt(sophut_md_tf_nv.getText().isEmpty() ? "0" : sophut_md_tf_nv.getText()));
+            ledgerDetails.setSo_gio_tk(Integer.parseInt(sogio_tk_tf_nv.getText().isEmpty() ? "0" : sogio_tk_tf_nv.getText()));
+            ledgerDetails.setSo_phut_tk(Integer.parseInt(sophut_tk_tf_nv.getText().isEmpty() ? "0" : sophut_tk_tf_nv.getText()));
+            ledgerDetails.setSo_km(Integer.parseInt(sokm_tf_nv.getText().isEmpty() ? "0" : sokm_tf_nv.getText()));
             ledgerDetails.setDenngay(denngay_dp_nv.getValue()==null ? "" : denngay_dp_nv.getValue().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
             ledgerDetails.setXd(cbb_tenxd_nv.getSelectionModel().getSelectedItem());
             ledgerDetails.setQuarter_id(DashboardController.findByTime.getId());

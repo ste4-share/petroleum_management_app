@@ -56,6 +56,8 @@ public class LedgerDetails {
     private int import_unit_id;
     private int export_unit_id;
     private int tructhuoc_id;
+    private int so_gio_tk;
+    private int so_phut_tk;
 
     public LedgerDetails() {
     }

@@ -10,6 +10,9 @@ public enum LoaiPTEnum {
     XE_CHAY_XANG("XE_CHAY_XANG"),
     MAY_CHAY_XANG("MAY_CHAY_XANG"),
     XE_CHAY_DIEZEL("XE_CHAY_DIEZEL"),
+    XE("XE"),
+    MAY("MAY"),
+    MAYBAY_a("MAYBAY"),
     MAY_CHAY_DIEZEL("MAY_CHAY_DIEZEL");
 
     public final String name;
