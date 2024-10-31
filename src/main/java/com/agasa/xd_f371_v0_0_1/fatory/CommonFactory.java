@@ -44,11 +44,19 @@ public class CommonFactory {
             } else {
                 if (ledgerDetails.getLoai_phieu().equals("NHAP")){
                     QuantityByTTDTO quantity = ledgerDetailsService.selectQuantityNguonnx(2,ledgerDetails.getLoai_phieu(),category.getTructhuoc_id(),ledgerDetails.getLoaixd_id());
-                    invReportDetail.setSoluong(quantity.getSum());
+                    if (quantity==null){
+                        invReportDetail.setSoluong(0);
+                    }else{
+                        invReportDetail.setSoluong(quantity.getSum());
+                    }
                     invReportDetailService.update(invReportDetail);
-                } else {
+                } else if (ledgerDetails.getLoai_phieu().equals("XUAT")){
                     QuantityByTTDTO quantity = ledgerDetailsService.selectQuantityNguonnxImport(2,ledgerDetails.getLoai_phieu(),category.getTructhuoc_id(),ledgerDetails.getLoaixd_id());
-                    invReportDetail.setSoluong(quantity.getSum());
+                    if (quantity==null){
+                        invReportDetail.setSoluong(0);
+                    }else{
+                        invReportDetail.setSoluong(quantity.getSum());
+                    }
                     invReportDetailService.update(invReportDetail);
                 }
             }

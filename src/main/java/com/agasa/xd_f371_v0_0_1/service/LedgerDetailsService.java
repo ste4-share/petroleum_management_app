@@ -20,4 +20,5 @@ public interface LedgerDetailsService {
     QuantityByTructhuocDTO selectQuantityByTT(String loaiphieu, int xd_id);
     QuantityByTTDTO selectQuantityNguonnx(int groupid, String loaiphieu, int tructhuoc_id,int xdid);
     QuantityByTTDTO selectQuantityNguonnxImport(int group_id, String loaiphieu, int tructhuoc_id, int loaixdId);
+    QuantityByTTDTO selectQuantityNguonnxExport(int group_id, String loaiphieu, int tructhuoc_id, int loaixdId);
 }

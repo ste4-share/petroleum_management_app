@@ -669,7 +669,7 @@ public class XuatController extends CommonFactory implements Initializable {
     }
 
     private void setPhuongtienNhiemVu(){
-        phuongTien_buf = cbb_dvn_nv.getSelectionModel().getSelectedItem();
+        phuongTien_buf = cbb_dvn_nv.getValue();
         phuongTienNhiemVu_selected.setPhuongtien_id(phuongTien_buf.getId());
         phuongTienNhiemVu_selected.setNhiemvu_id(nhiemVu_selected.getId());
     }
@@ -769,7 +769,7 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setTy_trong(Double.parseDouble(tytrong_tf_nv.getText().isEmpty() ? "0" : tytrong_tf_nv.getText()));
             ledgerDetails.setThanh_tien(Long.parseLong(thucxuat_tf_nv.getText()) * mucgia_id_selected_mucgia_cbb_nv.getPrice());
             ledgerDetails.setDvvc(cbb_dvx_nv.getSelectionModel().getSelectedItem().getTen());
-            ledgerDetails.setDvi(cbb_dvn_nv.getSelectionModel().getSelectedItem().getName());
+            ledgerDetails.setDvi(cbb_dvn_nv.getValue().getName());
             ledgerDetails.setNhiemvu_id(nhiemVu_selected.getId());
             ledgerDetails.setSo_gio(Integer.parseInt(sogio_tf_nv.getText()=="" ? "0" : sogio_tf_nv.getText()));
             ledgerDetails.setSo_phut(Integer.parseInt(sophut_tf_nv.getText()=="" ? "0" : sophut_tf_nv.getText()));
@@ -778,10 +778,10 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setXd(cbb_tenxd_nv.getSelectionModel().getSelectedItem());
             ledgerDetails.setQuarter_id(DashboardController.findByTime.getId());
             ledgerDetails.setPhuongtien_nvu_id(phuongTienNhiemVu_selected.getId());
-            ledgerDetails.setPhuongtien_id(pt_id_selected_by_cbb);
+            ledgerDetails.setPhuongtien_id(cbb_dvn_nv.getValue().getId());
             ledgerDetails.setDvvc_obj(cbb_dvx_nv.getSelectionModel().getSelectedItem());
             ledgerDetails.setLoaixd_id(cbb_tenxd_nv.getSelectionModel().getSelectedItem().getId());
-            ledgerDetails.setExport_unit_id(cbb_dvx_nv.getSelectionModel().getSelectedItem().getId());
+            ledgerDetails.setImport_unit_id(cbb_dvx_nv.getSelectionModel().getSelectedItem().getId());
         } catch (NullPointerException e) {
             throw new NullPointerException(e.getMessage());
         }
@@ -830,8 +830,6 @@ public class XuatController extends CommonFactory implements Initializable {
 
     @FXML
     public void dvnSelectedAction(ActionEvent actionEvent) {
-        System.out.println("dvn_: "+  cbb_dvn_xk.getSelectionModel().getSelectedItem().getTen());
-
     }
 
 }

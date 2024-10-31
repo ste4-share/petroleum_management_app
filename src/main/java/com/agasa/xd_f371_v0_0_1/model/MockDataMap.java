@@ -1,6 +1,7 @@
 package com.agasa.xd_f371_v0_0_1.model;
 
 import com.agasa.xd_f371_v0_0_1.controller.DashboardController;
+import com.agasa.xd_f371_v0_0_1.dto.QuantityByTTDTO;
 import com.agasa.xd_f371_v0_0_1.entity.*;
 import com.agasa.xd_f371_v0_0_1.service.*;
 import com.agasa.xd_f371_v0_0_1.service.impl.*;
@@ -16,6 +17,7 @@ public class MockDataMap {
     private static TonKhoService tonKhoService = new TonkhoImp();
     private static InvReportDetailService invReportDetailService = new invReportDetailImp();
     private static MucgiaService mucgiaService = new MucgiaImp();
+    private static LedgerDetailsService ledgerDetailsService = new LedgerDetailsImp();
 
     public static void initInventoryMap(){
         invReportDetailService.deleteAll();
@@ -29,7 +31,22 @@ public class MockDataMap {
                     Category catelos = categories.get(j);
                     InvReportDetail invReportDetail = new InvReportDetail();
                     Common.getInvCatalogField(catelos, inventory, invReportDetail);
+                    if (catelos.getCode().equals("NHAP")){
+                        QuantityByTTDTO quantity = ledgerDetailsService.selectQuantityNguonnx(2,"NHAP",catelos.getTructhuoc_id(),loaiXangDauList.get(i).getId());
+                        if (quantity==null){
+                            invReportDetail.setSoluong(0);
+                        }else{
+                            invReportDetail.setSoluong(quantity.getSum());
+                        }
 
+                    } else if(catelos.getCode().equals("XUAT")) {
+                        QuantityByTTDTO quantity = ledgerDetailsService.selectQuantityNguonnxImport(2,"XUAT",catelos.getTructhuoc_id(),loaiXangDauList.get(i).getId());
+                        if (quantity==null){
+                            invReportDetail.setSoluong(0);
+                        }else{
+                            invReportDetail.setSoluong(quantity.getSum());
+                        }
+                    }
                     //inventory detail
                     invReportDetail.setLoaixd(loaiXangDauList.get(i).getTenxd());
                     invReportDetail.setTitle_lv1(catelos.getHeader_lv1());
