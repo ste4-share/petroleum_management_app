@@ -1,10 +1,15 @@
 package com.agasa.xd_f371_v0_0_1.dto;
 
+import com.agasa.xd_f371_v0_0_1.entity.PhuongTien;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class NormDto {
     private int pt_id;
     private String namePt;
@@ -15,9 +20,11 @@ public class NormDto {
     private int dm_xm_gio;
     private int dm_xm_km;
     private String createtime;
+    private String status;
     private int loaiphuongtien_id;
+    private int quarter_id;
 
-    public NormDto(int pt_id, String namePt, String typePt, int quantity, int dm_md_gio, int dm_tk_gio, int dm_xm_gio, int dm_xm_km, String createtime, int loaiphuongtien_id) {
+    public NormDto(int pt_id, String namePt, String typePt, int quantity, int dm_md_gio, int dm_tk_gio, int dm_xm_gio, int dm_xm_km, String createtime, int loaiphuongtien_id,String status) {
         this.pt_id = pt_id;
         this.namePt = namePt;
         this.typePt = typePt;
@@ -28,5 +35,6 @@ public class NormDto {
         this.dm_xm_km = dm_xm_km;
         this.createtime = createtime;
         this.loaiphuongtien_id = loaiphuongtien_id;
+        this.status = status;
     }
 }

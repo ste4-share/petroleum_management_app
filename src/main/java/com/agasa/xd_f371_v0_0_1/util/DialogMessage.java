@@ -26,4 +26,14 @@ public class DialogMessage {
         //Button.Ok
         return result.get();
     }
+
+    public static ButtonType callAlertWithMessage(String title, String headerText, String content){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(content);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.get();
+    }
 }

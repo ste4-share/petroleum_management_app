@@ -20,7 +20,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="borderpane_base" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="823.0" prefWidth="1380.0" style="-fx-background-color: #ffffff;" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.agasa.xd_f371_v0_0_1.controller.DashboardController">
+<BorderPane fx:id="borderpane_base" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="823.0" prefWidth="1380.0" style="-fx-background-color: #ffffff;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23" fx:controller="com.agasa.xd_f371_v0_0_1.controller.DashboardController">
    <left>
       <AnchorPane fx:id="main_menu" prefHeight="10000.0" BorderPane.alignment="CENTER">
          <children>
@@ -198,7 +198,7 @@
       </AnchorPane>
    </left>
    <center>
-      <VBox fx:id="nx_vbox">
+      <VBox fx:id="nx_vbox" BorderPane.alignment="TOP_LEFT">
          <BorderPane.margin>
             <Insets left="10.0" />
          </BorderPane.margin>

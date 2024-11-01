@@ -1,6 +1,5 @@
 package com.agasa.xd_f371_v0_0_1.controller;
 
-import com.agasa.xd_f371_v0_0_1.dto.LichsuXNK;
 import com.agasa.xd_f371_v0_0_1.dto.NormDto;
 import com.agasa.xd_f371_v0_0_1.entity.NguonNx;
 import com.agasa.xd_f371_v0_0_1.model.LoaiPTEnum;
@@ -20,6 +19,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -30,15 +30,16 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class NormController implements Initializable {
-    private static int nguonnx_id;
-    private static Stage norm_stage;
+    public static int nguonnx_id;
+    public static Stage norm_stage;
+    public static NormDto normDto;
 
     @FXML
     TableView<NormDto> pt_tb;
     @FXML
     ComboBox<NguonNx> units_cbb;
     @FXML
-    RadioButton xe_radio;
+    RadioButton xe_radio,may_radio,mb_radio;
     @FXML
     TableColumn<NormDto, String> xmt_name,type_name,quantity,km,h,md,tk,createtime;
 
@@ -47,7 +48,7 @@ public class NormController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        normDto = new NormDto();
         xe_radio.setSelected(true);
         fillDatatoptTable(LoaiPTEnum.XE.name());
         initNguonnxCbb();
@@ -89,6 +90,12 @@ public class NormController implements Initializable {
 
     @FXML
     public void addNewPt(ActionEvent actionEvent) throws IOException {
+        normDto = new NormDto();
+        normDto.setDm_md_gio(0);
+        normDto.setDm_tk_gio(0);
+        normDto.setDm_xm_gio(0);
+        normDto.setDm_xm_km(0);
+        normDto.setPt_id(0);
         Parent root = FXMLLoader.load(getClass().getResource("../add_pt.fxml"));
         Scene scene = new Scene(root);
         norm_stage = new Stage();
@@ -97,6 +104,7 @@ public class NormController implements Initializable {
         norm_stage.initModality(Modality.APPLICATION_MODAL);
         norm_stage.setTitle("Thêm phương tiện");
         norm_stage.showAndWait();
+        fillDatatoptTable(LoaiPTEnum.XE.name());
     }
     @FXML
     public void xe_selected(ActionEvent actionEvent) {
@@ -109,5 +117,30 @@ public class NormController implements Initializable {
     @FXML
     public void maybay_selected(ActionEvent actionEvent) {
         fillDatatoptTable(LoaiPTEnum.MAYBAY_a.getNameVehicle());
+    }
+
+    @FXML
+    public void pt_selected(MouseEvent mouseEvent) throws IOException {
+        if (mouseEvent.getClickCount()==2){
+            normDto = pt_tb.getSelectionModel().getSelectedItem();
+            Parent root = FXMLLoader.load(getClass().getResource("../add_pt.fxml"));
+            Scene scene = new Scene(root);
+            norm_stage = new Stage();
+            norm_stage.setScene(scene);
+            norm_stage.initStyle(StageStyle.DECORATED);
+            norm_stage.initModality(Modality.APPLICATION_MODAL);
+            norm_stage.setTitle("Thêm phương tiện");
+            norm_stage.showAndWait();
+            if (xe_radio.isSelected()){
+                fillDatatoptTable(LoaiPTEnum.XE.getNameVehicle());
+                pt_tb.refresh();
+            }else if (may_radio.isSelected()){
+                fillDatatoptTable(LoaiPTEnum.MAY.getNameVehicle());
+                pt_tb.refresh();
+            }else if (mb_radio.isSelected()){
+                fillDatatoptTable(LoaiPTEnum.MAYBAY_a.getNameVehicle());
+                pt_tb.refresh();
+            }
+        }
     }
 }

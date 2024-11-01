@@ -23,6 +23,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -421,7 +422,7 @@ public class DashboardController implements Initializable {
         tonkho_menu.setStyle(resetStyle());
         baocao_menu.setStyle(resetStyle());
         try {
-            VBox norm_menu = FXMLLoader.load(getClass().getResource("../norm_menu.fxml"));
+            HBox norm_menu = FXMLLoader.load(getClass().getResource("../norm_menu.fxml"));
             borderpane_base.setCenter(norm_menu);
         } catch (IOException e) {
             throw new RuntimeException(e);

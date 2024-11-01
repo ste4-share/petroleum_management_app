@@ -1,21 +1,60 @@
 package com.agasa.xd_f371_v0_0_1.service.impl;
 
 import com.agasa.xd_f371_v0_0_1.dto.NormDto;
-import com.agasa.xd_f371_v0_0_1.entity.LoaiPhuongTien;
-import com.agasa.xd_f371_v0_0_1.entity.NguonNx;
-import com.agasa.xd_f371_v0_0_1.entity.PhuongTien;
-import com.agasa.xd_f371_v0_0_1.entity.Quarter;
+import com.agasa.xd_f371_v0_0_1.dto.StatusActive;
+import com.agasa.xd_f371_v0_0_1.entity.*;
 import com.agasa.xd_f371_v0_0_1.model.QDatabase;
 import com.agasa.xd_f371_v0_0_1.service.PhuongTienService;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PhuongTienImp implements PhuongTienService {
+    @Override
+    public List<StatusActive> getAllStatus() {
+        QDatabase.getConnectionDB();
+        List<StatusActive> result = new ArrayList<>();
+        String sql = "select * from activated_active";
+        try {
+            PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String statusNAme = resultSet.getString("status_name");
+
+                result.add(new StatusActive(id, statusNAme));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public StatusActive findStatusByName(String status) {
+        QDatabase.getConnectionDB();
+        String sql = "select * from activated_active where status_name=?";
+        try {
+            PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
+            statement.setString(1, status);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String statusNAme = resultSet.getString("status_name");
+                return new StatusActive(id, statusNAme);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
 
     @Override
     public List<PhuongTien> getAll() {
@@ -65,8 +104,9 @@ public class PhuongTienImp implements PhuongTienService {
     public List<NormDto> getAllPt(String typeName) {
         QDatabase.getConnectionDB();
         List<NormDto> result = new ArrayList<>();
-        String sql = "SELECT phuongtien.id,phuongtien.name, loai_phuongtien.type_name, quantity,phuongtien.timestamp,loaiphuongtien_id  FROM public.phuongtien \n" +
+        String sql = "SELECT phuongtien.id,phuongtien.name, loai_phuongtien.type_name, quantity,phuongtien.timestamp,loaiphuongtien_id,status,dm_tk_gio,dm_md_gio,dm_xm_gio,dm_xm_km  FROM public.phuongtien\n" +
                 "join loai_phuongtien on phuongtien.loaiphuongtien_id=loai_phuongtien.id\n" +
+                "join dinhmuc on dinhmuc.phuongtien_id=phuongtien.id\n" +
                 "where loai_phuongtien.type=?";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
@@ -80,12 +120,13 @@ public class PhuongTienImp implements PhuongTienService {
                 int quantity = resultSet.getInt("quantity");
                 String timestamp = resultSet.getString("timestamp");
                 int loaiphuongtienId = resultSet.getInt("loaiphuongtien_id");
+                String status = resultSet.getString("status");
+                int dm_tk_gio = resultSet.getInt("dm_tk_gio");
+                int dm_md_gio = resultSet.getInt("dm_md_gio");
+                int dm_xm_gio = resultSet.getInt("dm_xm_gio");
+                int dm_xm_km = resultSet.getInt("dm_xm_km");
 
-//                int hanMuc = resultSet.getInt("han_muc");
-//                int dm_tk = resultSet.getInt("dm_tk");
-//                int dm_md = resultSet.getInt("dm_md");
-//                int dm_xm = resultSet.getInt("dm_xm");
-                result.add(new NormDto(id, name, type, quantity,0,0,0,0,timestamp,loaiphuongtienId));
+                result.add(new NormDto(id, name, type, quantity,dm_md_gio,dm_tk_gio,dm_xm_gio,dm_xm_km,timestamp,loaiphuongtienId,status));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -138,6 +179,51 @@ public class PhuongTienImp implements PhuongTienService {
             throw new RuntimeException(e);
         }
         return result;
+    }
+
+    @Override
+    public int createNewNorm(Norm normDto) {
+        QDatabase.getConnectionDB();
+        String sql = "insert into dinhmuc(dm_tk_gio, dm_md_gio, dm_xm_km, dm_xm_gio, phuongtien_id, quarter_id) values(?,?,?,?,?,?) on conflict (phuongtien_id,quarter_id) do update set dm_tk_gio=?, dm_md_gio=?, dm_xm_km=?,dm_xm_gio=?";
+        try {
+            PreparedStatement statement = QDatabase.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, normDto.getDm_tk_gio());
+            statement.setInt(2, normDto.getDm_md_gio());
+            statement.setInt(3, normDto.getDm_xm_km());
+            statement.setInt(4, normDto.getDm_xm_gio());
+            statement.setInt(5, normDto.getPhuongtien_id());
+            statement.setInt(6, normDto.getQuarter_id());
+            statement.setInt(7, normDto.getDm_tk_gio());
+            statement.setInt(8, normDto.getDm_md_gio());
+            statement.setInt(9, normDto.getDm_xm_km());
+            statement.setInt(10, normDto.getDm_xm_gio());
+
+            return statement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public int updateNewNorm(Norm norm) {
+        QDatabase.getConnectionDB();
+        String sql = "update dinhmuc set dm_tk_gio=?, dm_md_gio=?, dm_xm_km=?,dm_xm_gio=? where phuongtien_id=? and quarter_id=?";
+        try {
+            PreparedStatement statement = QDatabase.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, norm.getDm_tk_gio());
+            statement.setInt(2, norm.getDm_md_gio());
+            statement.setInt(3, norm.getDm_xm_km());
+            statement.setInt(4, norm.getDm_xm_gio());
+            statement.setInt(5, norm.getPhuongtien_id());
+            statement.setInt(6, norm.getQuarter_id());
+
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -210,11 +296,11 @@ public class PhuongTienImp implements PhuongTienService {
     }
 
     @Override
-    public PhuongTien createNew(PhuongTien phuongTien) {
+    public int createNew(PhuongTien phuongTien) {
         QDatabase.getConnectionDB();
         String sql = "insert into phuongtien(name, type, han_muc, dm_tk, dm_md, dm_xm, quantity, status,nguonnx_id,loaiphuongtien_id) values(?,?,?,?,?,?,?,?,?,?)";
         try {
-            PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
+            PreparedStatement statement = QDatabase.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, phuongTien.getName());
             statement.setString(2, phuongTien.getType());
             statement.setInt(3, phuongTien.getHan_muc());
@@ -224,13 +310,38 @@ public class PhuongTienImp implements PhuongTienService {
             statement.setInt(7, phuongTien.getQuantity());
             statement.setString(8, phuongTien.getStatus());
             statement.setInt(9, phuongTien.getNguonnx_id());
-            statement.setInt(9, phuongTien.getLoaiphuongtien_id());
+            statement.setInt(10, phuongTien.getLoaiphuongtien_id());
             statement.executeUpdate();
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1);
+                }
+                else {
+                    throw new SQLException("Creating user failed, no ID obtained.");
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        return phuongTien;
+    }
+
+    @Override
+    public int updateNew(PhuongTien phuongTien) {
+        QDatabase.getConnectionDB();
+        String sql = "update phuongtien set name=?, quantity=?, status=?,loaiphuongtien_id=? where id=?";
+        try {
+            PreparedStatement statement = QDatabase.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, phuongTien.getName());
+            statement.setInt(2, phuongTien.getQuantity());
+            statement.setString(3, phuongTien.getStatus());
+            statement.setInt(4, phuongTien.getLoaiphuongtien_id());
+            statement.setInt(5, phuongTien.getId());
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

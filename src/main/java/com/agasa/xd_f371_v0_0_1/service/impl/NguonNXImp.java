@@ -19,7 +19,6 @@ public class NguonNXImp implements NguonNXService {
         QDatabase.getConnectionDB();
         List<NguonNx> result = new ArrayList<>();
 
-
         String SQL_SELECT = "Select * from nguon_nx";
 
         // auto close connection and preparedStatement
@@ -37,7 +36,6 @@ public class NguonNXImp implements NguonNXService {
                 obj.setTen(ten);
                 result.add(obj);
             }
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {

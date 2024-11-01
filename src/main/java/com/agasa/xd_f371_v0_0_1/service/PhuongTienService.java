@@ -1,10 +1,8 @@
 package com.agasa.xd_f371_v0_0_1.service;
 
 import com.agasa.xd_f371_v0_0_1.dto.NormDto;
-import com.agasa.xd_f371_v0_0_1.entity.LoaiPhuongTien;
-import com.agasa.xd_f371_v0_0_1.entity.NguonNx;
-import com.agasa.xd_f371_v0_0_1.entity.NguonnxTitle;
-import com.agasa.xd_f371_v0_0_1.entity.PhuongTien;
+import com.agasa.xd_f371_v0_0_1.dto.StatusActive;
+import com.agasa.xd_f371_v0_0_1.entity.*;
 
 import java.util.List;
 
@@ -13,10 +11,13 @@ public interface PhuongTienService {
     List<NormDto> getAllPt(String typeName);
     List<LoaiPhuongTien> getLoaiPt(String typeName);
     List<LoaiPhuongTien> getAllLoaiPt();
+    int createNewNorm(Norm norm);
+    int updateNewNorm(Norm norm);
     LoaiPhuongTien findPtById(int id);
     List<NguonNx> getIdNguonnx();
     List<String> getTypeName();
-    PhuongTien createNew(PhuongTien phuongTien);
+    int createNew(PhuongTien phuongTien);
+    int updateNew(PhuongTien phuongTien);
     int createNewPt(NormDto normDto);
     PhuongTien udpateObj(PhuongTien phuongTien) ;
     int createPt(PhuongTien phuongTien) ;
@@ -24,5 +25,7 @@ public interface PhuongTienService {
     List<PhuongTien> findPhuongTienByType(String type);
     List<NormDto> findListPhuongTienByType(int lpt_id);
     Integer findNnxByPt(String pt);
+    List<StatusActive> getAllStatus();
+    StatusActive findStatusByName(String status);
 
 }
