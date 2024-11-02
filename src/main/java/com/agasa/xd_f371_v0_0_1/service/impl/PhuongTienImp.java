@@ -68,11 +68,6 @@ public class PhuongTienImp implements PhuongTienService {
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
-                String type = resultSet.getString("type");
-                int hanMuc = resultSet.getInt("han_muc");
-                int dm_tk = resultSet.getInt("dm_tk");
-                int dm_md = resultSet.getInt("dm_md");
-                int dm_xm = resultSet.getInt("dm_xm");
                 int quantity = resultSet.getInt("quantity");
                 int nguonnxId = resultSet.getInt("nguonnx_id");
                 int loaiphuongtienId = resultSet.getInt("loaiphuongtien_id");
@@ -81,11 +76,6 @@ public class PhuongTienImp implements PhuongTienService {
                 PhuongTien phuongTien = new PhuongTien();
                 phuongTien.setId(id);
                 phuongTien.setName(name);
-                phuongTien.setType(type);
-                phuongTien.setHan_muc(hanMuc);
-                phuongTien.setDm_tk(dm_tk);
-                phuongTien.setDm_md(dm_md);
-                phuongTien.setDm_xm(dm_xm);
                 phuongTien.setQuantity(quantity);
                 phuongTien.setNguonnx_id(nguonnxId);
                 phuongTien.setStatus(status);
@@ -298,19 +288,14 @@ public class PhuongTienImp implements PhuongTienService {
     @Override
     public int createNew(PhuongTien phuongTien) {
         QDatabase.getConnectionDB();
-        String sql = "insert into phuongtien(name, type, han_muc, dm_tk, dm_md, dm_xm, quantity, status,nguonnx_id,loaiphuongtien_id) values(?,?,?,?,?,?,?,?,?,?)";
+        String sql = "insert into phuongtien(name, quantity, status,nguonnx_id,loaiphuongtien_id) values(?,?,?,?,?)";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, phuongTien.getName());
-            statement.setString(2, phuongTien.getType());
-            statement.setInt(3, phuongTien.getHan_muc());
-            statement.setInt(4, phuongTien.getDm_tk());
-            statement.setInt(5, phuongTien.getDm_md());
-            statement.setInt(6, phuongTien.getDm_xm());
-            statement.setInt(7, phuongTien.getQuantity());
-            statement.setString(8, phuongTien.getStatus());
-            statement.setInt(9, phuongTien.getNguonnx_id());
-            statement.setInt(10, phuongTien.getLoaiphuongtien_id());
+            statement.setInt(2, phuongTien.getQuantity());
+            statement.setString(3, phuongTien.getStatus());
+            statement.setInt(4, phuongTien.getNguonnx_id());
+            statement.setInt(5, phuongTien.getLoaiphuongtien_id());
             statement.executeUpdate();
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
@@ -352,18 +337,13 @@ public class PhuongTienImp implements PhuongTienService {
     @Override
     public PhuongTien udpateObj(PhuongTien phuongTien) {
         QDatabase.getConnectionDB();
-        String sql = "update phuongtien set name=?,type=?,han_muc=?,dm_tk=?,dm_md=?,dm_xm=?,quantity=?,status=?,nguonnx_id=?";
+        String sql = "update phuongtien set name=?,quantity=?,status=?,nguonnx_id=?";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
             statement.setString(1, phuongTien.getName());
-            statement.setString(2, phuongTien.getType());
-            statement.setInt(3, phuongTien.getHan_muc());
-            statement.setInt(4, phuongTien.getDm_tk());
-            statement.setInt(5, phuongTien.getDm_md());
-            statement.setInt(6, phuongTien.getDm_xm());
-            statement.setInt(7, phuongTien.getQuantity());
-            statement.setString(8, phuongTien.getStatus());
-            statement.setInt(9, phuongTien.getNguonnx_id());
+            statement.setInt(2, phuongTien.getQuantity());
+            statement.setString(3, phuongTien.getStatus());
+            statement.setInt(4, phuongTien.getNguonnx_id());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -390,24 +370,14 @@ public class PhuongTienImp implements PhuongTienService {
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
-                String type = resultSet.getString("type");
-                int hanMuc = resultSet.getInt("han_muc");
-                int dm_tk = resultSet.getInt("dm_tk");
-                int dm_md = resultSet.getInt("dm_md");
-                int dm_xm = resultSet.getInt("dm_xm");
                 int quantity = resultSet.getInt("quantity");
                 int nguonnxId = resultSet.getInt("nguonnx_id");
                 int loaiphuongtienId = resultSet.getInt("loaiphuongtien_id");
-                String status = resultSet.getString("han_muc");
+                String status = resultSet.getString("status");
 
 
                 phuongTien.setId(id);
                 phuongTien.setName(name);
-                phuongTien.setType(type);
-                phuongTien.setHan_muc(hanMuc);
-                phuongTien.setDm_tk(dm_tk);
-                phuongTien.setDm_md(dm_md);
-                phuongTien.setDm_xm(dm_xm);
                 phuongTien.setNguonnx_id(nguonnxId);
                 phuongTien.setQuantity(quantity);
                 phuongTien.setStatus(status);
@@ -424,33 +394,34 @@ public class PhuongTienImp implements PhuongTienService {
     public List<PhuongTien> findPhuongTienByType(String type1) {
         QDatabase.getConnectionDB();
         List<PhuongTien> result = new ArrayList<>();
-        String sql = "SELECT * FROM phuongtien where type like ?";
+        String sql = "select * from phuongtien \n" +
+                "join loai_phuongtien on phuongtien.loaiphuongtien_id=loai_phuongtien.id\n" +
+                "join dinhmuc on phuongtien.id=dinhmuc.phuongtien_id\n" +
+                "where loai_phuongtien.type=?";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
-            statement.setString(1, "%" + type1 + "%");
+            statement.setString(1,  type1 );
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
-                String type = resultSet.getString("type");
-                int hanMuc = resultSet.getInt("han_muc");
-                int dm_tk = resultSet.getInt("dm_tk");
-                int dm_md = resultSet.getInt("dm_md");
-                int dm_xm = resultSet.getInt("dm_xm");
+                int dm_tk = resultSet.getInt("dm_tk_gio");
+                int dm_md = resultSet.getInt("dm_md_gio");
+                int dm_xm_km = resultSet.getInt("dm_xm_km");
+                int dm_xm_gio = resultSet.getInt("dm_xm_gio");
                 int quantity = resultSet.getInt("quantity");
                 int nguonnxId = resultSet.getInt("nguonnx_id");
                 int loaiphuongtienId = resultSet.getInt("loaiphuongtien_id");
-                String status = resultSet.getString("han_muc");
+                String status = resultSet.getString("status");
 
                 PhuongTien phuongTien = new PhuongTien();
                 phuongTien.setId(id);
                 phuongTien.setName(name);
-                phuongTien.setType(type);
-                phuongTien.setHan_muc(hanMuc);
                 phuongTien.setDm_tk(dm_tk);
                 phuongTien.setDm_md(dm_md);
-                phuongTien.setDm_xm(dm_xm);
+                phuongTien.setDm_xm_km(dm_xm_km);
+                phuongTien.setDm_xm_gio(dm_xm_gio);
                 phuongTien.setNguonnx_id(nguonnxId);
                 phuongTien.setQuantity(quantity);
                 phuongTien.setStatus(status);

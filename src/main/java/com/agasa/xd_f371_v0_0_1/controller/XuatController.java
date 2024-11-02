@@ -4,8 +4,6 @@ import com.agasa.xd_f371_v0_0_1.dto.*;
 import com.agasa.xd_f371_v0_0_1.entity.*;
 import com.agasa.xd_f371_v0_0_1.fatory.CommonFactory;
 import com.agasa.xd_f371_v0_0_1.model.*;
-import com.agasa.xd_f371_v0_0_1.service.*;
-import com.agasa.xd_f371_v0_0_1.service.impl.*;
 import com.agasa.xd_f371_v0_0_1.util.TextToNumber;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -44,14 +42,18 @@ public class XuatController extends CommonFactory implements Initializable {
 
     @FXML
     private TextField so_tf_k,nguoinhan_tf_k,tcx_tf_k,lenhso_tf_k,soxe_tf_k,phaixuat_tf_k,nhietdothucte_tf_k,vcf_tf_k,tytrong_tf_k,thucxuat_tf_k,
-            so_tf_nv,nguoinhan_tf_nv,tcx_tf_nhiemvu,lenhso_tf_nv,soxe_tf_nv,sokm_tf_nv,sogio_md_tf_nv,
-            sophut_md_tf_nv,sogio_tk_tf_nv,sophut_tk_tf_nv,phaixuat_tf_nv,nhietdothucte_tf_nv,vcf_tf_nv,tytrong_tf_nv,thucxuat_tf_nv;
+            so_tf_nv,nguoinhan_tf_nv,tcx_tf_nhiemvu,lenhso_tf_nv,soxe_tf_nv,sokm_tf_nv,
+            sogio_md_tf_nv,
+            sophut_md_tf_nv,
+            sogio_tk_tf_nv,
+            sophut_tk_tf_nv,
+            phaixuat_tf_nv,nhietdothucte_tf_nv,vcf_tf_nv,tytrong_tf_nv,thucxuat_tf_nv;
     @FXML
     private CheckBox maybay_chkbox,xe_chkbox,may_chkbox;
     @FXML
     private Button editBtn_k,addBtn_k, delBtn_k, xuatButton_k,cancelBtn_k, addBtn_nv,editBtn_nv,delBtn_nv,xuatBtn_nv,cancelBtn_nv;
     @FXML
-    private Label lb_slt_nv,lb_slt_k;
+    private Label lb_slt_nv,lb_slt_k, tk_time, md_time;
     @FXML
     private ComboBox<NguonNx> cbb_dvn_xk, cbb_dvx_k,  cbb_dvx_nv;
     @FXML
@@ -101,7 +103,6 @@ public class XuatController extends CommonFactory implements Initializable {
         setDvnCombobox_tab_k();
         setDvxCombobox_tab_k();
         setUpTcx_tab_k_ForSearchCompleteTion();
-        //tab_nhiemvu
 
         if (click_index == -1 || ls_socai.isEmpty()){
             delBtn_k.setDisable(true);
@@ -221,7 +222,6 @@ public class XuatController extends CommonFactory implements Initializable {
         });
     }
 
-    // tab khac
     private void setUpTcx_tab_k_ForSearchCompleteTion(){
         List<String> search_arr = new ArrayList<>();
         for(int i = 0; i< ls_tcn.size(); i++){
@@ -434,14 +434,16 @@ public class XuatController extends CommonFactory implements Initializable {
         setDvxCombobox_tab_nv();
         setNhiemVuForTextField();
         if (maybay_chkbox.isSelected()){
-            setPhuongTienNhan(LoaiPTEnum.MAYBAY.getNameVehicle());
+            setPhuongTienNhan(LoaiPTEnum.MAYBAY_a.getNameVehicle());
         } else if (may_chkbox.isSelected()) {
-            setPhuongTienNhan(LoaiPTEnum.MAYCHAY.getNameVehicle());
+            setPhuongTienNhan(LoaiPTEnum.MAY.getNameVehicle());
         }else if (xe_chkbox.isSelected()) {
-            setPhuongTienNhan(LoaiPTEnum.XECHAY.getNameVehicle());
+            sogio_tk_tf_nv.setDisable(true);
+            sophut_tk_tf_nv.setDisable(true);
+            setPhuongTienNhan(LoaiPTEnum.XE.getNameVehicle());
         }else{
             maybay_chkbox.setSelected(true);
-            setPhuongTienNhan(LoaiPTEnum.MAYBAY.getNameVehicle());
+            setPhuongTienNhan(LoaiPTEnum.MAYBAY_a.getNameVehicle());
         }
         if (click_index == -1 || ls_socai.isEmpty()){
             delBtn_nv.setDisable(true);
@@ -636,7 +638,7 @@ public class XuatController extends CommonFactory implements Initializable {
                     return true;
                 }
             }
-        }else{
+        }else {
             if (arr[1].contains("-")){
                 throw new RuntimeException("Chitietnv contains dash  - ");
             }else {
@@ -787,7 +789,6 @@ public class XuatController extends CommonFactory implements Initializable {
         return ledgerDetails;
     }
 
-
     @FXML
     public void setActionDongia_tab_k(ActionEvent actionEvent) {
         setDongia_k_Label();
@@ -801,7 +802,10 @@ public class XuatController extends CommonFactory implements Initializable {
     public void maybay_chk_onAction(ActionEvent actionEvent) {
         setCheckBox(true, false,false);
         if (maybay_chkbox.isSelected()){
-            setPhuongTienNhan(LoaiPTEnum.MAYBAY.getNameVehicle());
+            setPhuongTienNhan(LoaiPTEnum.MAYBAY_a.getNameVehicle());
+            sokm_tf_nv.setDisable(true);
+            sogio_tk_tf_nv.setDisable(false);
+            sophut_tk_tf_nv.setDisable(false);
         }
     }
 
@@ -809,7 +813,10 @@ public class XuatController extends CommonFactory implements Initializable {
     public void xe_chk_onAction(ActionEvent actionEvent) {
         setCheckBox(false,false, true);
         if (xe_chkbox.isSelected()){
-            setPhuongTienNhan(LoaiPTEnum.XECHAY.getNameVehicle());
+            setPhuongTienNhan(LoaiPTEnum.XE.getNameVehicle());
+            sokm_tf_nv.setDisable(false);
+            sogio_tk_tf_nv.setDisable(true);
+            sophut_tk_tf_nv.setDisable(true);
         }
     }
 
@@ -817,7 +824,10 @@ public class XuatController extends CommonFactory implements Initializable {
     public void may_chk_onAction(ActionEvent actionEvent) {
         setCheckBox(false, true, false);
         if (may_chkbox.isSelected()){
-            setPhuongTienNhan(LoaiPTEnum.MAYCHAY.getNameVehicle());
+            setPhuongTienNhan(LoaiPTEnum.MAY.getNameVehicle());
+            sokm_tf_nv.setDisable(false);
+            sogio_tk_tf_nv.setDisable(true);
+            sophut_tk_tf_nv.setDisable(true);
         }
     }
 

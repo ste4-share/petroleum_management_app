@@ -5,6 +5,7 @@ import com.agasa.xd_f371_v0_0_1.dto.SpotDto;
 import com.agasa.xd_f371_v0_0_1.entity.AssignType;
 import com.agasa.xd_f371_v0_0_1.entity.Mucgia;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public interface MucgiaService {

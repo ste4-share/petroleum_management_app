@@ -152,14 +152,17 @@ public class MucgiaImp implements MucgiaService {
     @Override
     public Mucgia createNew(Mucgia mucgia) {
         QDatabase.getConnectionDB();
-        String sql = "begin transaction; insert into mucgia(price, amount, quarter_id, item_id, status,asssign_type_id, inventory_id) values(?,?,?,?,?,?,?);update inventory \n" +
+
+        String sql = "insert into mucgia(price, amount, quarter_id, item_id, status,asssign_type_id, inventory_id) values(?,?,?,?,?,?,?);update inventory \n" +
                                 "set pre_nvdx=(select sum(amount) from mucgia where quarter_id=? and item_id=? and asssign_type_id=2),\n"+
                                 "pre_sscd=(select sum(amount) from mucgia where quarter_id=? and item_id=? and asssign_type_id=1),\n" +
                                 "tck_nvdx=(select sum(amount) from mucgia where quarter_id=? and item_id=? and asssign_type_id=2),\n"  +
                                 "tck_sscd=(select sum(amount) from mucgia where quarter_id=? and item_id=? and asssign_type_id=1)\n" +
-                                "where petro_id=? and quarter_id=?;commit;";
+                                "where petro_id=? and quarter_id=?;";
         try {
+            QDatabase.conn.setAutoCommit(true);
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
+
             statement.setInt(1, mucgia.getPrice());
             statement.setInt(2, mucgia.getAmount());
             statement.setInt(3, mucgia.getQuarter_id());

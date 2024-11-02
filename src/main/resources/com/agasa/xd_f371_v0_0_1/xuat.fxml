@@ -20,7 +20,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="893.0" prefWidth="1172.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23" fx:controller="com.agasa.xd_f371_v0_0_1.controller.XuatController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="936.0" prefWidth="1172.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.agasa.xd_f371_v0_0_1.controller.XuatController">
    <top>
       <HBox alignment="CENTER" prefHeight="41.0" prefWidth="600.0" style="-fx-background-color: #262626;" BorderPane.alignment="CENTER">
          <children>
@@ -32,7 +32,7 @@
          </children></HBox>
    </top>
    <center>
-      <TabPane prefHeight="776.0" prefWidth="1172.0" BorderPane.alignment="CENTER">
+      <TabPane prefHeight="874.0" prefWidth="1172.0" BorderPane.alignment="CENTER">
          <tabs>
             <Tab fx:id="tab_khac" closable="false" text="Khác">
                <content>
@@ -450,9 +450,9 @@
             </Tab>
             <Tab fx:id="tab_nhiemvu" closable="false" text="Nhiệm vụ">
                <content>
-                  <VBox>
+                  <VBox prefHeight="873.0" prefWidth="1172.0">
                      <children>
-                        <HBox prefHeight="587.0" prefWidth="1172.0">
+                        <HBox prefHeight="662.0" prefWidth="1172.0">
                            <children>
                               <GridPane prefHeight="564.0" prefWidth="1122.0">
                                  <columnConstraints>
@@ -463,7 +463,7 @@
                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
                                  <children>
-                                    <VBox prefHeight="558.0" prefWidth="552.0">
+                                    <VBox prefHeight="595.0" prefWidth="546.0">
                                        <children>
                                           <HBox layoutX="10.0" layoutY="420.0" prefHeight="40.0" prefWidth="543.0">
                                              <children>
@@ -669,6 +669,23 @@
                                                 </Label>
                                              </children>
                                           </HBox>
+                                          <HBox layoutX="10.0" layoutY="550.0" prefHeight="25.0" prefWidth="546.0">
+                                             <children>
+                                                <Label prefHeight="40.0" prefWidth="197.0">
+                                                   <font>
+                                                      <Font name="Cambria Bold" size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label fx:id="md_time" layoutX="352.0" layoutY="10.0" prefHeight="23.0" prefWidth="83.0" text="(Phút)">
+                                                   <font>
+                                                      <Font name="Cambria Bold" size="16.0" />
+                                                   </font>
+                                                   <HBox.margin>
+                                                      <Insets left="10.0" />
+                                                   </HBox.margin>
+                                                </Label>
+                                             </children>
+                                          </HBox>
                                           <HBox layoutX="10.0" layoutY="460.0" prefHeight="40.0" prefWidth="523.0">
                                              <children>
                                                 <Label prefHeight="40.0" prefWidth="197.0" text="Giờ H.Đ Trên không:">
@@ -706,6 +723,23 @@
                                              <VBox.margin>
                                                 <Insets top="10.0" />
                                              </VBox.margin>
+                                          </HBox>
+                                          <HBox layoutX="10.0" layoutY="460.0" prefHeight="25.0" prefWidth="546.0">
+                                             <children>
+                                                <Label prefHeight="40.0" prefWidth="197.0">
+                                                   <font>
+                                                      <Font name="Cambria Bold" size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label fx:id="tk_time" layoutX="352.0" layoutY="10.0" prefHeight="23.0" prefWidth="83.0" text="(Phút)">
+                                                   <font>
+                                                      <Font name="Cambria Bold" size="16.0" />
+                                                   </font>
+                                                   <HBox.margin>
+                                                      <Insets left="10.0" />
+                                                   </HBox.margin>
+                                                </Label>
+                                             </children>
                                           </HBox>
                                        </children>
                                        <GridPane.margin>

@@ -194,8 +194,6 @@ public class ChangingController implements Initializable {
                 mucgiaService.updateMucGia(mucgia);
             }
         }
-//        TonkhoTong tonkhoTong = new TonkhoTong();
-//        tonkhoTongService.update();
     }
 
     @FXML

@@ -96,8 +96,8 @@ public class AddBtnPt implements Initializable {
                 phuongTien.setNguonnx_id(NormController.nguonnx_id);
                 phuongTien.setDm_md(Integer.parseInt(md.getText()));
                 phuongTien.setDm_tk(Integer.parseInt(tk.getText()));
-                phuongTien.setDm_xm(Integer.parseInt(km.getText()));
-                phuongTien.setHan_muc(0);
+                phuongTien.setDm_xm_km(Integer.parseInt(km.getText()));
+                phuongTien.setDm_xm_gio(Integer.parseInt(h.getText()));
                 phuongTien.setStatus(status_cbb.getValue().getStatusName());
                 phuongTien.setLoaiphuongtien_id(lpt_cmb.getValue().getId());
                 int ptId= phuongTienService.createNew(phuongTien);
