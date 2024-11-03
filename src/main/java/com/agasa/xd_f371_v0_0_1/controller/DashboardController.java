@@ -113,7 +113,7 @@ public class DashboardController implements Initializable {
     public static Quarter findByTime;
 
     @FXML
-    private HBox dvi_menu,nxt_menu, loai_xd_menu, haohut_menu, dinhmuc_menu,tonkho_menu,baocao_menu;
+    private HBox dvi_menu,nxt_menu, loai_xd_menu, haohut_menu, dinhmuc_menu,tonkho_menu, nhiemvu_menu;
     @FXML
     private AnchorPane main_menu;
 
@@ -177,7 +177,7 @@ public class DashboardController implements Initializable {
         loai_xd_menu.setStyle(resetStyle());
         haohut_menu.setStyle(resetStyle());
         dinhmuc_menu.setStyle(resetStyle());
-        baocao_menu.setStyle(resetStyle());
+        nhiemvu_menu.setStyle(resetStyle());
     }
 
     private void getCurrentQuarter(){
@@ -353,7 +353,7 @@ public class DashboardController implements Initializable {
         haohut_menu.setStyle(resetStyle());
         dinhmuc_menu.setStyle(resetStyle());
         tonkho_menu.setStyle(resetStyle());
-        baocao_menu.setStyle(resetStyle());
+        nhiemvu_menu.setStyle(resetStyle());
 
         borderpane_base.setCenter(nx_vbox);
     }
@@ -368,7 +368,7 @@ public class DashboardController implements Initializable {
         dinhmuc_menu.setStyle(resetStyle());
         nxt_menu.setStyle(resetStyle());
         dvi_menu.setStyle(resetStyle());
-        baocao_menu.setStyle(resetStyle());
+        nhiemvu_menu.setStyle(resetStyle());
 
         try {
             HBox nxt_menu_bar = FXMLLoader.load(getClass().getResource("../tonkho.fxml"));
@@ -388,11 +388,31 @@ public class DashboardController implements Initializable {
         dinhmuc_menu.setStyle(resetStyle());
         nxt_menu.setStyle(resetStyle());
         tonkho_menu.setStyle(resetStyle());
-        baocao_menu.setStyle(resetStyle());
+        nhiemvu_menu.setStyle(resetStyle());
         try {
             VBox lxd_menu_bar = FXMLLoader.load(getClass().getResource("../petroleum_menu.fxml"));
             borderpane_base.setCenter(lxd_menu_bar);
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @FXML
+    public void nhiemvu_menu_action(MouseEvent mouseEvent) {
+        String cssLayout =
+                "-fx-border-color: #aaaaaa;\n" +
+                        "-fx-background-color: #aaaaaa;\n" ;
+        nhiemvu_menu.setStyle(cssLayout);
+        dvi_menu.setStyle(resetStyle());
+        loai_xd_menu.setStyle(resetStyle());
+        haohut_menu.setStyle(resetStyle());
+        dinhmuc_menu.setStyle(resetStyle());
+        nxt_menu.setStyle(resetStyle());
+
+        try {
+            HBox nhiemvu_mnu_bar = FXMLLoader.load(getClass().getResource("../nhiemvu.fxml"));
+            borderpane_base.setCenter(nhiemvu_mnu_bar);
+        } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -407,7 +427,7 @@ public class DashboardController implements Initializable {
         dinhmuc_menu.setStyle(resetStyle());
         nxt_menu.setStyle(resetStyle());
         tonkho_menu.setStyle(resetStyle());
-        baocao_menu.setStyle(resetStyle());
+        nhiemvu_menu.setStyle(resetStyle());
     }
     @FXML
     public void dinhmuc_menu_action(MouseEvent event) {
@@ -420,7 +440,7 @@ public class DashboardController implements Initializable {
         loai_xd_menu.setStyle(resetStyle());
         nxt_menu.setStyle(resetStyle());
         tonkho_menu.setStyle(resetStyle());
-        baocao_menu.setStyle(resetStyle());
+        nhiemvu_menu.setStyle(resetStyle());
         try {
             HBox norm_menu = FXMLLoader.load(getClass().getResource("../norm_menu.fxml"));
             borderpane_base.setCenter(norm_menu);
@@ -438,28 +458,9 @@ public class DashboardController implements Initializable {
         haohut_menu.setStyle(resetStyle());
         dinhmuc_menu.setStyle(resetStyle());
         nxt_menu.setStyle(resetStyle());
-        baocao_menu.setStyle(resetStyle());
+        nhiemvu_menu.setStyle(resetStyle());
         try {
             VBox dvi_menu_bar = FXMLLoader.load(getClass().getResource("../donvi_menu.fxml"));
-            borderpane_base.setCenter(dvi_menu_bar);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    @FXML
-    public void baocao_menu_action(MouseEvent mouseEvent) {
-        String cssLayout =
-                "-fx-border-color: #aaaaaa;\n" +
-                        "-fx-background-color: #aaaaaa;\n" ;
-        baocao_menu.setStyle(cssLayout);
-        dvi_menu.setStyle(resetStyle());
-        loai_xd_menu.setStyle(resetStyle());
-        haohut_menu.setStyle(resetStyle());
-        dinhmuc_menu.setStyle(resetStyle());
-        nxt_menu.setStyle(resetStyle());
-
-        try {
-            BorderPane dvi_menu_bar = FXMLLoader.load(getClass().getResource("../baocao.fxml"));
             borderpane_base.setCenter(dvi_menu_bar);
         } catch (IOException e) {
             throw new RuntimeException(e);

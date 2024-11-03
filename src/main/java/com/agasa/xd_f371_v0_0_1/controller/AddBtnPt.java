@@ -25,7 +25,7 @@ public class AddBtnPt implements Initializable {
     private static int lpt_id=0;
 
     @FXML
-    TextField pt_name, quantity,h,km,md,tk;
+    TextField pt_name, quantity,h,km,md,tk,ct_tk,ct_md,ct_km;
     @FXML
     ComboBox<LoaiPhuongTien> lpt_cmb;
     @FXML

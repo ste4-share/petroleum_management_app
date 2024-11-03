@@ -1,6 +1,8 @@
 package com.agasa.xd_f371_v0_0_1.service.impl;
 
 import com.agasa.xd_f371_v0_0_1.dto.ChiTietNhiemVuDTO;
+import com.agasa.xd_f371_v0_0_1.dto.KhoiDto;
+import com.agasa.xd_f371_v0_0_1.dto.NhiemVuDto;
 import com.agasa.xd_f371_v0_0_1.entity.NhiemVu;
 import com.agasa.xd_f371_v0_0_1.model.QDatabase;
 import com.agasa.xd_f371_v0_0_1.service.NhiemVuService;
@@ -16,7 +18,6 @@ public class NhiemVuImp implements NhiemVuService {
     public List<NhiemVu> getAll() {
         QDatabase.getConnectionDB();
         List<NhiemVu> result = new ArrayList<>();
-
 
         String SQL_SELECT = "Select * from nhiemvu";
 
@@ -46,9 +47,116 @@ public class NhiemVuImp implements NhiemVuService {
             }
 
         } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<KhoiDto> getAllKhoi() {
+        QDatabase.getConnectionDB();
+        List<KhoiDto> result = new ArrayList<>();
+
+        String SQL_SELECT = "Select * from team";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                int id = resultSet.getInt("id");
+                String ten_nv = resultSet.getString("name");
+                String code = resultSet.getString("team_code");
+
+                result.add(new KhoiDto(id,ten_nv, code));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public KhoiDto findKhoiById(int id1) {
+        QDatabase.getConnectionDB();
+
+        String SQL_SELECT = "Select * from team where id=?";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, id1);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                int id = resultSet.getInt("id");
+                String ten_nv = resultSet.getString("name");
+                String code = resultSet.getString("team_code");
+
+                return new KhoiDto(id,ten_nv, code);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    @Override
+    public List<NhiemVuDto> getAllNVDTO(int khoi) {
+        QDatabase.getConnectionDB();
+        List<NhiemVuDto> result = new ArrayList<>();
+        String SQL_SELECT = "SELECT nhiemvu.id as nvid,team_id,loai_nhiemvu.id as lnv_id,chitiet_nhiemvu.id as ctnv_id, ten_nv, nhiemvu, assignment_type_name FROM public.nhiemvu \n" +
+                "left join chitiet_nhiemvu on nhiemvu.id=chitiet_nhiemvu.nhiemvu_id\n" +
+                "left join loai_nhiemvu on nhiemvu.assignment_type_id=loai_nhiemvu.id where team_id=?";
+
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, khoi);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                int nvid = resultSet.getInt("nvid");
+                int teamID = resultSet.getInt("team_id");
+                int lnvId = resultSet.getInt("lnv_id");
+                int ctnvId = resultSet.getInt("ctnv_id");
+                String ten_nv = resultSet.getString("ten_nv");
+                String nhiemvu = resultSet.getString("nhiemvu");
+                String assignment_type_name = resultSet.getString("assignment_type_name");
+                NhiemVuDto nhiemVu = new NhiemVuDto();
+                nhiemVu.setNv_id(nvid);
+                nhiemVu.setTen_nv(ten_nv);
+                nhiemVu.setTeam_id(teamID);
+                nhiemVu.setLnv_id(lnvId);
+                nhiemVu.setCtnv_id(ctnvId);
+                nhiemVu.setChitiet(nhiemvu);
+                nhiemVu.setTen_loai_nv(assignment_type_name);
+                result.add(nhiemVu);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return result;
     }
@@ -99,6 +207,7 @@ public class NhiemVuImp implements NhiemVuService {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return result;
     }
@@ -135,6 +244,7 @@ public class NhiemVuImp implements NhiemVuService {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return result;
     }
@@ -167,9 +277,10 @@ public class NhiemVuImp implements NhiemVuService {
             }
 
         } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            throw new RuntimeException(e);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return result;
     }
