@@ -14,6 +14,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.TextFields;
 
@@ -50,6 +51,10 @@ public class XuatController extends CommonFactory implements Initializable {
             phaixuat_tf_nv,nhietdothucte_tf_nv,vcf_tf_nv,tytrong_tf_nv,thucxuat_tf_nv;
     @FXML
     private CheckBox maybay_chkbox,xe_chkbox,may_chkbox;
+    @FXML
+    private RadioButton tk_radio,md_radio;
+    @FXML
+    private HBox lgb_hbox;
     @FXML
     private Button editBtn_k,addBtn_k, delBtn_k, xuatButton_k,cancelBtn_k, addBtn_nv,editBtn_nv,delBtn_nv,xuatBtn_nv,cancelBtn_nv;
     @FXML
@@ -433,16 +438,22 @@ public class XuatController extends CommonFactory implements Initializable {
         setTenXDToCombobox_tab_nv();
         setDvxCombobox_tab_nv();
         setNhiemVuForTextField();
+
         if (maybay_chkbox.isSelected()){
+            lgb_hbox.setDisable(false);
             setPhuongTienNhan(LoaiPTEnum.MAYBAY_a.getNameVehicle());
         } else if (may_chkbox.isSelected()) {
+            lgb_hbox.setDisable(true);
             setPhuongTienNhan(LoaiPTEnum.MAY.getNameVehicle());
         }else if (xe_chkbox.isSelected()) {
+            lgb_hbox.setDisable(true);
             sogio_tk_tf_nv.setDisable(true);
             sophut_tk_tf_nv.setDisable(true);
             setPhuongTienNhan(LoaiPTEnum.XE.getNameVehicle());
         }else{
+            lgb_hbox.setDisable(false);
             maybay_chkbox.setSelected(true);
+            tk_radio.setSelected(true);
             setPhuongTienNhan(LoaiPTEnum.MAYBAY_a.getNameVehicle());
         }
         if (click_index == -1 || ls_socai.isEmpty()){
@@ -690,7 +701,7 @@ public class XuatController extends CommonFactory implements Initializable {
     }
     private void setDvxCombobox_tab_nv(){
         ObservableList<NguonNx> observableArrayList =
-                FXCollections.observableArrayList(nguonNXService.findNguonNXByName_NON(LoaiPhieu_cons.ROOT_NAME_NGUONNX));
+                FXCollections.observableArrayList(nguonNXService.findNguonnxTructhuocF());
         cbb_dvx_nv.setItems(observableArrayList);
         cbb_dvx_nv.setConverter(new StringConverter<NguonNx>() {
             @Override
@@ -783,6 +794,7 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setDvvc_obj(cbb_dvx_nv.getSelectionModel().getSelectedItem());
             ledgerDetails.setLoaixd_id(cbb_tenxd_nv.getSelectionModel().getSelectedItem().getId());
             ledgerDetails.setImport_unit_id(cbb_dvx_nv.getSelectionModel().getSelectedItem().getId());
+            ledgerDetails.setLoaigiobay(tk_radio.isSelected() ? LoaiGB.TK.getName() : LoaiGB.MD.getName());
         } catch (NullPointerException e) {
             throw new NullPointerException(e.getMessage());
         }
@@ -801,6 +813,7 @@ public class XuatController extends CommonFactory implements Initializable {
     @FXML
     public void maybay_chk_onAction(ActionEvent actionEvent) {
         setCheckBox(true, false,false);
+        lgb_hbox.setDisable(false);
         if (maybay_chkbox.isSelected()){
             setPhuongTienNhan(LoaiPTEnum.MAYBAY_a.getNameVehicle());
             sokm_tf_nv.setDisable(true);
@@ -812,6 +825,8 @@ public class XuatController extends CommonFactory implements Initializable {
     @FXML
     public void xe_chk_onAction(ActionEvent actionEvent) {
         setCheckBox(false,false, true);
+        lgb_hbox.setDisable(true);
+        md_radio.setSelected(true);
         if (xe_chkbox.isSelected()){
             setPhuongTienNhan(LoaiPTEnum.XE.getNameVehicle());
             sokm_tf_nv.setDisable(false);
@@ -822,6 +837,8 @@ public class XuatController extends CommonFactory implements Initializable {
 
     @FXML
     public void may_chk_onAction(ActionEvent actionEvent) {
+        lgb_hbox.setDisable(true);
+        md_radio.setSelected(true);
         setCheckBox(false, true, false);
         if (may_chkbox.isSelected()){
             setPhuongTienNhan(LoaiPTEnum.MAY.getNameVehicle());

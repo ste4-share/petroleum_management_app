@@ -149,6 +149,31 @@ public class NguonNXImp implements NguonNXService {
     }
 
     @Override
+    public List<NguonNx> findNguonnxTructhuocF() {
+        QDatabase.getConnectionDB();
+        List<NguonNx> result = new ArrayList<>();
+        String SQL_SELECT = "SELECT * FROM public.nguon_nx join tructhuocf on nguon_nx.id=tructhuocf.dvi_tructhuoc_id";
+
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String ten = resultSet.getString("ten");
+                String createtime = resultSet.getString("createtime");
+                result.add(new NguonNx(id, ten, createtime));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
     public List<GroupTitle> getAllGroup() {
         QDatabase.getConnectionDB();
         List<GroupTitle> result = new ArrayList<>();

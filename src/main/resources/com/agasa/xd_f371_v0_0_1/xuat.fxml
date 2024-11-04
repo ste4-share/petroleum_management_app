@@ -7,6 +7,8 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -498,6 +500,28 @@
                                                 </CheckBox>
                                              </children>
                                           </HBox>
+                                          <HBox fx:id="lgb_hbox" layoutX="10.0" layoutY="10.0" prefHeight="40.0" prefWidth="543.0">
+                                             <children>
+                                                <Label prefHeight="40.0" prefWidth="197.0" text="Loại giờ bay:">
+                                                   <font>
+                                                      <Font name="Cambria Bold" size="16.0" />
+                                                   </font>
+                                                </Label>
+                                                <RadioButton fx:id="tk_radio" mnemonicParsing="false" prefHeight="39.0" prefWidth="97.0" text="Trên không" toggleGroup="$lgb">
+                                                   <font>
+                                                      <Font name="Cambria Bold" size="12.0" />
+                                                   </font>
+                                                   <toggleGroup>
+                                                      <ToggleGroup fx:id="lgb" />
+                                                   </toggleGroup>
+                                                </RadioButton>
+                                                <RadioButton fx:id="md_radio" mnemonicParsing="false" prefHeight="46.0" prefWidth="102.0" text="Mặt đất" toggleGroup="$lgb">
+                                                   <font>
+                                                      <Font name="Cambria Bold" size="12.0" />
+                                                   </font>
+                                                </RadioButton>
+                                             </children>
+                                          </HBox>
                                           <HBox prefHeight="40.0" prefWidth="523.0">
                                              <children>
                                                 <Label fx:id="dvn_lb2" prefHeight="40.0" prefWidth="197.0" text="Đơn vị nhận*:">
@@ -638,7 +662,7 @@
                                           </HBox>
                                           <HBox layoutX="10.0" layoutY="360.0" prefHeight="40.0" prefWidth="523.0">
                                              <children>
-                                                <Label prefHeight="40.0" prefWidth="197.0" text="Giờ H.Đ Mặt đất:">
+                                                <Label prefHeight="40.0" prefWidth="197.0" text="Giờ H.Đ:">
                                                    <font>
                                                       <Font name="Cambria Bold" size="16.0" />
                                                    </font>

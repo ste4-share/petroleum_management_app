@@ -1,5 +1,6 @@
 package com.agasa.xd_f371_v0_0_1.service;
 
+import com.agasa.xd_f371_v0_0_1.dto.AssignmentCategory;
 import com.agasa.xd_f371_v0_0_1.dto.TitleDto;
 import com.agasa.xd_f371_v0_0_1.entity.Category;
 
@@ -7,6 +8,7 @@ import java.util.List;
 
 public interface CategoryService {
     List<Category> getAll();
+    List<AssignmentCategory> getAllAssCategory();
     List<String> getAllTypeTitle();
     List<String> getAllCode();
     List<String> getAll_Header1();

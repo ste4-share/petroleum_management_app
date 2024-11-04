@@ -50,7 +50,7 @@ public class NormController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         normDto = new NormDto();
         xe_radio.setSelected(true);
-        fillDatatoptTable(LoaiPTEnum.XE.name());
+        fillDatatoptTable(LoaiPTEnum.XE.getNameVehicle());
         initNguonnxCbb();
     }
 

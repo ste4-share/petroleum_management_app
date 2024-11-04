@@ -1,6 +1,6 @@
 package com.agasa.xd_f371_v0_0_1.controller;
 
-import com.agasa.xd_f371_v0_0_1.dto.NormDto;
+import com.agasa.xd_f371_v0_0_1.dto.ChitieuDTO;
 import com.agasa.xd_f371_v0_0_1.dto.StatusActive;
 import com.agasa.xd_f371_v0_0_1.entity.LoaiPhuongTien;
 import com.agasa.xd_f371_v0_0_1.entity.Norm;
@@ -25,7 +25,7 @@ public class AddBtnPt implements Initializable {
     private static int lpt_id=0;
 
     @FXML
-    TextField pt_name, quantity,h,km,md,tk,ct_tk,ct_md,ct_km;
+    TextField pt_name, quantity,h,km,md,tk,ct_tk,ct_md,ct_km,soluong;
     @FXML
     ComboBox<LoaiPhuongTien> lpt_cmb;
     @FXML
@@ -45,6 +45,10 @@ public class AddBtnPt implements Initializable {
         km.setText(String.valueOf(NormController.normDto.getDm_xm_km()));
         md.setText(String.valueOf(NormController.normDto.getDm_md_gio()));
         tk.setText(String.valueOf(NormController.normDto.getDm_tk_gio()));
+        ct_tk.setText("");
+        ct_md.setText("2:31");
+        ct_km.setText("200");
+        soluong.setText("900");
         pt_name.setText(NormController.normDto.getNamePt());
         quantity.setText(String.valueOf(NormController.normDto.getQuantity()));
         status_cbb.getSelectionModel().select(phuongTienService.findStatusByName(NormController.normDto.getStatus()));
@@ -101,6 +105,8 @@ public class AddBtnPt implements Initializable {
                 phuongTien.setStatus(status_cbb.getValue().getStatusName());
                 phuongTien.setLoaiphuongtien_id(lpt_cmb.getValue().getId());
                 int ptId= phuongTienService.createNew(phuongTien);
+
+                createNewChiTieu(ptId);
                 if (phuongTienService.createNewNorm(new Norm(Integer.parseInt(md.getText()), Integer.parseInt(tk.getText()), Integer.parseInt(h.getText()),Integer.parseInt(km.getText()), ptId, DashboardController.findByTime.getId())) ==1){
                     DialogMessage.callAlertWithMessage("Thông báo", "Thông báo","Thêm phương tiện thành công");
                     NormController.norm_stage.close();
@@ -114,13 +120,24 @@ public class AddBtnPt implements Initializable {
                 phuongTien.setLoaiphuongtien_id(lpt_cmb.getValue().getId());
                 phuongTienService.updateNew(phuongTien);
                 // update dinhmuc
+                createNewChiTieu(NormController.normDto.getPt_id());
                 if (phuongTienService.createNewNorm(new Norm(Integer.parseInt(md.getText()), Integer.parseInt(tk.getText()), Integer.parseInt(h.getText()),Integer.parseInt(km.getText()), NormController.normDto.getPt_id(), DashboardController.findByTime.getId())) ==1){
                     DialogMessage.callAlertWithMessage("Thông báo", "Thông báo","Cập nhật phương tiện thành công");
                     NormController.norm_stage.close();
                 }
             }
         }
+    }
 
+    private void createNewChiTieu(int ptId){
+        ChitieuDTO chitieuDTO = new ChitieuDTO();
+        chitieuDTO.setQuarter_id(DashboardController.findByTime.getId());
+        chitieuDTO.setPhuongtien_id(ptId);
+        chitieuDTO.setSoluong(Integer.parseInt(soluong.getText()));
+        chitieuDTO.setHanmuc_km(Integer.parseInt(ct_km.getText()));
+        chitieuDTO.setHanmuc_md(ct_md.getText());
+        chitieuDTO.setHanmuc_tk(ct_tk.getText());
+        phuongTienService.createNewChiTieu(chitieuDTO);
     }
     @FXML
     public void cancelBtn(ActionEvent actionEvent) {

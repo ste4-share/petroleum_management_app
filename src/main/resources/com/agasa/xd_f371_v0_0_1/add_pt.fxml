@@ -253,6 +253,27 @@
                         <Insets top="10.0" />
                      </VBox.margin>
                   </HBox>
+                  <HBox layoutX="10.0" layoutY="174.0" prefHeight="48.0" prefWidth="600.0">
+                     <children>
+                        <Label prefHeight="42.0" prefWidth="169.0" text="Số lượng:">
+                           <font>
+                              <Font name="Cambria Bold" size="16.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="soluong" prefHeight="47.0" prefWidth="174.0" />
+                        <Label prefHeight="47.0" prefWidth="66.0" text="(Lít)">
+                           <font>
+                              <Font name="Cambria Bold" size="12.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </HBox>
                </children>
             </VBox>
          </children>

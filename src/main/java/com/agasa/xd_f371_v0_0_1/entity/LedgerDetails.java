@@ -58,6 +58,7 @@ public class LedgerDetails {
     private int tructhuoc_id;
     private int so_gio_tk;
     private int so_phut_tk;
+    private String loaigiobay;
 
     public LedgerDetails() {
     }

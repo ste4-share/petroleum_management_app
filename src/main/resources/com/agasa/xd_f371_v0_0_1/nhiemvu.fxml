@@ -59,10 +59,13 @@
                         <Insets top="10.0" />
                      </HBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" prefHeight="43.0" prefWidth="81.0" text="Thêm">
+                  <Button mnemonicParsing="false" onAction="#bcNlbayTheoKh" prefHeight="43.0" prefWidth="123.0" text="Init_reporter">
                      <HBox.margin>
                         <Insets left="10.0" top="10.0" />
                      </HBox.margin>
+                     <font>
+                        <Font name="Cambria Bold" size="12.0" />
+                     </font>
                   </Button>
                </children>
                <cursor>

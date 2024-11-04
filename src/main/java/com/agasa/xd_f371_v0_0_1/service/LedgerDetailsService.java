@@ -1,12 +1,10 @@
 package com.agasa.xd_f371_v0_0_1.service;
 
-import com.agasa.xd_f371_v0_0_1.dto.QuantityByTTDTO;
-import com.agasa.xd_f371_v0_0_1.dto.QuantityByTructhuocDTO;
+import com.agasa.xd_f371_v0_0_1.dto.*;
 import com.agasa.xd_f371_v0_0_1.entity.LedgerDetails;
-import com.agasa.xd_f371_v0_0_1.dto.TTPhieuDto;
-import com.agasa.xd_f371_v0_0_1.dto.XdTrucThuocDto;
 
 import java.util.List;
+import java.util.Map;
 
 public interface LedgerDetailsService {
     List<LedgerDetails> getAll();
@@ -21,4 +19,7 @@ public interface LedgerDetailsService {
     QuantityByTTDTO selectQuantityNguonnx(int groupid, String loaiphieu, int tructhuoc_id,int xdid);
     QuantityByTTDTO selectQuantityNguonnxImport(int group_id, String loaiphieu, int tructhuoc_id, int loaixdId);
     QuantityByTTDTO selectQuantityNguonnxExport(int group_id, String loaiphieu, int tructhuoc_id, int loaixdId);
+
+    GioBay getSumofWorkingTime(int pt_id, int quarterId, String lgb);
+    Map<String, Integer> getSumofconsumption(int pt_id, int quarterID);
 }

@@ -1,5 +1,6 @@
 package com.agasa.xd_f371_v0_0_1.service.impl;
 
+import com.agasa.xd_f371_v0_0_1.dto.AssignmentCategory;
 import com.agasa.xd_f371_v0_0_1.dto.TitleDto;
 import com.agasa.xd_f371_v0_0_1.entity.Category;
 import com.agasa.xd_f371_v0_0_1.model.QDatabase;
@@ -41,6 +42,44 @@ public class CategoryImp implements CategoryService {
                 category.setHeader_lv3(headerLv3);
                 category.setType_title(typeTitle);
                 category.setTructhuoc_id(tructhuoc_id);
+                category.setCode(code);
+                result.add(category);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<AssignmentCategory> getAllAssCategory() {
+        QDatabase.getConnectionDB();
+        List<AssignmentCategory> result = new ArrayList<>();
+        String SQL_SELECT = "Select * from category_assignment";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                int id = resultSet.getInt("id");
+                String title_1 = resultSet.getString("title_1");
+                String title_2 = resultSet.getString("title_2");
+                String title_3 = resultSet.getString("title_3");
+                String title_4 = resultSet.getString("title_4");
+                String code = resultSet.getString("code");
+                AssignmentCategory category = new AssignmentCategory();
+                category.setId(id);
+                category.setTitle1(title_1);
+                category.setTitle2(title_2);
+                category.setTitle3(title_3);
+                category.setTitle4(title_4);
                 category.setCode(code);
                 result.add(category);
             }

@@ -3,6 +3,7 @@ package com.agasa.xd_f371_v0_0_1.service.impl;
 import com.agasa.xd_f371_v0_0_1.dto.ChiTietNhiemVuDTO;
 import com.agasa.xd_f371_v0_0_1.dto.KhoiDto;
 import com.agasa.xd_f371_v0_0_1.dto.NhiemVuDto;
+import com.agasa.xd_f371_v0_0_1.dto.NhiemVuReport;
 import com.agasa.xd_f371_v0_0_1.entity.NhiemVu;
 import com.agasa.xd_f371_v0_0_1.model.QDatabase;
 import com.agasa.xd_f371_v0_0_1.service.NhiemVuService;
@@ -10,6 +11,7 @@ import com.agasa.xd_f371_v0_0_1.service.NhiemVuService;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -164,6 +166,31 @@ public class NhiemVuImp implements NhiemVuService {
     @Override
     public NhiemVu create(NhiemVu nhiemVu) {
         return null;
+    }
+
+    @Override
+    public int create(NhiemVuReport nhiemVuReport) {
+        QDatabase.getConnectionDB();
+        String sql = "insert into nhiemvu_reporter(title_1, title_2, title_3, title_4, soluong, nhiemvu_id,phuongtien_id,ten_nv_1,ten_nv_2,ten_nv_3) values(?,?,?,?,?,?,?,?,?,?)";
+        try {
+            PreparedStatement statement = QDatabase.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, nhiemVuReport.getTitle_1());
+            statement.setString(2, nhiemVuReport.getTitle_2());
+            statement.setString(3, nhiemVuReport.getTitle_3());
+            statement.setString(4, nhiemVuReport.getTitle_4());
+            statement.setString(5, nhiemVuReport.getSoluong());
+            statement.setInt(6, nhiemVuReport.getNhiemvu_id());
+            statement.setInt(7, nhiemVuReport.getPhuongtien_id());
+            statement.setString(8, nhiemVuReport.getTen_nv_1());
+            statement.setString(9, nhiemVuReport.getTen_nv_2());
+            statement.setString(10, nhiemVuReport.getTen_nv_3());
+
+            return statement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

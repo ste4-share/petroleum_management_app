@@ -1,5 +1,6 @@
 package com.agasa.xd_f371_v0_0_1.service;
 
+import com.agasa.xd_f371_v0_0_1.dto.ChitieuDTO;
 import com.agasa.xd_f371_v0_0_1.dto.NormDto;
 import com.agasa.xd_f371_v0_0_1.dto.StatusActive;
 import com.agasa.xd_f371_v0_0_1.entity.*;
@@ -11,6 +12,9 @@ public interface PhuongTienService {
     List<NormDto> getAllPt(String typeName);
     List<LoaiPhuongTien> getLoaiPt(String typeName);
     List<LoaiPhuongTien> getAllLoaiPt();
+    ChitieuDTO getChitieuDtoById(int pt_id, int quarterId);
+    int createNewChiTieu(ChitieuDTO chitieuDTO);
+    int updateChiTieu(int lxd_id, int quarterId);
     int createNewNorm(Norm norm);
     int updateNewNorm(Norm norm);
     LoaiPhuongTien findPtById(int id);

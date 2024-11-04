@@ -1,5 +1,6 @@
 package com.agasa.xd_f371_v0_0_1.service.impl;
 
+import com.agasa.xd_f371_v0_0_1.dto.ChitieuDTO;
 import com.agasa.xd_f371_v0_0_1.dto.NormDto;
 import com.agasa.xd_f371_v0_0_1.dto.StatusActive;
 import com.agasa.xd_f371_v0_0_1.entity.*;
@@ -71,7 +72,7 @@ public class PhuongTienImp implements PhuongTienService {
                 int quantity = resultSet.getInt("quantity");
                 int nguonnxId = resultSet.getInt("nguonnx_id");
                 int loaiphuongtienId = resultSet.getInt("loaiphuongtien_id");
-                String status = resultSet.getString("han_muc");
+                String status = resultSet.getString("status");
 
                 PhuongTien phuongTien = new PhuongTien();
                 phuongTien.setId(id);
@@ -169,6 +170,65 @@ public class PhuongTienImp implements PhuongTienService {
             throw new RuntimeException(e);
         }
         return result;
+    }
+
+    @Override
+    public ChitieuDTO getChitieuDtoById(int pt_id, int quarterId) {
+        QDatabase.getConnectionDB();
+
+        String sql = "SELECT * FROM hanmuc where phuongtien_id=? and quarter_id=?";
+        try {
+            PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
+            statement.setString(1, String.valueOf(pt_id));
+            statement.setInt(2, quarterId);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                int quarter_id = resultSet.getInt("quarter_id");
+                int phuongtien_id = Integer.parseInt(resultSet.getString("phuongtien_id"));
+                String hanmucMd = resultSet.getString("hanmuc_md");
+                int hanmucKm = resultSet.getInt("hanmuc_km");
+                String hanmucTk = resultSet.getString("hanmuc_tk");
+                int soluong = resultSet.getInt("soluong");
+
+                new ChitieuDTO(id, quarter_id, phuongtien_id, hanmucMd, hanmucKm, hanmucTk,soluong);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    @Override
+    public int createNewChiTieu(ChitieuDTO chitieuDTO) {
+        QDatabase.getConnectionDB();
+        String sql = "insert into hanmuc(quarter_id, phuongtien_id, hanmuc_md, hanmuc_km, hanmuc_tk, soluong) values(?,?,?,?,?,?) on conflict (phuongtien_id,quarter_id) do update set hanmuc_md=?, hanmuc_km=?, hanmuc_tk=?,soluong=?";
+        try {
+            PreparedStatement statement = QDatabase.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, chitieuDTO.getQuarter_id());
+            statement.setString(2, String.valueOf(chitieuDTO.getPhuongtien_id()));
+            statement.setString(3, chitieuDTO.getHanmuc_md());
+            statement.setInt(4, chitieuDTO.getHanmuc_km());
+            statement.setString(5, chitieuDTO.getHanmuc_tk());
+            statement.setInt(6, chitieuDTO.getSoluong());
+            statement.setString(7, chitieuDTO.getHanmuc_md());
+            statement.setInt(8, chitieuDTO.getHanmuc_km());
+            statement.setString(9, chitieuDTO.getHanmuc_tk());
+            statement.setInt(10, chitieuDTO.getSoluong());
+
+            return statement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public int updateChiTieu(int lxd_id, int quarterId) {
+        return 0;
     }
 
     @Override

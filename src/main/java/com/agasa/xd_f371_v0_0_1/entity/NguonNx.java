@@ -21,6 +21,12 @@ public class NguonNx {
         this.ten = ten;
     }
 
+    public NguonNx(int id, String ten, String createtime) {
+        this.id = id;
+        this.ten = ten;
+        this.createtime = createtime;
+    }
+
     public NguonNx(int id, String ten, String tructhuoc, String loaiphieu, String createtime) {
         this.id = id;
         this.ten = ten;

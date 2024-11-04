@@ -15,6 +15,7 @@ public interface NguonNXService {
     NguonNx update(NguonNx nguonNx);
     NguonNx findById(int id);
     NguonNx findNguonNXByName_NON(String name);
+    List<NguonNx> findNguonnxTructhuocF();
 
     List<GroupTitle> getAllGroup();
     GroupTitle findGroupById(int grid);
