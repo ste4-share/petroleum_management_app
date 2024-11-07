@@ -11,6 +11,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.awt.im.InputContext;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class F371Application extends Application {
     public static Stage rootStage;
@@ -45,6 +47,8 @@ public class F371Application extends Application {
 //        thread.setDaemon(true);
 //        thread.start();
 //        ProgressBarShowing.show(task);
+
+
     }
 
     public static void main(String[] args) {

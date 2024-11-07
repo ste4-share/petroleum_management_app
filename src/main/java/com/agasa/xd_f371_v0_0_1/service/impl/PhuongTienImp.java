@@ -176,23 +176,23 @@ public class PhuongTienImp implements PhuongTienService {
     public ChitieuDTO getChitieuDtoById(int pt_id, int quarterId) {
         QDatabase.getConnectionDB();
 
-        String sql = "SELECT * FROM hanmuc where phuongtien_id=? and quarter_id=?";
+        String sql = "SELECT * FROM hanmuc where pt_id=? and quarter_id=?";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
-            statement.setString(1, String.valueOf(pt_id));
+            statement.setInt(1,pt_id);
             statement.setInt(2, quarterId);
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 int quarter_id = resultSet.getInt("quarter_id");
-                int phuongtien_id = Integer.parseInt(resultSet.getString("phuongtien_id"));
+                int phuongtien_id = resultSet.getInt("pt_id");
                 String hanmucMd = resultSet.getString("hanmuc_md");
                 int hanmucKm = resultSet.getInt("hanmuc_km");
                 String hanmucTk = resultSet.getString("hanmuc_tk");
                 int soluong = resultSet.getInt("soluong");
 
-                new ChitieuDTO(id, quarter_id, phuongtien_id, hanmucMd, hanmucKm, hanmucTk,soluong);
+                return new ChitieuDTO(id, quarter_id, phuongtien_id, hanmucMd, hanmucKm, hanmucTk,soluong);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -204,7 +204,7 @@ public class PhuongTienImp implements PhuongTienService {
     @Override
     public int createNewChiTieu(ChitieuDTO chitieuDTO) {
         QDatabase.getConnectionDB();
-        String sql = "insert into hanmuc(quarter_id, phuongtien_id, hanmuc_md, hanmuc_km, hanmuc_tk, soluong) values(?,?,?,?,?,?) on conflict (phuongtien_id,quarter_id) do update set hanmuc_md=?, hanmuc_km=?, hanmuc_tk=?,soluong=?";
+        String sql = "insert into hanmuc(quarter_id, pt_id, hanmuc_md, hanmuc_km, hanmuc_tk, soluong) values(?,?,?,?,?,?) on conflict (pt_id,quarter_id) do update set hanmuc_md=?, hanmuc_km=?, hanmuc_tk=?,soluong=?";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setInt(1, chitieuDTO.getQuarter_id());

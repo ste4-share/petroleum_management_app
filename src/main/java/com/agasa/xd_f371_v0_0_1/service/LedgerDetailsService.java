@@ -21,5 +21,8 @@ public interface LedgerDetailsService {
     QuantityByTTDTO selectQuantityNguonnxExport(int group_id, String loaiphieu, int tructhuoc_id, int loaixdId);
 
     GioBay getSumofWorkingTime(int pt_id, int quarterId, String lgb);
+    GioBay getSumofWorkingTime_byNvid(int nv_id, int quarterId, String lgb);
+    int getHHByNV(int nv_id, int quarterId);
     Map<String, Integer> getSumofconsumption(int pt_id, int quarterID);
+    Map<String, Integer> getSumofconsumption_nvuId(int nvu_id, int quarterID);
 }

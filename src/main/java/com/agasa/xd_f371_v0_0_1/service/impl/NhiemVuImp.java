@@ -1,9 +1,7 @@
 package com.agasa.xd_f371_v0_0_1.service.impl;
 
-import com.agasa.xd_f371_v0_0_1.dto.ChiTietNhiemVuDTO;
-import com.agasa.xd_f371_v0_0_1.dto.KhoiDto;
-import com.agasa.xd_f371_v0_0_1.dto.NhiemVuDto;
-import com.agasa.xd_f371_v0_0_1.dto.NhiemVuReport;
+import com.agasa.xd_f371_v0_0_1.dto.*;
+import com.agasa.xd_f371_v0_0_1.entity.HanmucNhiemvu;
 import com.agasa.xd_f371_v0_0_1.entity.NhiemVu;
 import com.agasa.xd_f371_v0_0_1.model.QDatabase;
 import com.agasa.xd_f371_v0_0_1.service.NhiemVuService;
@@ -46,6 +44,38 @@ public class NhiemVuImp implements NhiemVuService {
                 nhiemVu.setCreatetime(createtime);
                 nhiemVu.setStatus(status);
                 result.add(nhiemVu);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<CtnvDto> getAllNvByType(int loainv_id) {
+        QDatabase.getConnectionDB();
+        List<CtnvDto> result = new ArrayList<>();
+        String SQL_SELECT = "SELECT nhiemvu.id as nvid, ten_nv, nhiemvu FROM public.nhiemvu \n" +
+                "left join chitiet_nhiemvu on nhiemvu.id=chitiet_nhiemvu.nhiemvu_id \n" +
+                "where assignment_type_id=?";
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, loainv_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                int id = resultSet.getInt("nvid");
+                String ten_nv = resultSet.getString("ten_nv");
+                String chitiet = resultSet.getString("nhiemvu");
+
+                result.add(new CtnvDto(id, ten_nv, chitiet));
             }
 
         } catch (SQLException e) {
@@ -165,6 +195,64 @@ public class NhiemVuImp implements NhiemVuService {
 
     @Override
     public NhiemVu create(NhiemVu nhiemVu) {
+        return null;
+    }
+
+    @Override
+    public int createHanmucNhiemVu(HanmucNhiemvu hanmucNhiemvu) {
+        QDatabase.getConnectionDB();
+        String sql = "insert into hanmuc_nhiemvu(quarter_id, unit_id, nhiemvu_id, ct_tk, ct_md, sum_ct, consumpt) values(?,?,?,?,?,?,?)";
+        try {
+            PreparedStatement statement = QDatabase.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, hanmucNhiemvu.getQuarter_id());
+            statement.setInt(2, hanmucNhiemvu.getUnit_id());
+            statement.setInt(3, hanmucNhiemvu.getNhiemvu_id());
+            statement.setString(4, hanmucNhiemvu.getCt_tk());
+            statement.setString(5, hanmucNhiemvu.getCt_md());
+            statement.setString(6, hanmucNhiemvu.getSum_ct());
+            statement.setInt(7, hanmucNhiemvu.getConsumpt());
+
+            return statement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public HanmucNhiemvu getHanmucNhiemvu(int unit_id, int nhiemvu_id, int quarter_id) {
+        QDatabase.getConnectionDB();
+        String SQL_SELECT = "select * from hanmuc_nhiemvu where unit_id=? and nhiemvu_id=? and quarter_id=?";
+
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, unit_id);
+            preparedStatement.setInt(2, nhiemvu_id);
+            preparedStatement.setInt(3, quarter_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                int id = resultSet.getInt("id");
+                int quarterId = resultSet.getInt("quarter_id");
+                int unitId = resultSet.getInt("unit_id");
+                int nhiemvuId = resultSet.getInt("nhiemvu_id");
+                String ct_tk = resultSet.getString("ct_tk");
+                String ct_md = resultSet.getString("ct_md");
+                String sum_ct = resultSet.getString("sum_ct");
+                int consumpt = resultSet.getInt("consumpt");
+
+                return new HanmucNhiemvu(id,quarterId, unitId, nhiemvuId, ct_tk,ct_md,sum_ct,consumpt);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
         return null;
     }
 

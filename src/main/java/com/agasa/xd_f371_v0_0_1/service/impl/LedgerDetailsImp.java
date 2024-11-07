@@ -6,6 +6,7 @@ import com.agasa.xd_f371_v0_0_1.model.LoaiGB;
 import com.agasa.xd_f371_v0_0_1.model.QDatabase;
 import com.agasa.xd_f371_v0_0_1.service.LoaiXdService;
 import com.agasa.xd_f371_v0_0_1.service.LedgerDetailsService;
+import org.postgresql.util.PGInterval;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -67,8 +68,6 @@ public class LedgerDetailsImp implements LedgerDetailsService {
                 int tonkho_id = resultSet.getInt("tonkho_id");
                 int import_unit_id = resultSet.getInt("import_unit_id");
                 int export_unit_id = resultSet.getInt("export_unit_id");
-                int sogio_tk = resultSet.getInt("so_gio_tk");
-                int sophut_tk = resultSet.getInt("so_phut_tk");
                 String loaigiobay = resultSet.getString("loaigiobay");
 
                 LedgerDetails obj = new LedgerDetails();
@@ -110,8 +109,6 @@ public class LedgerDetailsImp implements LedgerDetailsService {
                 obj.setTonkhotong_id(tonkhotong_id);
                 obj.setImport_unit_id(import_unit_id);
                 obj.setExport_unit_id(export_unit_id);
-                obj.setSo_gio_tk(sogio_tk);
-                obj.setSo_phut_tk(sophut_tk);
                 obj.setLoaigiobay(loaigiobay);
                 result.add(obj);
             }
@@ -131,8 +128,8 @@ public class LedgerDetailsImp implements LedgerDetailsService {
         String sql = "INSERT INTO ledger_details (dvi, ngay, ma_xd, ten_xd, chung_loai, loai_phieu, so, theo_lenh_so, nhiem_vu, nguoi_nhan_hang, " +
                 "so_xe, chat_luong, phai_xuat, nhiet_do_tt, ty_trong, he_so_vcf, thuc_xuat, don_gia, thanh_tien, so_km, so_gio, dvvc," +
                 "loaixd_id, nguonnx_id, nguonnx_dvvc_id, denngay," +
-                "nvu_tcn_id,nvu_tructhuoc,quarter_id,phuongtien_id,nhiemvu_id,phuongtien_nvu_id,so_phut,tonkhotong_id,tonkho_id,ledger_id, tcn_id,import_unit_id,export_unit_id,so_gio_tk,so_phut_tk,loaigiobay) " +
-                "VALUES (?, ?,?, ?, ?,?, ?, ?, ?, ?,?,?,?,?, ?,?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "nvu_tcn_id,nvu_tructhuoc,quarter_id,phuongtien_id,nhiemvu_id,phuongtien_nvu_id,so_phut,tonkhotong_id,tonkho_id,ledger_id, tcn_id,import_unit_id,export_unit_id,loaigiobay,dur) " +
+                "VALUES (?, ?,?, ?, ?,?, ?, ?, ?, ?,?,?,?,?, ?,?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
             statement.setString(2, ledgerDetails.getNgay());
@@ -179,9 +176,8 @@ public class LedgerDetailsImp implements LedgerDetailsService {
             statement.setInt(37, ledgerDetails.getTcn_id());
             statement.setInt(38, ledgerDetails.getImport_unit_id());
             statement.setInt(39, ledgerDetails.getExport_unit_id());
-            statement.setInt(40, ledgerDetails.getSo_gio_tk());
-            statement.setInt(41, ledgerDetails.getSo_phut_tk());
-            statement.setString(42, ledgerDetails.getLoaigiobay());
+            statement.setString(40, ledgerDetails.getLoaigiobay());
+            statement.setObject(41, ledgerDetails.getDur());
 
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -595,6 +591,60 @@ public class LedgerDetailsImp implements LedgerDetailsService {
     }
 
     @Override
+    public GioBay getSumofWorkingTime_byNvid(int pnv_id, int quarterId, String lgb) {
+        QDatabase.getConnectionDB();
+        String SQL_SELECT = "SELECT sum(so_gio) as h_ground,sum(so_phut) as m_ground\n" +
+                "FROM public.ledger_details\n" +
+                "WHERE loai_phieu='XUAT' AND nhiemvu_id=? and quarter_id=? and loaigiobay=? ";
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, pnv_id);
+            preparedStatement.setInt(2, quarterId);
+            preparedStatement.setString(3, lgb);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int h_ground = resultSet.getInt("h_ground");
+                int m_ground = resultSet.getInt("m_ground");
+                return new GioBay(h_ground, m_ground);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    @Override
+    public int getHHByNV(int nv_id, int quarterId) {
+        QDatabase.getConnectionDB();
+        String SQL_SELECT = "";
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, nv_id);
+            preparedStatement.setInt(2, quarterId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int h_ground = resultSet.getInt("h_ground");
+                int m_ground = resultSet.getInt("m_ground");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return 0;
+    }
+
+    @Override
     public Map<String, Integer> getSumofconsumption(int pt_id, int quarterId) {
         Map<String, Integer> map = new HashMap<>();
         QDatabase.getConnectionDB();
@@ -609,6 +659,41 @@ public class LedgerDetailsImp implements LedgerDetailsService {
             preparedStatement.setString(3, LoaiGB.MD.getName());
             preparedStatement.setInt(4, pt_id);
             preparedStatement.setInt(5, quarterId);
+            preparedStatement.setString(6, LoaiGB.TK.getName());
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int sumoftk = resultSet.getInt("sumoftk");
+                int sumofmd = resultSet.getInt("sum");
+                map.put(LoaiGB.TK.getName(), sumoftk);
+                map.put(LoaiGB.MD.getName(), sumofmd);
+                return map;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    @Override
+    public Map<String, Integer> getSumofconsumption_nvuId(int nvu_id, int quarterID) {
+        Map<String, Integer> map = new HashMap<>();
+        QDatabase.getConnectionDB();
+        String SQL_SELECT = "SELECT sum(thuc_xuat) as sumoftk,(SELECT sum(thuc_xuat) \n" +
+                "FROM public.ledger_details WHERE loai_phieu='XUAT' and nhiemvu_id=? and quarter_id=? and loaigiobay=?)\n" +
+                "FROM public.ledger_details\n" +
+                "WHERE loai_phieu='XUAT' and nhiemvu_id=? and quarter_id=? and loaigiobay=?";
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, nvu_id);
+            preparedStatement.setInt(2, quarterID);
+            preparedStatement.setString(3, LoaiGB.MD.getName());
+            preparedStatement.setInt(4, nvu_id);
+            preparedStatement.setInt(5, quarterID);
             preparedStatement.setString(6, LoaiGB.TK.getName());
             ResultSet resultSet = preparedStatement.executeQuery();
 

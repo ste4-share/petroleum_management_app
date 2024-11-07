@@ -3,10 +3,7 @@ package com.agasa.xd_f371_v0_0_1.controller;
 import com.agasa.xd_f371_v0_0_1.dto.LichsuXNK;
 import com.agasa.xd_f371_v0_0_1.dto.TTPhieuDto;
 import com.agasa.xd_f371_v0_0_1.dto.TonKho;
-import com.agasa.xd_f371_v0_0_1.entity.AssignType;
-import com.agasa.xd_f371_v0_0_1.entity.LoaiXangDau;
-import com.agasa.xd_f371_v0_0_1.entity.Quarter;
-import com.agasa.xd_f371_v0_0_1.entity.TonkhoTong;
+import com.agasa.xd_f371_v0_0_1.entity.*;
 import com.agasa.xd_f371_v0_0_1.model.AssignTypeEnum;
 import com.agasa.xd_f371_v0_0_1.model.TTPhieuModel;
 import com.agasa.xd_f371_v0_0_1.service.*;
@@ -59,7 +56,9 @@ public class DashboardController implements Initializable {
     public static Stage ctStage;
     public static String so_clicked;
     public static AssignType assignType;
+    public static List<Ledger> ledgerList = new ArrayList<>();
     private static List<TTPhieuModel> ttp_ls = new ArrayList<>();
+
     public static List<TonkhoTong> prepare_addnew_inventory = new ArrayList<>();
     public static List<TonkhoTong> root_inventory = new ArrayList<>();
     private static List<LichsuXNK> lichsuXNKS = new ArrayList<>();
@@ -106,6 +105,7 @@ public class DashboardController implements Initializable {
     @FXML
     private LedgerDetailsService ledgerDetailsService = new LedgerDetailsImp();
     private LichsuNXKService lichsuNXKService = new LichsuNXKImp();
+    private LedgerService ledgerService = new LedgerImp();
     private QuarterService quarterService = new QuarterImp();
     private LoaiXdService loaiXdService = new LoaiXdImp();
     private TonkhoTongService tonkhoTongService = new TonkhoTongImp();
@@ -121,6 +121,7 @@ public class DashboardController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ttp_ls = new ArrayList<>();
         lichsuXNKS = new ArrayList<>();
+        ledgerList = ledgerService.getAll();
         root_inventory = tonkhoTongService.getAll();
         assignType = mucgiaService.findByName(AssignTypeEnum.NVDX.getName());
         getDataToChart(root_inventory);

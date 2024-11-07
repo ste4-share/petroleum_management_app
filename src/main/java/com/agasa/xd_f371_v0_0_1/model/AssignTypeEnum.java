@@ -5,11 +5,14 @@ public enum AssignTypeEnum {
     HH("HH"),
     NLTT_MD("NLTT_MD"),
     NLTT_TK("NLTT_TK"),
+    NLTT_SUM("NLTT_SUM"),
     HD_MD("HD_MD"),
     HD_TK("HD_TK"),
+    HD_SUM("HD_SUM"),
     NL("NL"),
     GB_MD("GB_MD"),
     GB_TK("GB_TK"),
+    GB_SUM("GB_SUM"),
     SSCD("SSCD");
 
     public final String name;

@@ -2,6 +2,7 @@ package com.agasa.xd_f371_v0_0_1.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.postgresql.util.PGInterval;
 
 @Getter
 @Setter
@@ -56,9 +57,8 @@ public class LedgerDetails {
     private int import_unit_id;
     private int export_unit_id;
     private int tructhuoc_id;
-    private int so_gio_tk;
-    private int so_phut_tk;
     private String loaigiobay;
+    private PGInterval dur;
 
     public LedgerDetails() {
     }

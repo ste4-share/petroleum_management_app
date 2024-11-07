@@ -8,12 +8,12 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -94,7 +94,7 @@
                                                       <Font name="Cambria Bold" size="16.0" />
                                                    </font>
                                                 </Label>
-                                                <TextField fx:id="so_tf_k" prefHeight="40.0" prefWidth="327.0">
+                                                <TextField fx:id="so_tf_k" onKeyReleased="#so_x1" prefHeight="40.0" prefWidth="327.0">
                                                    <cursor>
                                                       <Cursor fx:constant="TEXT" />
                                                    </cursor></TextField>
@@ -452,9 +452,9 @@
             </Tab>
             <Tab fx:id="tab_nhiemvu" closable="false" text="Nhiệm vụ">
                <content>
-                  <VBox prefHeight="873.0" prefWidth="1172.0">
+                  <VBox prefHeight="833.0" prefWidth="1172.0">
                      <children>
-                        <HBox prefHeight="662.0" prefWidth="1172.0">
+                        <HBox prefHeight="593.0" prefWidth="1172.0">
                            <children>
                               <GridPane prefHeight="564.0" prefWidth="1122.0">
                                  <columnConstraints>
@@ -563,7 +563,7 @@
                                                       <Font name="Cambria Bold" size="16.0" />
                                                    </font>
                                                 </Label>
-                                                <TextField fx:id="so_tf_nv" prefHeight="40.0" prefWidth="327.0">
+                                                <TextField fx:id="so_tf_nv" onKeyReleased="#so_keyboard" prefHeight="40.0" prefWidth="327.0">
                                                    <cursor>
                                                       <Cursor fx:constant="TEXT" />
                                                    </cursor></TextField>
@@ -699,69 +699,6 @@
                                                    <font>
                                                       <Font name="Cambria Bold" size="16.0" />
                                                    </font>
-                                                </Label>
-                                                <Label fx:id="md_time" layoutX="352.0" layoutY="10.0" prefHeight="23.0" prefWidth="83.0" text="(Phút)">
-                                                   <font>
-                                                      <Font name="Cambria Bold" size="16.0" />
-                                                   </font>
-                                                   <HBox.margin>
-                                                      <Insets left="10.0" />
-                                                   </HBox.margin>
-                                                </Label>
-                                             </children>
-                                          </HBox>
-                                          <HBox layoutX="10.0" layoutY="460.0" prefHeight="40.0" prefWidth="523.0">
-                                             <children>
-                                                <Label prefHeight="40.0" prefWidth="197.0" text="Giờ H.Đ Trên không:">
-                                                   <font>
-                                                      <Font name="Cambria Bold" size="16.0" />
-                                                   </font>
-                                                </Label>
-                                                <TextField fx:id="sogio_tk_tf_nv" prefHeight="40.0" prefWidth="90.0">
-                                                   <cursor>
-                                                      <Cursor fx:constant="TEXT" />
-                                                   </cursor>
-                                                </TextField>
-                                                <Label prefHeight="40.0" prefWidth="45.0" text="(Giờ)">
-                                                   <font>
-                                                      <Font name="Cambria Bold" size="16.0" />
-                                                   </font>
-                                                   <HBox.margin>
-                                                      <Insets left="10.0" />
-                                                   </HBox.margin>
-                                                </Label>
-                                                <TextField fx:id="sophut_tk_tf_nv" prefHeight="40.0" prefWidth="90.0">
-                                                   <cursor>
-                                                      <Cursor fx:constant="TEXT" />
-                                                   </cursor>
-                                                </TextField>
-                                                <Label prefHeight="40.0" prefWidth="83.0" text="(Phút)">
-                                                   <font>
-                                                      <Font name="Cambria Bold" size="16.0" />
-                                                   </font>
-                                                   <HBox.margin>
-                                                      <Insets left="10.0" />
-                                                   </HBox.margin>
-                                                </Label>
-                                             </children>
-                                             <VBox.margin>
-                                                <Insets top="10.0" />
-                                             </VBox.margin>
-                                          </HBox>
-                                          <HBox layoutX="10.0" layoutY="460.0" prefHeight="25.0" prefWidth="546.0">
-                                             <children>
-                                                <Label prefHeight="40.0" prefWidth="197.0">
-                                                   <font>
-                                                      <Font name="Cambria Bold" size="16.0" />
-                                                   </font>
-                                                </Label>
-                                                <Label fx:id="tk_time" layoutX="352.0" layoutY="10.0" prefHeight="23.0" prefWidth="83.0" text="(Phút)">
-                                                   <font>
-                                                      <Font name="Cambria Bold" size="16.0" />
-                                                   </font>
-                                                   <HBox.margin>
-                                                      <Insets left="10.0" />
-                                                   </HBox.margin>
                                                 </Label>
                                              </children>
                                           </HBox>
@@ -993,7 +930,7 @@
                         </HBox>
                         <VBox prefHeight="212.0" prefWidth="1133.0">
                            <children>
-                              <TableView fx:id="tbXuat_nv" prefHeight="200.0" prefWidth="200.0">
+                              <TableView fx:id="tbXuat_nv" prefHeight="248.0" prefWidth="1152.0">
                                  <columns>
                                     <TableColumn fx:id="col_stt_nv" prefWidth="49.0" text="STT" />
                                     <TableColumn fx:id="col_tenxd_nv" prefWidth="156.0" text="TÊN XĂNG DẦU" />

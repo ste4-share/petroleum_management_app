@@ -174,7 +174,7 @@ public class LedgerImp implements LedgerService {
     @Override
     public Ledger createNew(Ledger ledger) {
         QDatabase.getConnectionDB();
-        String sql = "insert into ledgers(quarter_id, bill_id, amount, from_date, end_date, status,bill_type_id) values(?,?,?,?,?,?,?)";
+        String sql = "insert into ledgers(quarter_id, bill_id, amount, from_date, end_date, status,bill_type_id) values(?,?,?,?,?,?,?) on conflict do nothing";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
             statement.setInt(1, ledger.getQuarter_id());

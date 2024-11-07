@@ -5,6 +5,7 @@ import com.agasa.xd_f371_v0_0_1.entity.*;
 import com.agasa.xd_f371_v0_0_1.fatory.CommonFactory;
 import com.agasa.xd_f371_v0_0_1.model.*;
 import com.agasa.xd_f371_v0_0_1.util.TextToNumber;
+import jakarta.transaction.Transactional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -13,13 +14,16 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.TextFields;
+import org.postgresql.util.PGInterval;
 
 import java.net.URL;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -37,6 +41,7 @@ public class XuatController extends CommonFactory implements Initializable {
     private static int click_index;
     private boolean addedBySelection_lstb = false;
     private static List<LedgerDetails> ls_socai;
+    private static List<Ledger> ledgerList = new ArrayList<>();
     private static PhuongTienNhiemVu phuongTienNhiemVu_selected = new PhuongTienNhiemVu();
     private static List<ChiTietNhiemVuDTO> chiTietNhiemVuDTO_list = new ArrayList<>();
     private static ChiTietNhiemVuDTO nhiemVu_selected=  new ChiTietNhiemVuDTO();
@@ -46,8 +51,6 @@ public class XuatController extends CommonFactory implements Initializable {
             so_tf_nv,nguoinhan_tf_nv,tcx_tf_nhiemvu,lenhso_tf_nv,soxe_tf_nv,sokm_tf_nv,
             sogio_md_tf_nv,
             sophut_md_tf_nv,
-            sogio_tk_tf_nv,
-            sophut_tk_tf_nv,
             phaixuat_tf_nv,nhietdothucte_tf_nv,vcf_tf_nv,tytrong_tf_nv,thucxuat_tf_nv;
     @FXML
     private CheckBox maybay_chkbox,xe_chkbox,may_chkbox;
@@ -82,6 +85,7 @@ public class XuatController extends CommonFactory implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ls_socai = new ArrayList<>();
+//        ledgerList = DashboardController.ledgerList;
         chiTietNhiemVuDTO_list = nhiemVuService.getNvAndCtnv();
         lp_id_pre = loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_XUAT);
         ls_tcn = tcnService.getAllByBillTypeId(lp_id_pre.getId());
@@ -447,8 +451,6 @@ public class XuatController extends CommonFactory implements Initializable {
             setPhuongTienNhan(LoaiPTEnum.MAY.getNameVehicle());
         }else if (xe_chkbox.isSelected()) {
             lgb_hbox.setDisable(true);
-            sogio_tk_tf_nv.setDisable(true);
-            sophut_tk_tf_nv.setDisable(true);
             setPhuongTienNhan(LoaiPTEnum.XE.getNameVehicle());
         }else{
             lgb_hbox.setDisable(false);
@@ -780,11 +782,9 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setThanh_tien(Long.parseLong(thucxuat_tf_nv.getText()) * mucgia_id_selected_mucgia_cbb_nv.getPrice());
             ledgerDetails.setDvvc(cbb_dvx_nv.getSelectionModel().getSelectedItem().getTen());
             ledgerDetails.setDvi(cbb_dvn_nv.getValue().getName());
-            ledgerDetails.setNhiemvu_id(nhiemVu_selected.getId());
+            ledgerDetails.setNhiemvu_id(nhiemVu_selected.getCtnv_id());
             ledgerDetails.setSo_gio(Integer.parseInt(sogio_md_tf_nv.getText().isEmpty() ? "0" : sogio_md_tf_nv.getText()));
             ledgerDetails.setSo_phut(Integer.parseInt(sophut_md_tf_nv.getText().isEmpty() ? "0" : sophut_md_tf_nv.getText()));
-            ledgerDetails.setSo_gio_tk(Integer.parseInt(sogio_tk_tf_nv.getText().isEmpty() ? "0" : sogio_tk_tf_nv.getText()));
-            ledgerDetails.setSo_phut_tk(Integer.parseInt(sophut_tk_tf_nv.getText().isEmpty() ? "0" : sophut_tk_tf_nv.getText()));
             ledgerDetails.setSo_km(Integer.parseInt(sokm_tf_nv.getText().isEmpty() ? "0" : sokm_tf_nv.getText()));
             ledgerDetails.setDenngay(denngay_dp_nv.getValue()==null ? "" : denngay_dp_nv.getValue().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
             ledgerDetails.setXd(cbb_tenxd_nv.getSelectionModel().getSelectedItem());
@@ -795,10 +795,50 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setLoaixd_id(cbb_tenxd_nv.getSelectionModel().getSelectedItem().getId());
             ledgerDetails.setImport_unit_id(cbb_dvx_nv.getSelectionModel().getSelectedItem().getId());
             ledgerDetails.setLoaigiobay(tk_radio.isSelected() ? LoaiGB.TK.getName() : LoaiGB.MD.getName());
-        } catch (NullPointerException e) {
+            System.out.println("time: "+getStrInterval());
+            ledgerDetails.setDur(new PGInterval(getStrInterval()));
+        } catch (NullPointerException | SQLException e) {
             throw new NullPointerException(e.getMessage());
         }
         return ledgerDetails;
+    }
+
+    private String getStrInterval(){
+        String hour_str = sogio_md_tf_nv.getText().trim();
+        String m_str = sophut_md_tf_nv.getText().trim();
+
+        if (hour_str.isEmpty() && m_str.isEmpty()){
+            return "00:00";
+        } else if (hour_str.isEmpty()) {
+            int minute = Integer.parseInt(m_str);
+            int hour = 0;
+            if (minute>=60){
+                int remainder = minute%60;
+                int inter = minute/60;
+                return (hour+inter) + ":" + remainder;
+            }else if (minute==0){
+                return hour + ":00";
+            }
+            else if (minute>=0 && minute<60){
+                return hour + ":" +minute;
+            }
+        } else if (m_str.isEmpty()) {
+            return hour_str +":00";
+        }
+        int minute = Integer.parseInt(m_str);
+        int hour = Integer.parseInt(hour_str);
+        if (minute>=60){
+            int remainder = minute%60;
+            int inter = minute/60;
+            return (hour+inter) + ":" + remainder;
+        }else if (minute==0){
+            return hour + ":00";
+        }
+        else if (minute>=0 && minute<60){
+            return hour + ":" +minute;
+        }
+
+        return null;
     }
 
     @FXML
@@ -817,8 +857,6 @@ public class XuatController extends CommonFactory implements Initializable {
         if (maybay_chkbox.isSelected()){
             setPhuongTienNhan(LoaiPTEnum.MAYBAY_a.getNameVehicle());
             sokm_tf_nv.setDisable(true);
-            sogio_tk_tf_nv.setDisable(false);
-            sophut_tk_tf_nv.setDisable(false);
         }
     }
 
@@ -830,8 +868,6 @@ public class XuatController extends CommonFactory implements Initializable {
         if (xe_chkbox.isSelected()){
             setPhuongTienNhan(LoaiPTEnum.XE.getNameVehicle());
             sokm_tf_nv.setDisable(false);
-            sogio_tk_tf_nv.setDisable(true);
-            sophut_tk_tf_nv.setDisable(true);
         }
     }
 
@@ -843,8 +879,6 @@ public class XuatController extends CommonFactory implements Initializable {
         if (may_chkbox.isSelected()){
             setPhuongTienNhan(LoaiPTEnum.MAY.getNameVehicle());
             sokm_tf_nv.setDisable(false);
-            sogio_tk_tf_nv.setDisable(true);
-            sophut_tk_tf_nv.setDisable(true);
         }
     }
 
@@ -858,4 +892,28 @@ public class XuatController extends CommonFactory implements Initializable {
     public void dvnSelectedAction(ActionEvent actionEvent) {
     }
 
+    @FXML
+    public void so_x1(KeyEvent keyEvent) {
+        try {
+            if (!so_tf_k.getText().isEmpty()){
+                if (DashboardController.ledgerList.stream().filter(x->x.getBill_id()==Integer.parseInt(so_tf_k.getText())).findFirst().isPresent()){
+                    so_tf_k.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
+                } else {
+                    so_tf_k.setStyle(null);
+                }
+            }
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+    @FXML
+    public void so_keyboard(KeyEvent keyEvent) {
+        if (!so_tf_nv.getText().isEmpty()){
+            if (DashboardController.ledgerList.stream().filter(x->x.getBill_id()==Integer.parseInt(so_tf_nv.getText())).findFirst().isPresent()){
+                so_tf_nv.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
+            } else {
+                so_tf_nv.setStyle(null);
+            }
+        }
+    }
 }
