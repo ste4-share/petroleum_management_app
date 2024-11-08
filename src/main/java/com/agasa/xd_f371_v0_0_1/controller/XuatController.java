@@ -19,12 +19,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.TextFields;
+import org.jetbrains.annotations.TestOnly;
 import org.postgresql.util.PGInterval;
 
 import java.net.URL;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -86,6 +88,8 @@ public class XuatController extends CommonFactory implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ls_socai = new ArrayList<>();
 //        ledgerList = DashboardController.ledgerList;
+        sogio_md_tf_nv.setText("00");
+        sophut_md_tf_nv.setText("00");
         chiTietNhiemVuDTO_list = nhiemVuService.getNvAndCtnv();
         lp_id_pre = loaiPhieuService.findLoaiPhieuByType(LoaiPhieu_cons.PHIEU_XUAT);
         ls_tcn = tcnService.getAllByBillTypeId(lp_id_pre.getId());
@@ -775,7 +779,6 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setSo_xe(soxe_tf_nv.getText());
             ledgerDetails.setDon_gia(cbb_dongia_nv.getSelectionModel().getSelectedItem().getPrice());
             ledgerDetails.setPhai_xuat(Integer.parseInt(phaixuat_tf_nv.getText()));
-            ledgerDetails.setThuc_xuat(Integer.parseInt(thucxuat_tf_nv.getText()));
             ledgerDetails.setNhiet_do_tt(Double.parseDouble(nhietdothucte_tf_nv.getText().isEmpty() ? "0" : nhietdothucte_tf_nv.getText()));
             ledgerDetails.setHe_so_vcf(Integer.parseInt(vcf_tf_nv.getText().isEmpty() ? "0" : vcf_tf_nv.getText()));
             ledgerDetails.setTy_trong(Double.parseDouble(tytrong_tf_nv.getText().isEmpty() ? "0" : tytrong_tf_nv.getText()));
@@ -795,8 +798,18 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setLoaixd_id(cbb_tenxd_nv.getSelectionModel().getSelectedItem().getId());
             ledgerDetails.setImport_unit_id(cbb_dvx_nv.getSelectionModel().getSelectedItem().getId());
             ledgerDetails.setLoaigiobay(tk_radio.isSelected() ? LoaiGB.TK.getName() : LoaiGB.MD.getName());
-            System.out.println("time: "+getStrInterval());
             ledgerDetails.setDur(new PGInterval(getStrInterval()));
+            if (tk_radio.isSelected()){
+                ledgerDetails.setDur_text_tk(getStrIntervalText());
+                ledgerDetails.setDur_text("0.00:00:00");
+                ledgerDetails.setThuc_xuat_tk(Integer.parseInt(thucxuat_tf_nv.getText()));
+                ledgerDetails.setThuc_xuat(0);
+            }else {
+                ledgerDetails.setDur_text_tk("0.00:00:00");
+                ledgerDetails.setThuc_xuat(Integer.parseInt(thucxuat_tf_nv.getText()));
+                ledgerDetails.setDur_text(getStrIntervalText());
+                ledgerDetails.setThuc_xuat_tk(0);
+            }
         } catch (NullPointerException | SQLException e) {
             throw new NullPointerException(e.getMessage());
         }
@@ -807,38 +820,58 @@ public class XuatController extends CommonFactory implements Initializable {
         String hour_str = sogio_md_tf_nv.getText().trim();
         String m_str = sophut_md_tf_nv.getText().trim();
 
-        if (hour_str.isEmpty() && m_str.isEmpty()){
-            return "00:00";
-        } else if (hour_str.isEmpty()) {
-            int minute = Integer.parseInt(m_str);
-            int hour = 0;
-            if (minute>=60){
-                int remainder = minute%60;
-                int inter = minute/60;
-                return (hour+inter) + ":" + remainder;
-            }else if (minute==0){
-                return hour + ":00";
-            }
-            else if (minute>=0 && minute<60){
-                return hour + ":" +minute;
-            }
-        } else if (m_str.isEmpty()) {
-            return hour_str +":00";
-        }
-        int minute = Integer.parseInt(m_str);
-        int hour = Integer.parseInt(hour_str);
-        if (minute>=60){
-            int remainder = minute%60;
-            int inter = minute/60;
-            return (hour+inter) + ":" + remainder;
-        }else if (minute==0){
-            return hour + ":00";
-        }
-        else if (minute>=0 && minute<60){
-            return hour + ":" +minute;
-        }
+        int hour1 = getHourMinute(Integer.parseInt(m_str)).get(0);
+        int minute = getHourMinute(Integer.parseInt(m_str)).get(1);
+        int sum_hour = Integer.parseInt(hour_str) + hour1;
 
-        return null;
+        if (minute <10){
+            return sum_hour+":0"+minute+":00";
+        }
+        if (sum_hour<10){
+            return "0"+sum_hour+":"+minute+":00";
+        }
+        return sum_hour+":"+minute+":00";
+    }
+    private String getStrIntervalText(){
+        String hour_str = sogio_md_tf_nv.getText().trim();
+        String m_str = sophut_md_tf_nv.getText().trim();
+
+        int hour1 = getHourMinute(Integer.parseInt(m_str)).get(0);
+        int minute = getHourMinute(Integer.parseInt(m_str)).get(1);
+        int sum_hour = Integer.parseInt(hour_str) + hour1;
+        int day = getDayHours(sum_hour).get(0);
+        int hour = getDayHours(sum_hour).get(1);
+        if (minute <10){
+            return day+"."+hour+":0"+minute+":00";
+        }
+        if (hour<10){
+            return day+"."+"0"+hour+":"+minute+":00";
+        }
+        return day+"."+hour+":"+minute+":00";
+    }
+
+    private List<Integer> getDayHours(int hour){
+        if (hour>=0 && hour <24){
+            return List.of(0,hour);
+        }
+        else if (hour>=24){
+            int day = hour/24;
+            int remainder_hour = hour%24;
+            return List.of(day, remainder_hour);
+        }
+        return List.of();
+    }
+
+    private List<Integer> getHourMinute(int minute){
+        if (minute>=0 && minute <60){
+            return List.of(0,minute);
+        }
+        else if (minute>=60){
+            int hour = minute/60;
+            int remainder_minute = minute%60;
+            return List.of(hour, remainder_minute);
+        }
+        return List.of();
     }
 
     @FXML

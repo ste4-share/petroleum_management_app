@@ -59,6 +59,9 @@ public class LedgerDetails {
     private int tructhuoc_id;
     private String loaigiobay;
     private PGInterval dur;
+    private String dur_text;
+    private int thuc_xuat_tk;
+    private String dur_text_tk;
 
     public LedgerDetails() {
     }

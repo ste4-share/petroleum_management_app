@@ -11,10 +11,7 @@ import org.postgresql.util.PGInterval;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class LedgerDetailsImp implements LedgerDetailsService {
     private LoaiXdService loaiXdService = new LoaiXdImp();
@@ -69,6 +66,10 @@ public class LedgerDetailsImp implements LedgerDetailsService {
                 int import_unit_id = resultSet.getInt("import_unit_id");
                 int export_unit_id = resultSet.getInt("export_unit_id");
                 String loaigiobay = resultSet.getString("loaigiobay");
+                PGInterval dur = (PGInterval) resultSet.getObject("dur");
+                String durText = resultSet.getString("dur_text");
+                int thucXuatTk = resultSet.getInt("thuc_xuat_tk");
+                String durTextTk = resultSet.getString("dur_text_tk");
 
                 LedgerDetails obj = new LedgerDetails();
                 obj.setId(id);
@@ -110,6 +111,10 @@ public class LedgerDetailsImp implements LedgerDetailsService {
                 obj.setImport_unit_id(import_unit_id);
                 obj.setExport_unit_id(export_unit_id);
                 obj.setLoaigiobay(loaigiobay);
+                obj.setDur(dur);
+                obj.setDur_text(durText);
+                obj.setThuc_xuat_tk(thucXuatTk);
+                obj.setDur_text_tk(durTextTk);
                 result.add(obj);
             }
 
@@ -128,8 +133,8 @@ public class LedgerDetailsImp implements LedgerDetailsService {
         String sql = "INSERT INTO ledger_details (dvi, ngay, ma_xd, ten_xd, chung_loai, loai_phieu, so, theo_lenh_so, nhiem_vu, nguoi_nhan_hang, " +
                 "so_xe, chat_luong, phai_xuat, nhiet_do_tt, ty_trong, he_so_vcf, thuc_xuat, don_gia, thanh_tien, so_km, so_gio, dvvc," +
                 "loaixd_id, nguonnx_id, nguonnx_dvvc_id, denngay," +
-                "nvu_tcn_id,nvu_tructhuoc,quarter_id,phuongtien_id,nhiemvu_id,phuongtien_nvu_id,so_phut,tonkhotong_id,tonkho_id,ledger_id, tcn_id,import_unit_id,export_unit_id,loaigiobay,dur) " +
-                "VALUES (?, ?,?, ?, ?,?, ?, ?, ?, ?,?,?,?,?, ?,?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "nvu_tcn_id,nvu_tructhuoc,quarter_id,phuongtien_id,nhiemvu_id,phuongtien_nvu_id,so_phut,tonkhotong_id,tonkho_id,ledger_id, tcn_id,import_unit_id,export_unit_id,loaigiobay,dur,dur_text,thuc_xuat_tk,dur_text_tk) " +
+                "VALUES (?, ?,?, ?, ?,?, ?, ?, ?, ?,?,?,?,?, ?,?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
             statement.setString(2, ledgerDetails.getNgay());
@@ -178,6 +183,9 @@ public class LedgerDetailsImp implements LedgerDetailsService {
             statement.setInt(39, ledgerDetails.getExport_unit_id());
             statement.setString(40, ledgerDetails.getLoaigiobay());
             statement.setObject(41, ledgerDetails.getDur());
+            statement.setString(42, ledgerDetails.getDur_text());
+            statement.setInt(43, ledgerDetails.getThuc_xuat_tk());
+            statement.setString(44, ledgerDetails.getDur_text_tk());
 
             statement.executeUpdate();
         } catch (SQLException e) {
