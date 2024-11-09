@@ -59,7 +59,7 @@ public class ChiTietSCController implements Initializable {
         List<LedgerDetails> ledgerDetailsList = ledgerDetailsService.getChiTietSoCai(DashboardController.so_clicked);
         for (LedgerDetails ledgerDetails : ledgerDetailsList) {
             ledgerDetails.setStt(index_val + 1);
-            ledgerDetails.setThuc_xuat_str(TextToNumber.textToNum(String.valueOf(ledgerDetails.getThuc_xuat())));
+            ledgerDetails.setThuc_xuat_str(TextToNumber.textToNum(String.valueOf(ledgerDetails.getSoluong())));
             ledgerDetails.setPhai_xuat_str(TextToNumber.textToNum(String.valueOf(ledgerDetails.getPhai_xuat())));
             ledgerDetails.setThanh_tien_str(TextToNumber.textToNum(String.valueOf(ledgerDetails.getThanh_tien())));
             ls.add(ledgerDetails);

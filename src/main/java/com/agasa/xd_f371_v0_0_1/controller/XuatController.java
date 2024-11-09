@@ -18,6 +18,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
+import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.textfield.TextFields;
 import org.jetbrains.annotations.TestOnly;
 import org.postgresql.util.PGInterval;
@@ -31,6 +32,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class XuatController extends CommonFactory implements Initializable {
 
     private static int stt = 0;
@@ -361,7 +363,7 @@ public class XuatController extends CommonFactory implements Initializable {
         col_tenxd_nv.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("ten_xd"));
         col_dongia_nv.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("don_gia"));
         col_phaixuat_nv.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("phai_xuat"));
-        col_thucxuat_nv.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("thuc_xuat"));
+        col_thucxuat_nv.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("soluong"));
         col_nhietdo_nv.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("nhiet_do_tt"));
         col_vcf_nv.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("he_so_vcf"));
         col_tytrong_nv.setCellValueFactory(new PropertyValueFactory<LedgerDetails, String>("ty_trong"));
@@ -411,6 +413,9 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setLoaixd_id(cbb_tenxd_k.getSelectionModel().getSelectedItem().getId());
             ledgerDetails.setExport_unit_id(cbb_dvx_k.getSelectionModel().getSelectedItem().getId());
             ledgerDetails.setImport_unit_id(cbb_dvn_xk.getSelectionModel().getSelectedItem().getId());
+            ledgerDetails.setDur_text("0.00:00:00");
+            ledgerDetails.setDur_text_tk("0.00:00:00");
+            ledgerDetails.setSoluong(Integer.parseInt(thucxuat_tf_k.getText()));
         } catch (NullPointerException e) {
             throw new NullPointerException(e.getMessage());
         }
@@ -580,7 +585,7 @@ public class XuatController extends CommonFactory implements Initializable {
 
     private void saveLichsuxnk(LedgerDetails soCaiDto) {
         Inventory inventory = tonKhoService.findByUniqueId(soCaiDto.getLoaixd_id(), DashboardController.findByTime.getId());
-        int tonsau = inventory.getPre_nvdx() - soCaiDto.getThuc_xuat();
+        int tonsau = inventory.getPre_nvdx() - soCaiDto.getSoluong();
         int tontruoc = inventory.getPre_nvdx();
         createNewTransaction(soCaiDto, tontruoc, tonsau);
     }
@@ -588,9 +593,9 @@ public class XuatController extends CommonFactory implements Initializable {
     private void saveMucgia(LedgerDetails soCaiDto){
         Mucgia mucgia_existed = mucgiaService.findMucgiaByGia(soCaiDto.getXd().getId(), soCaiDto.getQuarter_id(), soCaiDto.getDon_gia(),DashboardController.assignType.getId());
         if (mucgia_existed==null){
-            createNewMucgia(soCaiDto, soCaiDto.getThuc_xuat()*(-1));
+            createNewMucgia(soCaiDto, soCaiDto.getSoluong()*(-1));
         }else{
-            int quantityPerPrice = mucgia_existed.getAmount() - soCaiDto.getThuc_xuat();
+            int quantityPerPrice = mucgia_existed.getAmount() - soCaiDto.getSoluong();
             updateMucgia(quantityPerPrice, mucgia_existed);
         }
     }
@@ -602,7 +607,7 @@ public class XuatController extends CommonFactory implements Initializable {
         int amount = 0;
         for (int i =0; i< ls_socai.size(); i++){
             LedgerDetails ledgerDetails = ls_socai.get(i);
-            amount = amount + (ledgerDetails.getDon_gia()*ledgerDetails.getThuc_xuat());
+            amount = amount + (ledgerDetails.getDon_gia()*ledgerDetails.getSoluong());
         }
         ledger.setAmount(amount);
         ledger.setFrom_date(java.sql.Date.valueOf(tungay));
@@ -799,21 +804,29 @@ public class XuatController extends CommonFactory implements Initializable {
             ledgerDetails.setImport_unit_id(cbb_dvx_nv.getSelectionModel().getSelectedItem().getId());
             ledgerDetails.setLoaigiobay(tk_radio.isSelected() ? LoaiGB.TK.getName() : LoaiGB.MD.getName());
             ledgerDetails.setDur(new PGInterval(getStrInterval()));
+            ledgerDetails.setNhiemvu_hanmuc_id(getNhiemvuhanmucId());
             if (tk_radio.isSelected()){
                 ledgerDetails.setDur_text_tk(getStrIntervalText());
                 ledgerDetails.setDur_text("0.00:00:00");
                 ledgerDetails.setThuc_xuat_tk(Integer.parseInt(thucxuat_tf_nv.getText()));
+                ledgerDetails.setSoluong(Integer.parseInt(thucxuat_tf_nv.getText()));
                 ledgerDetails.setThuc_xuat(0);
             }else {
                 ledgerDetails.setDur_text_tk("0.00:00:00");
                 ledgerDetails.setThuc_xuat(Integer.parseInt(thucxuat_tf_nv.getText()));
                 ledgerDetails.setDur_text(getStrIntervalText());
+                ledgerDetails.setSoluong(Integer.parseInt(thucxuat_tf_nv.getText()));
                 ledgerDetails.setThuc_xuat_tk(0);
             }
         } catch (NullPointerException | SQLException e) {
             throw new NullPointerException(e.getMessage());
         }
         return ledgerDetails;
+    }
+
+    private int getNhiemvuhanmucId(){
+        HanmucNhiemvu hanmucNhiemvu = nhiemVuService.getHanmucNhiemvu(cbb_dvx_nv.getValue().getId(),nhiemVu_selected.getCtnv_id(),DashboardController.findByTime.getId());
+        return hanmucNhiemvu.getId();
     }
 
     private String getStrInterval(){

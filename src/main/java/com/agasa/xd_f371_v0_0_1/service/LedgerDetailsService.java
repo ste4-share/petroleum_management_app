@@ -14,15 +14,9 @@ public interface LedgerDetailsService {
     List<TTPhieuDto> getTTPhieu();
     List<TTPhieuDto> getTTPhieu_ByLoaiPhieu(String loaiPhieu);
     List<LedgerDetails> getChiTietSoCai(String so);
-    List<XdTrucThuocDto> findTrucThuocByNameXd(String loaiphieu, String tenxd);
-    QuantityByTructhuocDTO selectQuantityByTT(String loaiphieu, int xd_id);
     QuantityByTTDTO selectQuantityNguonnx(int groupid, String loaiphieu, int tructhuoc_id,int xdid);
     QuantityByTTDTO selectQuantityNguonnxImport(int group_id, String loaiphieu, int tructhuoc_id, int loaixdId);
-    QuantityByTTDTO selectQuantityNguonnxExport(int group_id, String loaiphieu, int tructhuoc_id, int loaixdId);
 
     GioBay getSumofWorkingTime(int pt_id, int quarterId, String lgb);
-    GioBay getSumofWorkingTime_byNvid(int nv_id, int quarterId, String lgb);
-    int getHHByNV(int nv_id, int quarterId);
     Map<String, Integer> getSumofconsumption(int pt_id, int quarterID);
-    Map<String, Integer> getSumofconsumption_nvuId(int nvu_id, int quarterID);
 }

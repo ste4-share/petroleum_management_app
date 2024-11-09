@@ -14,6 +14,7 @@ public interface NhiemVuService {
     List<NhiemVuDto> getAllNVDTO(int khoi);
     NhiemVu create(NhiemVu nhiemVu);
     int createHanmucNhiemVu(HanmucNhiemvu hanmucNhiemvu);
+    HanmucNhiemvu findHanmucNhiemVu(int quarter_id, int unit_id, int nhiemvu_id);
     HanmucNhiemvu getHanmucNhiemvu(int unit_id, int nhiemvu_id, int quarter_id);
     int create(NhiemVuReport nhiemVuReport);
     NhiemVu update(NhiemVu nhiemVu);
@@ -21,4 +22,5 @@ public interface NhiemVuService {
     NhiemVu findById(int id);
     NhiemVu findByTenNv(String tennv, String ct);
     List<ChiTietNhiemVuDTO> getNvAndCtnv();
+    List<ChiTietNhiemVuDTO> getAllCtnvByType(int type);
 }

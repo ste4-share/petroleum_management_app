@@ -70,6 +70,7 @@ public class LedgerDetailsImp implements LedgerDetailsService {
                 String durText = resultSet.getString("dur_text");
                 int thucXuatTk = resultSet.getInt("thuc_xuat_tk");
                 String durTextTk = resultSet.getString("dur_text_tk");
+                int soluong = resultSet.getInt("so_luong");
 
                 LedgerDetails obj = new LedgerDetails();
                 obj.setId(id);
@@ -115,6 +116,7 @@ public class LedgerDetailsImp implements LedgerDetailsService {
                 obj.setDur_text(durText);
                 obj.setThuc_xuat_tk(thucXuatTk);
                 obj.setDur_text_tk(durTextTk);
+                obj.setSoluong(soluong);
                 result.add(obj);
             }
 
@@ -133,8 +135,8 @@ public class LedgerDetailsImp implements LedgerDetailsService {
         String sql = "INSERT INTO ledger_details (dvi, ngay, ma_xd, ten_xd, chung_loai, loai_phieu, so, theo_lenh_so, nhiem_vu, nguoi_nhan_hang, " +
                 "so_xe, chat_luong, phai_xuat, nhiet_do_tt, ty_trong, he_so_vcf, thuc_xuat, don_gia, thanh_tien, so_km, so_gio, dvvc," +
                 "loaixd_id, nguonnx_id, nguonnx_dvvc_id, denngay," +
-                "nvu_tcn_id,nvu_tructhuoc,quarter_id,phuongtien_id,nhiemvu_id,phuongtien_nvu_id,so_phut,tonkhotong_id,tonkho_id,ledger_id, tcn_id,import_unit_id,export_unit_id,loaigiobay,dur,dur_text,thuc_xuat_tk,dur_text_tk) " +
-                "VALUES (?, ?,?, ?, ?,?, ?, ?, ?, ?,?,?,?,?, ?,?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "nvu_tcn_id,nvu_tructhuoc,quarter_id,phuongtien_id,nhiemvu_id,phuongtien_nvu_id,so_phut,tonkhotong_id,tonkho_id,ledger_id, tcn_id,import_unit_id,export_unit_id,loaigiobay,dur,dur_text,thuc_xuat_tk,dur_text_tk,nhiemvu_hanmuc_id,so_luong) " +
+                "VALUES (?, ?,?, ?, ?,?, ?, ?, ?, ?,?,?,?,?, ?,?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql);
             statement.setString(2, ledgerDetails.getNgay());
@@ -186,6 +188,8 @@ public class LedgerDetailsImp implements LedgerDetailsService {
             statement.setString(42, ledgerDetails.getDur_text());
             statement.setInt(43, ledgerDetails.getThuc_xuat_tk());
             statement.setString(44, ledgerDetails.getDur_text_tk());
+            statement.setInt(45, ledgerDetails.getNhiemvu_hanmuc_id());
+            statement.setInt(46, ledgerDetails.getSoluong());
 
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -207,7 +211,7 @@ public class LedgerDetailsImp implements LedgerDetailsService {
     public List<TTPhieuDto> getTTPhieu() {
         QDatabase.getConnectionDB();
         List<TTPhieuDto> result = new ArrayList<>();
-        String SQL_SELECT = "select so,ngay, loai_phieu, dvi,dvvc,nhiem_vu,max(timestamp) as mx, string_agg(ten_xd, ', '),count(loai_phieu), SUM(thuc_xuat*don_gia::BIGINT) from ledger_details group by so,ngay, loai_phieu, dvi, dvvc, nhiem_vu order by mx DESC;";
+        String SQL_SELECT = "select so,ngay, loai_phieu, dvi,dvvc,nhiem_vu,max(timestamp) as mx, string_agg(ten_xd, ', '),count(loai_phieu), SUM(so_luong*don_gia::BIGINT) from ledger_details group by so,ngay, loai_phieu, dvi, dvvc, nhiem_vu order by mx DESC;";
         // auto close connection and preparedStatement
         try {
             PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
@@ -247,7 +251,7 @@ public class LedgerDetailsImp implements LedgerDetailsService {
         QDatabase.getConnectionDB();
         List<TTPhieuDto> result = new ArrayList<>();
 
-        String SQL_SELECT = "select so,ngay, loai_phieu, dvi,dvvc,nhiem_vu,max(timestamp) as mx, string_agg(ten_xd, ', '),count(loai_phieu), SUM(thuc_xuat*don_gia::BIGINT) from ledger_details where loai_phieu=? group by so,ngay, loai_phieu, dvi, dvvc, nhiem_vu order by mx DESC;";
+        String SQL_SELECT = "select so,ngay, loai_phieu, dvi,dvvc,nhiem_vu,max(timestamp) as mx, string_agg(ten_xd, ', '),count(loai_phieu), SUM(so_luong*don_gia::BIGINT) from ledger_details where loai_phieu=? group by so,ngay, loai_phieu, dvi, dvvc, nhiem_vu order by mx DESC;";
 
         // auto close connection and preparedStatement
         try {
@@ -338,6 +342,11 @@ public class LedgerDetailsImp implements LedgerDetailsService {
                 int import_unit_id = resultSet.getInt("import_unit_id");
                 int export_unit_id = resultSet.getInt("export_unit_id");
                 String loaigiobay = resultSet.getString("loaigiobay");
+                PGInterval dur = (PGInterval) resultSet.getObject("dur");
+                String durText = resultSet.getString("dur_text");
+                int thucXuatTk = resultSet.getInt("thuc_xuat_tk");
+                String durTextTk = resultSet.getString("dur_text_tk");
+                int soluong = resultSet.getInt("so_luong");
 
                 LedgerDetails obj = new LedgerDetails();
                 obj.setId(id);
@@ -378,6 +387,11 @@ public class LedgerDetailsImp implements LedgerDetailsService {
                 obj.setImport_unit_id(import_unit_id);
                 obj.setExport_unit_id(export_unit_id);
                 obj.setLoaigiobay(loaigiobay);
+                obj.setDur(dur);
+                obj.setDur_text(durText);
+                obj.setThuc_xuat_tk(thucXuatTk);
+                obj.setDur_text_tk(durTextTk);
+                obj.setSoluong(soluong);
                 result.add(obj);
             }
         } catch (SQLException e) {
@@ -386,95 +400,6 @@ public class LedgerDetailsImp implements LedgerDetailsService {
         }
         return result;
     }
-
-    @Override
-    public List<XdTrucThuocDto> findTrucThuocByNameXd(String loaiphieu, String chungloai) {
-        QDatabase.getConnectionDB();
-        List<XdTrucThuocDto> result = new ArrayList<>();
-
-        String SQL_SELECT = "select loaixd2.id as idxd,tructhuoc.id as tt_id, tenxd, chungloai,ledger_details.loai_phieu as loaiphieu,sum(thuc_xuat) as soluong_sum, sum(tdk_nvdx) as tdk_nvdx_sum,sum(tdk_sscd) as tdk_sscd_sum,sum(tdk_sum) as sum_tdk, tructhuoc.name as tt_name,tck_nvdx,tck_sscd,tck_sum, ut from ledger_details right join loaixd2 on ledger_details.loaixd_id= loaixd2.id join tonkho_tong on ledger_details.tonkhotong_id = tonkho_tong.id left join nguonnx_tructhuoc on ledger_details.nguonnx_tructhuoc= nguonnx_tructhuoc.id join tructhuoc on nguonnx_tructhuoc.tructhuoc_id=tructhuoc.id where ledger_details.loai_phieu=? and chungloai=? group by idxd,tt_id,tenxd,chungloai,loaiphieu, tt_name,tck_nvdx, tck_sscd, tck_sum, ut ORDER BY ut ASC;";
-        // auto close connection and preparedStatement
-        try {
-            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
-            preparedStatement.setString(1, loaiphieu);
-            preparedStatement.setString(2, chungloai);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-
-                int idxd = resultSet.getInt("idxd");
-                int tt_id = resultSet.getInt("tt_id");
-                String tenxd = resultSet.getString("tenxd");
-                String chung_loai = resultSet.getString("chungloai");
-                String loai_phieu = resultSet.getString("loai_phieu");
-                int soluong_sum = resultSet.getInt("soluong_sum");
-                int tdk_nvdx_sum = resultSet.getInt("tdk_nvdx_sum");
-                int tdk_sscd_sum = resultSet.getInt("tdk_sscd_sum");
-                int sum_tdk = resultSet.getInt("sum_tdk");
-                String tt_name = resultSet.getString("tt_name");
-                int tck_nvdx = resultSet.getInt("tck_nvdx");
-                int tck_sscd = resultSet.getInt("tck_sscd");
-                int tck_sum = resultSet.getInt("tck_sum");
-                int ut = resultSet.getInt("ut");
-
-                XdTrucThuocDto xdTrucThuocDto = new XdTrucThuocDto();
-                xdTrucThuocDto.setIdxd(idxd);
-                xdTrucThuocDto.setTt_id(tt_id);
-                xdTrucThuocDto.setTenxd(tenxd);
-                xdTrucThuocDto.setChungloai(chung_loai);
-                xdTrucThuocDto.setLoai_phieu(loai_phieu);
-                xdTrucThuocDto.setSoluong_sum(soluong_sum);
-                xdTrucThuocDto.setTdk_nvdx_sum(tdk_nvdx_sum);
-                xdTrucThuocDto.setTdk_sscd_sum(tdk_sscd_sum);
-                xdTrucThuocDto.setSum_tdk(sum_tdk);
-                xdTrucThuocDto.setTt_name(tt_name);
-                xdTrucThuocDto.setTck_nvdx(tck_nvdx);
-                xdTrucThuocDto.setTck_sscd(tck_sscd);
-                xdTrucThuocDto.setTck_sum(tck_sum);
-                xdTrucThuocDto.setUt(ut);
-                result.add(xdTrucThuocDto);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-        return result;
-    }
-
-    @Override
-    public QuantityByTructhuocDTO selectQuantityByTT(String loaiphieu, int xd_id) {
-        QDatabase.getConnectionDB();
-        String SQL_SELECT = "SELECT ten_xd, loai_phieu, tructhuoc.name as ttname, sum(thuc_xuat) as ttsum FROM public.ledger_details left join nguonnx_tructhuoc on ledger_details.nguonnx_tructhuoc =nguonnx_tructhuoc.id  left join tructhuoc on tructhuoc.id = nguonnx_tructhuoc.tructhuoc_id where loaixd_id=? and loai_phieu=? and tructhuoc.id=? group by ten_xd, loai_phieu,tructhuoc.name;";
-        // auto close connection and preparedStatement
-        try {
-            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
-            preparedStatement.setInt(1, xd_id);
-            preparedStatement.setString(2, loaiphieu);
-//            preparedStatement.setInt(3, tructhuoc_id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                String tenxd = resultSet.getString("ten_xd");
-                String loai_phieu = resultSet.getString("loai_phieu");
-                String ttname = resultSet.getString("ttname");
-                int ttsum = resultSet.getInt("ttsum");
-
-                QuantityByTructhuocDTO quantityByTructhuocDTO  = new QuantityByTructhuocDTO(tenxd,loai_phieu,ttname,ttsum);
-                return quantityByTructhuocDTO;
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-        return null;
-    }
-
     @Override
     public QuantityByTTDTO selectQuantityNguonnx(int group_id, String loaiphieu, int tructhuoc_id, int loaixdId) {
         QDatabase.getConnectionDB();
@@ -538,37 +463,6 @@ public class LedgerDetailsImp implements LedgerDetailsService {
         }
         return null;
     }
-    @Override
-    public QuantityByTTDTO selectQuantityNguonnxExport(int group_id, String loaiphieu, int tructhuoc_id, int loaixdId) {
-        QDatabase.getConnectionDB();
-        String SQL_SELECT = "SELECT title_id,tructhuoc.name as ttname,sum(thuc_xuat) FROM ledger_details \n" +
-                "join nguonnx_title on ledger_details.export_unit_id=nguonnx_title.nguonnx_id\n" +
-                "join tructhuoc on tructhuoc.id=nguonnx_title.title_id\n" +
-                "where loai_phieu=? and group_id=? and nguonnx_title.title_id=? and loaixd_id=?\n" +
-                "group by title_id, ttname";
-        // auto close connection and preparedStatement
-        try {
-            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
-            preparedStatement.setString(1, loaiphieu);
-            preparedStatement.setInt(2, group_id);
-            preparedStatement.setInt(3, tructhuoc_id);
-            preparedStatement.setInt(4, loaixdId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                int titleID = resultSet.getInt("title_id");
-                String ttname = resultSet.getString("ttname");
-                int sum = resultSet.getInt("sum");
-                return new QuantityByTTDTO(titleID,ttname,sum);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-        return null;
-    }
 
     @Override
     public GioBay getSumofWorkingTime(int pt_id, int quarter_id,String lgb) {
@@ -599,60 +493,6 @@ public class LedgerDetailsImp implements LedgerDetailsService {
     }
 
     @Override
-    public GioBay getSumofWorkingTime_byNvid(int pnv_id, int quarterId, String lgb) {
-        QDatabase.getConnectionDB();
-        String SQL_SELECT = "SELECT sum(so_gio) as h_ground,sum(so_phut) as m_ground\n" +
-                "FROM public.ledger_details\n" +
-                "WHERE loai_phieu='XUAT' AND nhiemvu_id=? and quarter_id=? and loaigiobay=? ";
-        // auto close connection and preparedStatement
-        try {
-            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
-            preparedStatement.setInt(1, pnv_id);
-            preparedStatement.setInt(2, quarterId);
-            preparedStatement.setString(3, lgb);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                int h_ground = resultSet.getInt("h_ground");
-                int m_ground = resultSet.getInt("m_ground");
-                return new GioBay(h_ground, m_ground);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-        return null;
-    }
-
-    @Override
-    public int getHHByNV(int nv_id, int quarterId) {
-        QDatabase.getConnectionDB();
-        String SQL_SELECT = "";
-        // auto close connection and preparedStatement
-        try {
-            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
-            preparedStatement.setInt(1, nv_id);
-            preparedStatement.setInt(2, quarterId);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                int h_ground = resultSet.getInt("h_ground");
-                int m_ground = resultSet.getInt("m_ground");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-        return 0;
-    }
-
-    @Override
     public Map<String, Integer> getSumofconsumption(int pt_id, int quarterId) {
         Map<String, Integer> map = new HashMap<>();
         QDatabase.getConnectionDB();
@@ -667,41 +507,6 @@ public class LedgerDetailsImp implements LedgerDetailsService {
             preparedStatement.setString(3, LoaiGB.MD.getName());
             preparedStatement.setInt(4, pt_id);
             preparedStatement.setInt(5, quarterId);
-            preparedStatement.setString(6, LoaiGB.TK.getName());
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                int sumoftk = resultSet.getInt("sumoftk");
-                int sumofmd = resultSet.getInt("sum");
-                map.put(LoaiGB.TK.getName(), sumoftk);
-                map.put(LoaiGB.MD.getName(), sumofmd);
-                return map;
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-        return null;
-    }
-
-    @Override
-    public Map<String, Integer> getSumofconsumption_nvuId(int nvu_id, int quarterID) {
-        Map<String, Integer> map = new HashMap<>();
-        QDatabase.getConnectionDB();
-        String SQL_SELECT = "SELECT sum(thuc_xuat) as sumoftk,(SELECT sum(thuc_xuat) \n" +
-                "FROM public.ledger_details WHERE loai_phieu='XUAT' and nhiemvu_id=? and quarter_id=? and loaigiobay=?)\n" +
-                "FROM public.ledger_details\n" +
-                "WHERE loai_phieu='XUAT' and nhiemvu_id=? and quarter_id=? and loaigiobay=?";
-        // auto close connection and preparedStatement
-        try {
-            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
-            preparedStatement.setInt(1, nvu_id);
-            preparedStatement.setInt(2, quarterID);
-            preparedStatement.setString(3, LoaiGB.MD.getName());
-            preparedStatement.setInt(4, nvu_id);
-            preparedStatement.setInt(5, quarterID);
             preparedStatement.setString(6, LoaiGB.TK.getName());
             ResultSet resultSet = preparedStatement.executeQuery();
 

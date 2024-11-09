@@ -223,6 +223,9 @@ public class NhapController extends CommonFactory implements Initializable {
         ledgerDetails.setLoaixd_id(cmb_tenxd.getSelectionModel().getSelectedItem().getId());
         ledgerDetails.setImport_unit_id(cmb_dvn.getSelectionModel().getSelectedItem().getId());
         ledgerDetails.setExport_unit_id(cmb_dvvc.getSelectionModel().getSelectedItem().getId());
+        ledgerDetails.setDur_text("0.00:00:00");
+        ledgerDetails.setDur_text_tk("0.00:00:00");
+        ledgerDetails.setSoluong(Integer.parseInt(thucXuatTf.getText()));
         return ledgerDetails;
     }
 

@@ -221,6 +221,11 @@ public class NhiemVuImp implements NhiemVuService {
     }
 
     @Override
+    public HanmucNhiemvu findHanmucNhiemVu(int quarter_id, int unit_id, int nhiemvu_id) {
+        return null;
+    }
+
+    @Override
     public HanmucNhiemvu getHanmucNhiemvu(int unit_id, int nhiemvu_id, int quarter_id) {
         QDatabase.getConnectionDB();
         String SQL_SELECT = "select * from hanmuc_nhiemvu where unit_id=? and nhiemvu_id=? and quarter_id=?";
@@ -375,6 +380,44 @@ public class NhiemVuImp implements NhiemVuService {
         // auto close connection and preparedStatement
         try {
             PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+
+                int id = resultSet.getInt("nvid");
+                String ten_nv = resultSet.getString("ten_nv");
+                String nhiemVu = resultSet.getString("nhiemvu");
+                int ctnv_id = resultSet.getInt("ctnvid");
+                ChiTietNhiemVuDTO chiTietNhiemVuDTO = new ChiTietNhiemVuDTO();
+                chiTietNhiemVuDTO.setId(id);
+                chiTietNhiemVuDTO.setNhiemvu(ten_nv);
+                chiTietNhiemVuDTO.setChiTietNhiemVu(nhiemVu);
+                chiTietNhiemVuDTO.setCtnv_id(ctnv_id);
+                result.add(chiTietNhiemVuDTO);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<ChiTietNhiemVuDTO> getAllCtnvByType(int type) {
+
+        QDatabase.getConnectionDB();
+        List<ChiTietNhiemVuDTO> result = new ArrayList<>();
+
+
+        String SQL_SELECT = "select nhiemvu.id as nvid,ten_nv, nhiemvu, chitiet_nhiemvu.id as ctnvid from nhiemvu join chitiet_nhiemvu on chitiet_nhiemvu.nhiemvu_id = nhiemvu.id where assignment_type_id=?;";
+
+        // auto close connection and preparedStatement
+        try {
+            PreparedStatement preparedStatement = QDatabase.conn.prepareStatement(SQL_SELECT);
+            preparedStatement.setInt(1, type);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {

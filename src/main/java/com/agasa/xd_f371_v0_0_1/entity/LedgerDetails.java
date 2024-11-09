@@ -62,6 +62,8 @@ public class LedgerDetails {
     private String dur_text;
     private int thuc_xuat_tk;
     private String dur_text_tk;
+    private int nhiemvu_hanmuc_id;
+    private int soluong;
 
     public LedgerDetails() {
     }
