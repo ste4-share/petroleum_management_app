@@ -14,6 +14,5 @@ public class HanmucNhiemvu {
     private int nhiemvu_id;
     private String ct_tk;
     private String ct_md;
-    private String sum_ct;
     private int consumpt;
 }

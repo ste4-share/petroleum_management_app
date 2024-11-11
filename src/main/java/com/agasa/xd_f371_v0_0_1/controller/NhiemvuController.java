@@ -123,11 +123,10 @@ public class NhiemvuController implements Initializable {
             for (int j=0; j< nhiemVuService.getAllCtnvByType(1).size(); j++){
                 List<AssignmentCategory> assignmentCategories = categoryService.getAllAssCategory();
                 ChiTietNhiemVuDTO ctnvDto = nhiemVuService.getAllCtnvByType(1).get(j);
-                String ct_tk = "200:20";
-                String ct_md = "200:20";
-                String sum_ct = "400:40";
+                String ct_tk = "0.20:11:00";
+                String ct_md = "0.01:12:00";
                 int consumpt =9000;
-                nhiemVuService.createHanmucNhiemVu(new HanmucNhiemvu(0, quarterId, nguonNx.getId(),ctnvDto.getCtnv_id(), ct_tk,ct_md,sum_ct,consumpt));
+                nhiemVuService.createHanmucNhiemVu(new HanmucNhiemvu(0, quarterId, nguonNx.getId(),ctnvDto.getCtnv_id(), ct_tk,ct_md,consumpt));
 //                HanmucNhiemvu hanmucNhiemvu = nhiemVuService.getHanmucNhiemvu(nguonNx.getId(), ctnvDto.getCtnv_id(), quarterId);
 //                GioBay gioBay_md = ledgerDetailsService.getSumofWorkingTime(ctnvDto.getCtnv_id(), quarterId, LoaiGB.MD.getName());
 //                GioBay gioBay_tk = ledgerDetailsService.getSumofWorkingTime(ctnvDto.getCtnv_id(), quarterId, LoaiGB.TK.getName());

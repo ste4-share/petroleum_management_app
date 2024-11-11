@@ -201,7 +201,7 @@ public class NhiemVuImp implements NhiemVuService {
     @Override
     public int createHanmucNhiemVu(HanmucNhiemvu hanmucNhiemvu) {
         QDatabase.getConnectionDB();
-        String sql = "insert into hanmuc_nhiemvu(quarter_id, unit_id, nhiemvu_id, ct_tk, ct_md, sum_ct, consumpt) values(?,?,?,?,?,?,?)";
+        String sql = "insert into hanmuc_nhiemvu(quarter_id, unit_id, nhiemvu_id, ct_tk, ct_md, consumpt) values(?,?,?,?,?,?)";
         try {
             PreparedStatement statement = QDatabase.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setInt(1, hanmucNhiemvu.getQuarter_id());
@@ -209,8 +209,7 @@ public class NhiemVuImp implements NhiemVuService {
             statement.setInt(3, hanmucNhiemvu.getNhiemvu_id());
             statement.setString(4, hanmucNhiemvu.getCt_tk());
             statement.setString(5, hanmucNhiemvu.getCt_md());
-            statement.setString(6, hanmucNhiemvu.getSum_ct());
-            statement.setInt(7, hanmucNhiemvu.getConsumpt());
+            statement.setInt(6, hanmucNhiemvu.getConsumpt());
 
             return statement.executeUpdate();
 
@@ -245,10 +244,9 @@ public class NhiemVuImp implements NhiemVuService {
                 int nhiemvuId = resultSet.getInt("nhiemvu_id");
                 String ct_tk = resultSet.getString("ct_tk");
                 String ct_md = resultSet.getString("ct_md");
-                String sum_ct = resultSet.getString("sum_ct");
                 int consumpt = resultSet.getInt("consumpt");
 
-                return new HanmucNhiemvu(id,quarterId, unitId, nhiemvuId, ct_tk,ct_md,sum_ct,consumpt);
+                return new HanmucNhiemvu(id,quarterId, unitId, nhiemvuId, ct_tk,ct_md,consumpt);
             }
 
         } catch (SQLException e) {
